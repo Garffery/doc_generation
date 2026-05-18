@@ -1,0 +1,124 @@
+# 初始化模型
+
+import os
+
+from langgraph.constants import START, END
+from langgraph.graph import StateGraph
+from typing_extensions import Literal
+from doc_generation.llm import get_chat_model
+from doc_generation import AgentState
+from langgraph.types import Command
+from doc_generation.prompts import RESEARCH_BRIEF_PROMPT, DRAFT_REPORT_PROMPT
+from langchain_core.messages import AIMessage, HumanMessage, get_buffer_string
+from rich.markdown import Markdown
+from rich.console import Console
+import logging
+
+from doc_generation.states.draft import DraftReport, ResearchQuestion, AgentInputState
+from doc_generation.utils import get_today_str
+from doc_generation.logging_config import configure_logging
+
+logger = logging.getLogger(__name__)
+draft_model = get_chat_model("draft")
+
+
+
+def write_research_brief(state: AgentState) -> Command[Literal["write_draft_report"]]:
+    """根据用户对话生成需求拆解简报（功能点列表），供后续生成开发文档草稿"""
+
+    logger.debug(
+        "write research_brief invoked with %d messages", len(state.get("messages", []))
+    )
+
+    # 组装prompt
+    prompt = RESEARCH_BRIEF_PROMPT.format(
+        messages=get_buffer_string(state.get("messages", [])),
+        date=get_today_str()
+    )
+    logger.debug("write_research_brief invoking structured_output_model with prompt_length=%d", len(prompt))
+
+    # 结构化输出
+    structured_output_model = draft_model.with_structured_output(ResearchQuestion)
+    response = structured_output_model.invoke([HumanMessage(content=prompt)])
+    logger.debug("write_research_brief produced research_brief length=%d", len(response.research_brief))
+
+    # 更新Messages并回传给主agent
+    return Command(
+            goto="write_draft_report",
+            update={"research_brief": response.research_brief}
+        )
+
+def write_draft_report(state: AgentState) -> Command[Literal["__end__"]]:
+    """根据需求拆解简报生成后端开发技术文档草稿"""
+
+    logger.debug(
+        "write_draft_report invoked with research_brief present=%s",
+        bool(state.get("research_brief")),
+    )
+
+    # 组装prompt
+    research_brief = state.get("research_brief", "")
+    draft_report_prompt = DRAFT_REPORT_PROMPT.format(
+        research_brief=research_brief,
+        date=get_today_str()
+    )
+
+    # 结构化输出
+    structured_output_model = draft_model.with_structured_output(DraftReport)
+    response = structured_output_model.invoke([HumanMessage(content=draft_report_prompt)])
+    logger.debug("write_draft_report produced draft_report length=%d", len(response.draft_report))
+
+    return {
+        "research_brief": research_brief,
+        "draft_report": response.draft_report,
+        "supervisor_messages": ["Here is the backend dev doc draft: " + response.draft_report, research_brief]
+    }
+
+
+if __name__  == "__main__":
+    configure_logging(level=os.environ.get("LOG_LEVEL", "DEBUG"))
+
+    # 构建Graph
+    deep_researcher_builder = StateGraph(AgentState, input_schema=AgentInputState)
+
+    # 增加节点
+    deep_researcher_builder.add_node("write_research_brief", write_research_brief)
+    deep_researcher_builder.add_node("write_draft_report", write_draft_report)
+
+    # 增加边
+    deep_researcher_builder.add_edge(START, "write_research_brief")
+    deep_researcher_builder.add_edge("write_research_brief", "write_draft_report")
+    deep_researcher_builder.add_edge("write_draft_report", END)
+
+    # 编译graph
+    draft_agent = deep_researcher_builder.compile()
+
+    # 打印graph
+    print(draft_agent.get_graph().draw_ascii())
+
+    # 测试问题
+    thread = {"configurable": {"thread_id": "1", "recursion_limit": 50}}
+    result = draft_agent.invoke({"messages": [HumanMessage(content="""
+    游戏中需要开发一个战令活动,这个战令总共有三档,一档免费战令,"进阶福利","天降豪礼"这两档付费直购战令。
+活动逻辑:1.点击战令入口，弹出战令界面，显示达到战令等级能够获得的奖励。
+         2. 点击战令界面上的物品，如果有满足战令等级的奖励，会一次性全部领取
+         3.如果没有购买"进阶福利"和"天降豪礼",则只能领取免费战令对应的奖励
+战令等级:
+		战令一共有15个等级，玩家没累计1000积分可以提升一个等级
+
+积分:
+	在游戏中完成相应的任务，能够获得对应任务的积分。
+
+活动结算:
+	如果活动结束的时候,玩家存在满足领取条件的奖励，但是未领取，需要通过邮件补发的方式进行奖励补发。
+    """)]},
+                                config=thread)
+
+    # 输出
+    console = Console()
+    print("=====  Research Brief ====")
+    console.print(Markdown(result["research_brief"]))
+    print()
+
+    print("=====  Draft Report ====")
+    console.print(Markdown(result["draft_report"]))

@@ -1,0 +1,68 @@
+stages:
+  prod:
+    cognition:
+      openai:
+        base_url: https://api.zhizengzeng.com/v1
+        api_key: sk-zk277ff6b7d3c232ad0a5b5c334823f062669c29be85008a
+        organization: dingshixiong
+        default_model: gpt-5.4-mini
+        temperature: 0
+        timeout_seconds: 600
+        models:
+          gpt-5.4-mini:
+            max_tokens: 128000
+    search:
+      backend: tavily
+      tavily:
+        api_key: tvly-dev-xxxx
+        base_url: https://api.tavily.com
+        max_results: 3
+        topic: general
+        include_raw_content: true
+        timeout_seconds: 300
+    roles:
+      supervisor:
+        backend: openai
+        handle: gpt-5.4-nano 
+        max_tokens: 128000
+        timeout_seconds: 600
+      red_team:
+        backend: openai
+        handle: gpt-5.4-mini 
+        max_tokens: 128000
+        timeout_seconds: 600
+      context_pruner:
+        backend: openai
+        handle: gpt-5.4-nano 
+        max_tokens: 128000
+        timeout_seconds: 600
+      researcher_main:
+        backend: openai
+        handle: gpt-5.4-nano
+        max_tokens: 128000
+        timeout_seconds: 600
+      researcher_summarizer:
+        backend: openai
+        handle: gpt-5.4-nano
+        max_tokens: 128000
+        timeout_seconds: 600
+      researcher_compressor:
+        backend: openai
+        handle: gpt-5.4-nano
+        max_tokens: 128000
+        timeout_seconds: 600
+      writer:
+        backend: openai
+        handle: gpt-5.4-nano
+        max_tokens: 128000
+        timeout_seconds: 600
+      draft:
+        backend: openai
+        handle: gpt-5.4-nano 
+        max_tokens: 128000
+        timeout_seconds: 600
+      evaluator:
+        backend: openai
+        handle: gpt-5.4-nano 
+        max_tokens: 128000
+        timeout_seconds: 600

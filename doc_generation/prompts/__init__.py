@@ -1,0 +1,2 @@
+from doc_generation.prompts.research_brief import RESEARCH_BRIEF_PROMPT
+from doc_generation.prompts.draft_report import DRAFT_REPORT_PROMPT
