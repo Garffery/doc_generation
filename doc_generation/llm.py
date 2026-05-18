@@ -11,13 +11,33 @@ import os
 from typing import Any, Dict, Optional
 from langchain.chat_models import init_chat_model
 
-from doc_generation.utils import load_config
+from doc_generation.utils import load_config, load_dotenv_if_present
+
+load_dotenv_if_present()
 
 
 logger = logging.getLogger(__name__)
 
 # 缓存CONFIG，避免重复导入(config_path, stage, loader_id) 
 _CONFIG_CACHE: Dict[tuple[str, str, int], Dict[str, Any]] = {}
+
+_PLACEHOLDER_API_KEYS = frozenset(
+    {"", "your-openai-api-key-here", "CHANGE_ME", "sk-your-api-key-here"}
+)
+_PLACEHOLDER_BASE_URLS = frozenset({"", "https://your-api-base-url.example/v1"})
+
+
+def _resolve_openai_credential(
+    config_value: str | None,
+    env_key: str,
+    placeholders: frozenset[str],
+) -> str | None:
+    env_value = os.environ.get(env_key)
+    if env_value:
+        return env_value
+    if config_value and config_value not in placeholders:
+        return config_value
+    return None
 
 # 默认的stage
 DEFAULT_STAGE = "prod"
@@ -64,10 +84,28 @@ def _build_openai_kwargs(
         "model": model,
     }
 
-    # api_key, base_url
-    for key in ("api_key", "base_url", "organization"):
-        if api_cfg.get(key):
-            kwargs[key] = api_cfg[key]
+    api_key = _resolve_openai_credential(
+        api_cfg.get("api_key"),
+        "OPENAI_API_KEY",
+        _PLACEHOLDER_API_KEYS,
+    )
+    if not api_key:
+        raise LLMConfigError(
+            "OpenAI api_key is missing. Set OPENAI_API_KEY or cognition.openai.api_key in config."
+        )
+    kwargs["api_key"] = api_key
+
+    base_url = _resolve_openai_credential(
+        api_cfg.get("base_url"),
+        "OPENAI_BASE_URL",
+        _PLACEHOLDER_BASE_URLS,
+    )
+    if base_url:
+        kwargs["base_url"] = base_url
+
+    organization = api_cfg.get("organization")
+    if organization:
+        kwargs["organization"] = organization
 
     # 温度系数
     if api_cfg.get("temperature") is not None:
