@@ -15,12 +15,27 @@ from rich.console import Console
 import logging
 
 from doc_generation.states.draft import DraftReport, ResearchQuestion, AgentInputState
-from doc_generation.utils import get_today_str
+from doc_generation.utils import get_today_str, load_config
 from doc_generation.logging_config import configure_logging
+from doc_generation.skills import build_skills_context
+from doc_generation.skills.config import SkillsConfig
+from doc_generation.skills.registry import get_or_new_skill_storage, load_skills_config_from_stage
 
 logger = logging.getLogger(__name__)
 draft_model = get_chat_model("draft")
 
+
+def _load_skills_config() -> SkillsConfig:
+    config_path = os.environ.get("CONFIG_PATH", "config.yml")
+    stage = os.environ.get("STAGE") or "prod"
+    stage_cfg = load_config(stage_name=stage, config_path=config_path)
+    return load_skills_config_from_stage(stage_cfg or {})
+
+
+def _skills_section(step: str) -> str:
+    skills_cfg = _load_skills_config()
+    storage = get_or_new_skill_storage(skills_config=skills_cfg)
+    return build_skills_context(skills_cfg, agent="draft", step=step, storage=storage)
 
 
 def write_research_brief(state: AgentState) -> Command[Literal["write_draft_report"]]:
@@ -33,7 +48,8 @@ def write_research_brief(state: AgentState) -> Command[Literal["write_draft_repo
     # 组装prompt
     prompt = RESEARCH_BRIEF_PROMPT.format(
         messages=get_buffer_string(state.get("messages", [])),
-        date=get_today_str()
+        date=get_today_str(),
+        skills_section=_skills_section("write_research_brief"),
     )
     logger.debug("write_research_brief invoking structured_output_model with prompt_length=%d", len(prompt))
 
@@ -60,7 +76,8 @@ def write_draft_report(state: AgentState) -> Command[Literal["__end__"]]:
     research_brief = state.get("research_brief", "")
     draft_report_prompt = DRAFT_REPORT_PROMPT.format(
         research_brief=research_brief,
-        date=get_today_str()
+        date=get_today_str(),
+        skills_section=_skills_section("write_draft_report"),
     )
 
     # 结构化输出
@@ -99,8 +116,8 @@ if __name__  == "__main__":
     # 测试问题
     thread = {"configurable": {"thread_id": "1", "recursion_limit": 50}}
     result = draft_agent.invoke({"messages": [HumanMessage(content="""
-    游戏中需要开发一个战令活动,这个战令总共有三档,一档免费战令,"进阶福利","天降豪礼"这两档付费直购战令。
-活动逻辑:1.点击战令入口，弹出战令界面，显示达到战令等级能够获得的奖励。
+游戏中需要开发一个战令活动,这个战令总共有三档,一档免费战令,"进阶福利","天降豪礼"这两档付费直购战令。
+活动逻辑: 1.点击战令入口，弹出战令界面，显示战令的奖励,能领取的奖励高亮,未达到领取条件的奖励置灰。
          2. 点击战令界面上的物品，如果有满足战令等级的奖励，会一次性全部领取
          3.如果没有购买"进阶福利"和"天降豪礼",则只能领取免费战令对应的奖励
 战令等级:

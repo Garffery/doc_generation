@@ -66,3 +66,22 @@ stages:
         handle: gpt-5.4-nano 
         max_tokens: 128000
         timeout_seconds: 600
+    skills:
+      # Pluggable storage backend (module:Class)
+      use: doc_generation.skills.storage.local_skill_storage:LocalSkillStorage
+      path: skills
+      # Global enable list; omit to enable all discovered skills
+      enabled:
+        - erlang-player-data-storage
+        - erlang-socket-protocol-doc
+      # inline: inject SKILL.md body into prompt; catalog: list paths only (deer-flow style)
+      mode: inline
+      agents:
+        draft:
+          write_research_brief:
+            skills:
+              - erlang-player-data-storage
+          write_draft_report:
+            skills:
+              - erlang-player-data-storage
+              - erlang-socket-protocol-doc
