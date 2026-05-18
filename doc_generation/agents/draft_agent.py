@@ -135,7 +135,7 @@ if __name__  == "__main__":
     console = Console()
     print("=====  Research Brief ====")
     console.print(Markdown(result["research_brief"]))
-    print()
+    print("====Research Brief end====")
 
-    print("=====  Draft Report ====")
-    console.print(Markdown(result["draft_report"]))
+    # print("=====  Draft Report ====")
+    # console.print(Markdown(result["draft_report"]))
