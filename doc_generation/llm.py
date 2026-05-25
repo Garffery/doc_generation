@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 _CONFIG_CACHE: Dict[tuple[str, str, int], Dict[str, Any]] = {}
 
 _PLACEHOLDER_API_KEYS = frozenset(
-    {"", "your-openai-api-key-here", "CHANGE_ME", "sk-your-api-key-here"}
+    {"", "your-openai-api-key-here", "your-deepseek-api-key-here", "CHANGE_ME", "sk-your-api-key-here"}
 )
 _PLACEHOLDER_BASE_URLS = frozenset({"", "https://your-api-base-url.example/v1"})
 
@@ -145,6 +145,56 @@ def _resolve_timeout_seconds(api_cfg: Dict[str, Any], role_cfg: Dict[str, Any]) 
     return None
 
 
+def _build_deepseek_kwargs(
+    handle: str,
+    api_cfg: Dict[str, Any],
+    max_tokens: int | None,
+    timeout_seconds: Optional[int],
+) -> Dict[str, Any]:
+    """构建 DeepSeek 模型参数，DeepSeek API 兼容 OpenAI 格式。"""
+
+    model = handle or api_cfg.get("default_model")
+    if not model:
+        raise LLMConfigError("DeepSeek config requires a model name!")
+
+    kwargs: Dict[str, Any] = {
+        "model": model,
+        "model_provider": "deepseek",
+    }
+
+    api_key = _resolve_openai_credential(
+        api_cfg.get("api_key"),
+        "DEEPSEEK_API_KEY",
+        _PLACEHOLDER_API_KEYS,
+    )
+    if not api_key:
+        raise LLMConfigError(
+            "DeepSeek api_key is missing. Set DEEPSEEK_API_KEY or cognition.deepseek.api_key in config."
+        )
+    kwargs["api_key"] = api_key
+
+    base_url = _resolve_openai_credential(
+        api_cfg.get("base_url"),
+        "DEEPSEEK_BASE_URL",
+        _PLACEHOLDER_BASE_URLS,
+    )
+    if base_url:
+        kwargs["base_url"] = base_url
+
+    if api_cfg.get("temperature") is not None:
+        kwargs["temperature"] = api_cfg["temperature"]
+
+    if timeout_seconds is not None:
+        kwargs["timeout"] = timeout_seconds
+        kwargs["request_timeout"] = timeout_seconds
+
+    # 关闭 thinking 模式，避免与 tool_choice 冲突
+    thinking_cfg = api_cfg.get("thinking", {"type": "disabled"})
+    kwargs["model_kwargs"] = {"extra_body": {"thinking": thinking_cfg}}
+
+    return kwargs
+
+
 def _build_kwargs(
     backend: str,
     handle: str,
@@ -156,6 +206,8 @@ def _build_kwargs(
 
     if backend == "openai":
         return _build_openai_kwargs(handle, api_cfg, max_tokens, timeout_seconds)
+    elif backend == "deepseek":
+        return _build_deepseek_kwargs(handle, api_cfg, max_tokens, timeout_seconds)
     else:
         raise LLMConfigError(f"Unsupported backend '{backend}'")
 
