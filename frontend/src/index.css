@@ -1,0 +1,17 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+.report-markdown pre {
+  background-color: inherit !important;
+  color: #374151 !important;
+}
+
+.report-markdown pre code {
+  background-color: inherit !important;
+  color: #374151 !important;
+}
+
+.report-markdown code {
+  background-color: inherit !important;
+  color: #374151 !important;
+}

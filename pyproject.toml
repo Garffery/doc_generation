@@ -13,7 +13,14 @@ dependencies = [
   "langchain-core>=0.3",
   "langgraph>=0.2",
   "langchain>=0.3",
+  "langchain-chroma>=0.2",
+  "langchain-openai>=0.3",
+  "langchain-text-splitters>=0.3",
+  "chromadb>=0.5",
   "typing-extensions>=4.0",
+  "claude-code-sdk>=0.0.25",
+  "langsmith>=0.3",
+  "motor>=3.0",
 ]
 
 [project.optional-dependencies]
@@ -21,6 +28,7 @@ dev = ["pytest>=8.0"]
 
 [project.scripts]
 doc-generation = "doc_generation.main:main"
+doc-generation-rag-ingest = "doc_generation.rag.ingest:main"
 
 [tool.setuptools.packages.find]
 where = ["."]
@@ -29,3 +37,7 @@ include = ["doc_generation*"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["."]
+log_cli = true
+log_cli_level = "INFO"
+log_cli_format = "%(asctime)s %(levelname)s [%(name)s] %(message)s"
+log_cli_date_format = "%Y-%m-%d %H:%M:%S"

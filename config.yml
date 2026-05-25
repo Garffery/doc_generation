@@ -11,6 +11,15 @@ stages:
         models:
           gpt-5.4-mini:
             max_tokens: 128000
+    rag:
+      enabled: true
+      backend: chroma
+      chroma:
+        persist_directory: data/chroma
+        collection_name: doc_generation
+        embedding_model: text-embedding-3-small
+        top_k: 5
+        # score_threshold: 1.5
     search:
       backend: tavily
       tavily:
@@ -58,7 +67,7 @@ stages:
         timeout_seconds: 600
       draft:
         backend: openai
-        handle: gpt-5.4-nano 
+        handle: gpt-5.4-mini
         max_tokens: 128000
         timeout_seconds: 600
       evaluator:

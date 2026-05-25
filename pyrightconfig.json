@@ -1,0 +1,13 @@
+{
+  "venvPath": ".",
+  "venv": ".venv",
+  "pythonVersion": "3.10",
+  "include": ["doc_generation", "tests"],
+  "exclude": [
+    "**/.venv",
+    "**/__pycache__",
+    "**/.pytest_cache",
+    "**/node_modules"
+  ],
+  "typeCheckingMode": "basic"
+}
