@@ -111,9 +111,9 @@ def _build_openai_kwargs(
     if api_cfg.get("temperature") is not None:
         kwargs["temperature"] = api_cfg["temperature"]
 
-    # 最大token数
-    if max_tokens is not None:
-        kwargs["max_tokens"] = max_tokens
+    # # 最大token数（新模型使用 max_completion_tokens）
+    # if max_tokens is not None:
+    #     kwargs["max_completion_tokens"] = max_tokens
 
     # 请求超时
     if timeout_seconds is not None:

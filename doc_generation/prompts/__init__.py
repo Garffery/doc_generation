@@ -17,4 +17,5 @@ from doc_generation.prompts.summarize_webpage import SUMMARIZE_PROMPT
 from doc_generation.prompts.critical_address import CRITICAL_ADDRESS_PROMPT
 from doc_generation.prompts.red_team import RED_TEAM_PROMPT
 from doc_generation.prompts.draft_evaluator import DRAFT_EVALUATOR_PROMPT
+from doc_generation.prompts.question_to_user import QUESTION_TO_USER_PROMPT
 

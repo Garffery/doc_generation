@@ -4,17 +4,16 @@ import os
 
 from langgraph.constants import START, END
 from langgraph.graph import StateGraph
-from typing_extensions import Literal
+from langgraph.types import interrupt
 from doc_generation.llm import get_chat_model
 from doc_generation import AgentState
-from langgraph.types import Command
-from doc_generation.prompts import RESEARCH_BRIEF_PROMPT, DRAFT_REPORT_PROMPT
+from doc_generation.prompts import RESEARCH_BRIEF_PROMPT, DRAFT_REPORT_PROMPT, QUESTION_TO_USER_PROMPT
 from langchain_core.messages import AIMessage, HumanMessage, get_buffer_string
 from rich.markdown import Markdown
 from rich.console import Console
 import logging
 
-from doc_generation.states.draft import DraftReport, ResearchQuestion, AgentInputState
+from doc_generation.states.draft import DraftReport, ResearchQuestion, ClarificationQuestions, ClarificationItem, AgentInputState
 from doc_generation.utils import get_today_str, load_config
 from doc_generation.logging_config import configure_logging
 from doc_generation.skills import build_skills_context
@@ -38,7 +37,7 @@ def _skills_section(step: str) -> str:
     return build_skills_context(skills_cfg, agent="draft", step=step, storage=storage)
 
 
-def write_research_brief(state: AgentState) -> Command[Literal["write_draft_report"]]:
+def write_research_brief(state: AgentState):
     """根据用户对话生成需求拆解简报（功能点列表），供后续生成开发文档草稿"""
 
     logger.debug(
@@ -58,13 +57,34 @@ def write_research_brief(state: AgentState) -> Command[Literal["write_draft_repo
     response = structured_output_model.invoke([HumanMessage(content=prompt)])
     logger.debug("write_research_brief produced research_brief length=%d", len(response.research_brief))
 
-    # 更新Messages并回传给主agent
-    return Command(
-            goto="write_draft_report",
-            update={"research_brief": response.research_brief}
-        )
+    return {"research_brief": response.research_brief}
 
-def write_draft_report(state: AgentState) -> Command[Literal["__end__"]]:
+
+def question_to_user(state: AgentState):
+    """根据 research_brief 生成澄清问题（含候选答案），通过 interrupt 暂停等待用户回答"""
+
+    research_brief = state.get("research_brief", "")
+
+    prompt = QUESTION_TO_USER_PROMPT.format(
+        research_brief=research_brief,
+        date=get_today_str(),
+    )
+
+    structured_model = draft_model.with_structured_output(ClarificationQuestions)
+    response = structured_model.invoke([HumanMessage(content=prompt)])
+    items = [{"question": item.question, "options": item.options} for item in response.items]
+
+    logger.info("question_to_user generated %d questions, interrupting for user input", len(items))
+
+    # interrupt 暂停图执行，将问题及候选答案发送给用户；resume 时返回用户的回答
+    answer = interrupt({"questions": items})
+
+    return {
+        "clarification_questions": items,
+        "clarification_answers": answer,
+    }
+
+def write_draft_report(state: AgentState):
     """根据需求拆解简报生成后端开发技术文档草稿"""
 
     logger.debug(
@@ -79,6 +99,11 @@ def write_draft_report(state: AgentState) -> Command[Literal["__end__"]]:
         date=get_today_str(),
         skills_section=_skills_section("write_draft_report"),
     )
+
+    # 如果有用户澄清回答，追加到 prompt 上下文
+    clarification_answers = state.get("clarification_answers", "")
+    if clarification_answers:
+        draft_report_prompt += f"\n\n<用户补充说明>\n{clarification_answers}\n</用户补充说明>\n"
 
     # 结构化输出
     structured_output_model = draft_model.with_structured_output(DraftReport)
@@ -101,10 +126,12 @@ if __name__  == "__main__":
     # 增加节点
     deep_researcher_builder.add_node("write_research_brief", write_research_brief)
     deep_researcher_builder.add_node("write_draft_report", write_draft_report)
+    deep_researcher_builder.add_node("question_to_user", question_to_user)
 
     # 增加边
     deep_researcher_builder.add_edge(START, "write_research_brief")
-    deep_researcher_builder.add_edge("write_research_brief", "write_draft_report")
+    deep_researcher_builder.add_edge("write_research_brief", "question_to_user")
+    deep_researcher_builder.add_edge("question_to_user", "write_draft_report")
     deep_researcher_builder.add_edge("write_draft_report", END)
 
     # 编译graph

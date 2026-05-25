@@ -29,6 +29,8 @@ class AgentState(MessagesState):
     """
 
     research_brief: Optional[str]                                           # 根据用户对话历史生成的需求拆解简报（功能点列表）
+    clarification_questions: Optional[list[dict]]                            # LLM生成的澄清问题（含候选答案）
+    clarification_answers: Optional[str]                                    # 用户对澄清问题的回答
     supervisor_messages: Annotated[Sequence[BaseMessage], add_messages]     # 与Supervisor Agent交换的协调消息
     raw_notes: Annotated[list[str], operator.add] = []                      # 研究阶段收集的原始未处理研究笔记
     notes: Annotated[list[str], operator.add] = []                          # 已处理和结构化的笔记，可用于生成报告
@@ -58,4 +60,19 @@ class DraftReport(BaseModel):
             "architecture sketch, per functional point F-xxx sections (API, logic, data, "
             "tests, open items), implementation order, NFRs, risks. Same language as brief."
         ),
+    )
+
+
+class ClarificationItem(BaseModel):
+    """单个澄清问题及其候选答案"""
+
+    question: str = Field(description="The clarification question")
+    options: list[str] = Field(description="3 suggested answers for the user to choose from")
+
+
+class ClarificationQuestions(BaseModel):
+    """LLM生成的澄清问题列表，每个问题附带3个候选答案"""
+
+    items: list[ClarificationItem] = Field(
+        description="2-5 clarification questions with suggested answers, ordered by importance"
     )
