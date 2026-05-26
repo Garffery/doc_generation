@@ -15,12 +15,14 @@ dependencies = [
   "langchain>=0.3",
   "langchain-chroma>=0.2",
   "langchain-openai>=0.3",
+  "langchain-deepseek>=1.0",
   "langchain-text-splitters>=0.3",
   "chromadb>=0.5",
   "typing-extensions>=4.0",
   "claude-code-sdk>=0.0.25",
   "langsmith>=0.3",
   "motor>=3.0",
+  "tavily-python>=0.7",
 ]
 
 [project.optional-dependencies]

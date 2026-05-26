@@ -2,7 +2,7 @@ stages:
   prod:
     cognition:
       openai:
-        base_url: https://api.zhizengzeng.com/v1
+        base_url: https://api.openai.com/v1
         api_key: your-openai-api-key-here
         organization: dingshixiong
         default_model: gpt-5.4-mini
@@ -12,8 +12,8 @@ stages:
           gpt-5.4-mini:
             max_tokens: 128000
       deepseek:
-        base_url: https://api.zhizengzeng.com/v1
-        api_key: sk-zk2f62f8abfee2397b81f857078fa72ca8c6a0b3001723a4
+        base_url: https://api.deepseek.com
+        api_key: your-deepseek-api-key-here
         default_model: deepseek-v4-flash
         temperature: 0
         timeout_seconds: 600
@@ -40,38 +40,38 @@ stages:
         timeout_seconds: 300
     roles:
       supervisor:
-        backend: deepseek
-        handle: deepseek-v4-flash
+        backend: openai
+        handle: gpt-5.4-nano 
         max_tokens: 128000
         timeout_seconds: 600
       red_team:
-        backend: deepseek
-        handle: deepseek-v4-flash
+        backend: openai
+        handle: gpt-5.4-mini 
         max_tokens: 128000
         timeout_seconds: 600
       context_pruner:
-        backend: deepseek
-        handle: deepseek-v4-flash
+        backend: openai
+        handle: gpt-5.4-nano 
         max_tokens: 128000
         timeout_seconds: 600
       researcher_main:
-        backend: deepseek
-        handle: deepseek-v4-flash
+        backend: openai
+        handle: gpt-5.4-nano
         max_tokens: 128000
         timeout_seconds: 600
       researcher_summarizer:
-        backend: deepseek
-        handle: deepseek-v4-flash
+        backend: openai
+        handle: gpt-5.4-nano
         max_tokens: 128000
         timeout_seconds: 600
       researcher_compressor:
-        backend: deepseek
-        handle: deepseek-v4-flash
+        backend: openai
+        handle: gpt-5.4-nano
         max_tokens: 128000
         timeout_seconds: 600
       writer:
-        backend: deepseek
-        handle: deepseek-v4-flash
+        backend: openai
+        handle: gpt-5.4-nano
         max_tokens: 128000
         timeout_seconds: 600
       draft:
@@ -80,8 +80,8 @@ stages:
         max_tokens: 128000
         timeout_seconds: 600
       evaluator:
-        backend: deepseek
-        handle: deepseek-v4-flash
+        backend: openai
+        handle: gpt-5.4-nano 
         max_tokens: 128000
         timeout_seconds: 600
     skills:

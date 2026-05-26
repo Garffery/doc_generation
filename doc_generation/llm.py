@@ -179,7 +179,7 @@ def _build_deepseek_kwargs(
         _PLACEHOLDER_BASE_URLS,
     )
     if base_url:
-        kwargs["base_url"] = base_url
+        kwargs["api_base"] = base_url
 
     if api_cfg.get("temperature") is not None:
         kwargs["temperature"] = api_cfg["temperature"]

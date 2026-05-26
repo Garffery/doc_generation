@@ -1,0 +1,416 @@
+
+============================================================
+Traceback (most recent call last):
+  File "D:\project\doc_generation\backend\service.py", line 31, in run_agent_stream
+    async for event in agent.astream_events(input_state, config=config, version="v2"):
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\base.py", line 1607, in _astream_events_v1_v2
+    async for event in event_stream:
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\tracers\event_stream.py", line 1100, in _astream_events_implementation_v2
+    await task
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\tracers\event_stream.py", line 1055, in consume_astream
+    async for _ in event_streamer.tap_output_aiter(run_id, stream):
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\tracers\event_stream.py", line 199, in tap_output_aiter
+    first = await anext(output, sentinel)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\pregel\main.py", line 3407, in astream
+    async for _ in runner.atick(
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\pregel\_runner.py", line 396, in atick
+    await arun_with_retry(
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\pregel\_retry.py", line 703, in arun_with_retry
+    async for _ in task.proc.astream(task.input, config):
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\_internal\_runnable.py", line 867, in astream
+    output = await asyncio.create_task(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\_internal\_runnable.py", line 932, in _consume_aiter
+    async for chunk in it:
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\tracers\event_stream.py", line 199, in tap_output_aiter
+    first = await anext(output, sentinel)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\base.py", line 1767, in atransform
+    async for ichunk in input:
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\base.py", line 1171, in astream
+    yield await self.ainvoke(input, config, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\_internal\_runnable.py", line 501, in ainvoke
+    ret = await self.afunc(*args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\config.py", line 667, in run_in_executor
+    return await asyncio.get_running_loop().run_in_executor(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\software\myConda\envs\rag-test\Lib\concurrent\futures\thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\config.py", line 658, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\doc_generation\agents\draft_agent.py", line 57, in write_research_brief
+    response = structured_output_model.invoke([HumanMessage(content=prompt)])
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\base.py", line 3333, in invoke
+    input_ = context.run(step.invoke, input_, config, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\base.py", line 5881, in invoke
+    return self.bound.invoke(
+           ^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\language_models\chat_models.py", line 474, in invoke
+    self.generate_prompt(
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\language_models\chat_models.py", line 1823, in generate_prompt
+    return self.generate(prompt_messages, stop=stop, callbacks=callbacks, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\language_models\chat_models.py", line 1630, in generate
+    self._generate_with_cache(
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\language_models\chat_models.py", line 1927, in _generate_with_cache
+    for chunk in self._stream(messages, stop=stop, **kwargs):
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_openai\chat_models\base.py", line 1610, in _stream
+    _handle_openai_bad_request(e)
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_openai\chat_models\base.py", line 1587, in _stream
+    with context_manager as response:
+         ^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\openai\lib\streaming\chat\_completions.py", line 149, in __enter__
+    raw_stream = self.__api_request()
+                 ^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\openai\_utils\_utils.py", line 298, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\openai\resources\chat\completions\completions.py", line 1215, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\openai\_base_client.py", line 1332, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\openai\_base_client.py", line 1105, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.BadRequestError: Error code: 400 - {'error': {'code': '401', 'message': 'Authorization is wrong. Note: You don’t need openai key, you need zhizenzeng key.', 'param': '', 'type': 'authentication_error'}}
+During task with name 'write_research_brief' and id '65ce1a3e-ff11-5cf6-e297-a37d87f59ee7'
+
+
+============================================================
+Traceback (most recent call last):
+  File "D:\project\doc_generation\backend\service.py", line 31, in run_agent_stream
+    async for event in agent.astream_events(input_state, config=config, version="v2"):
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\base.py", line 1607, in _astream_events_v1_v2
+    async for event in event_stream:
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\tracers\event_stream.py", line 1100, in _astream_events_implementation_v2
+    await task
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\tracers\event_stream.py", line 1055, in consume_astream
+    async for _ in event_streamer.tap_output_aiter(run_id, stream):
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\tracers\event_stream.py", line 199, in tap_output_aiter
+    first = await anext(output, sentinel)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\pregel\main.py", line 3407, in astream
+    async for _ in runner.atick(
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\pregel\_runner.py", line 396, in atick
+    await arun_with_retry(
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\pregel\_retry.py", line 703, in arun_with_retry
+    async for _ in task.proc.astream(task.input, config):
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\_internal\_runnable.py", line 867, in astream
+    output = await asyncio.create_task(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\_internal\_runnable.py", line 932, in _consume_aiter
+    async for chunk in it:
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\tracers\event_stream.py", line 199, in tap_output_aiter
+    first = await anext(output, sentinel)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\base.py", line 1767, in atransform
+    async for ichunk in input:
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\base.py", line 1171, in astream
+    yield await self.ainvoke(input, config, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\_internal\_runnable.py", line 501, in ainvoke
+    ret = await self.afunc(*args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\config.py", line 667, in run_in_executor
+    return await asyncio.get_running_loop().run_in_executor(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\software\myConda\envs\rag-test\Lib\concurrent\futures\thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\config.py", line 658, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\doc_generation\agents\draft_agent.py", line 57, in write_research_brief
+    response = structured_output_model.invoke([HumanMessage(content=prompt)])
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\base.py", line 3333, in invoke
+    input_ = context.run(step.invoke, input_, config, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\base.py", line 5881, in invoke
+    return self.bound.invoke(
+           ^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\language_models\chat_models.py", line 474, in invoke
+    self.generate_prompt(
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\language_models\chat_models.py", line 1823, in generate_prompt
+    return self.generate(prompt_messages, stop=stop, callbacks=callbacks, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\language_models\chat_models.py", line 1630, in generate
+    self._generate_with_cache(
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\language_models\chat_models.py", line 1927, in _generate_with_cache
+    for chunk in self._stream(messages, stop=stop, **kwargs):
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_deepseek\chat_models.py", line 331, in _stream
+    yield from super()._stream(
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_openai\chat_models\base.py", line 1610, in _stream
+    _handle_openai_bad_request(e)
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_openai\chat_models\base.py", line 1585, in _stream
+    response = self.client.create(**payload)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\openai\_utils\_utils.py", line 298, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\openai\resources\chat\completions\completions.py", line 1215, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\openai\_base_client.py", line 1332, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\openai\_base_client.py", line 1105, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.BadRequestError: Error code: 400 - {'error': {'message': 'Thinking mode does not support this tool_choice', 'type': 'invalid_request_error', 'param': None, 'code': 'invalid_request_error'}}
+During task with name 'write_research_brief' and id '2e02c2bb-3296-4dbd-7e77-d6751ee37c6c'
+
+
+============================================================
+Traceback (most recent call last):
+  File "D:\project\doc_generation\backend\service.py", line 31, in run_agent_stream
+    async for event in agent.astream_events(input_state, config=config, version="v2"):
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\base.py", line 1607, in _astream_events_v1_v2
+    async for event in event_stream:
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\tracers\event_stream.py", line 1100, in _astream_events_implementation_v2
+    await task
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\tracers\event_stream.py", line 1055, in consume_astream
+    async for _ in event_streamer.tap_output_aiter(run_id, stream):
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\tracers\event_stream.py", line 199, in tap_output_aiter
+    first = await anext(output, sentinel)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\pregel\main.py", line 3407, in astream
+    async for _ in runner.atick(
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\pregel\_runner.py", line 396, in atick
+    await arun_with_retry(
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\pregel\_retry.py", line 703, in arun_with_retry
+    async for _ in task.proc.astream(task.input, config):
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\_internal\_runnable.py", line 867, in astream
+    output = await asyncio.create_task(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\_internal\_runnable.py", line 932, in _consume_aiter
+    async for chunk in it:
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\tracers\event_stream.py", line 199, in tap_output_aiter
+    first = await anext(output, sentinel)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\base.py", line 1767, in atransform
+    async for ichunk in input:
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\base.py", line 1171, in astream
+    yield await self.ainvoke(input, config, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\_internal\_runnable.py", line 501, in ainvoke
+    ret = await self.afunc(*args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\config.py", line 667, in run_in_executor
+    return await asyncio.get_running_loop().run_in_executor(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\software\myConda\envs\rag-test\Lib\concurrent\futures\thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\config.py", line 658, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\doc_generation\agents\draft_agent.py", line 57, in write_research_brief
+    response = structured_output_model.invoke([HumanMessage(content=prompt)])
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\base.py", line 3333, in invoke
+    input_ = context.run(step.invoke, input_, config, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\base.py", line 5881, in invoke
+    return self.bound.invoke(
+           ^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\language_models\chat_models.py", line 474, in invoke
+    self.generate_prompt(
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\language_models\chat_models.py", line 1823, in generate_prompt
+    return self.generate(prompt_messages, stop=stop, callbacks=callbacks, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\language_models\chat_models.py", line 1630, in generate
+    self._generate_with_cache(
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\language_models\chat_models.py", line 1927, in _generate_with_cache
+    for chunk in self._stream(messages, stop=stop, **kwargs):
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_deepseek\chat_models.py", line 331, in _stream
+    yield from super()._stream(
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_openai\chat_models\base.py", line 1610, in _stream
+    _handle_openai_bad_request(e)
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_openai\chat_models\base.py", line 1585, in _stream
+    response = self.client.create(**payload)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\openai\_utils\_utils.py", line 298, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\openai\resources\chat\completions\completions.py", line 1215, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\openai\_base_client.py", line 1332, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\openai\_base_client.py", line 1105, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.BadRequestError: Error code: 400 - {'error': {'message': 'Thinking mode does not support this tool_choice', 'type': 'invalid_request_error', 'param': None, 'code': 'invalid_request_error'}}
+During task with name 'write_research_brief' and id '3ff062ce-322d-6b2c-013e-f525825d97ff'
+
+
+============================================================
+Traceback (most recent call last):
+  File "D:\project\doc_generation\backend\service.py", line 31, in run_agent_stream
+    async for event in agent.astream_events(input_state, config=config, version="v2"):
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\base.py", line 1607, in _astream_events_v1_v2
+    async for event in event_stream:
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\tracers\event_stream.py", line 1100, in _astream_events_implementation_v2
+    await task
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\tracers\event_stream.py", line 1055, in consume_astream
+    async for _ in event_streamer.tap_output_aiter(run_id, stream):
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\tracers\event_stream.py", line 199, in tap_output_aiter
+    first = await anext(output, sentinel)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\pregel\main.py", line 3407, in astream
+    async for _ in runner.atick(
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\pregel\_runner.py", line 396, in atick
+    await arun_with_retry(
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\pregel\_retry.py", line 703, in arun_with_retry
+    async for _ in task.proc.astream(task.input, config):
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\_internal\_runnable.py", line 867, in astream
+    output = await asyncio.create_task(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\_internal\_runnable.py", line 932, in _consume_aiter
+    async for chunk in it:
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\tracers\event_stream.py", line 199, in tap_output_aiter
+    first = await anext(output, sentinel)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\base.py", line 1767, in atransform
+    async for ichunk in input:
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\base.py", line 1171, in astream
+    yield await self.ainvoke(input, config, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\_internal\_runnable.py", line 501, in ainvoke
+    ret = await self.afunc(*args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\config.py", line 667, in run_in_executor
+    return await asyncio.get_running_loop().run_in_executor(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\software\myConda\envs\rag-test\Lib\concurrent\futures\thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\config.py", line 658, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\doc_generation\agents\draft_agent.py", line 57, in write_research_brief
+    response = structured_output_model.invoke([HumanMessage(content=prompt)])
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\base.py", line 3333, in invoke
+    input_ = context.run(step.invoke, input_, config, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\base.py", line 5881, in invoke
+    return self.bound.invoke(
+           ^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\language_models\chat_models.py", line 474, in invoke
+    self.generate_prompt(
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\language_models\chat_models.py", line 1823, in generate_prompt
+    return self.generate(prompt_messages, stop=stop, callbacks=callbacks, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\language_models\chat_models.py", line 1630, in generate
+    self._generate_with_cache(
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\language_models\chat_models.py", line 1927, in _generate_with_cache
+    for chunk in self._stream(messages, stop=stop, **kwargs):
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_deepseek\chat_models.py", line 331, in _stream
+    yield from super()._stream(
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_openai\chat_models\base.py", line 1585, in _stream
+    response = self.client.create(**payload)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\openai\_utils\_utils.py", line 298, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+TypeError: Completions.create() got an unexpected keyword argument 'thinking'
+During task with name 'write_research_brief' and id 'c696ef2c-d7de-7667-1a56-1fa9bc49cce9'
+
+
+============================================================
+Traceback (most recent call last):
+  File "D:\project\doc_generation\backend\service.py", line 31, in run_agent_stream
+    async for event in agent.astream_events(input_state, config=config, version="v2"):
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\base.py", line 1607, in _astream_events_v1_v2
+    async for event in event_stream:
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\tracers\event_stream.py", line 1100, in _astream_events_implementation_v2
+    await task
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\tracers\event_stream.py", line 1055, in consume_astream
+    async for _ in event_streamer.tap_output_aiter(run_id, stream):
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\tracers\event_stream.py", line 199, in tap_output_aiter
+    first = await anext(output, sentinel)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\pregel\main.py", line 3407, in astream
+    async for _ in runner.atick(
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\pregel\_runner.py", line 396, in atick
+    await arun_with_retry(
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\pregel\_retry.py", line 703, in arun_with_retry
+    async for _ in task.proc.astream(task.input, config):
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\_internal\_runnable.py", line 867, in astream
+    output = await asyncio.create_task(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\_internal\_runnable.py", line 932, in _consume_aiter
+    async for chunk in it:
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\tracers\event_stream.py", line 199, in tap_output_aiter
+    first = await anext(output, sentinel)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\base.py", line 1767, in atransform
+    async for ichunk in input:
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\base.py", line 1171, in astream
+    yield await self.ainvoke(input, config, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\_internal\_runnable.py", line 501, in ainvoke
+    ret = await self.afunc(*args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\config.py", line 667, in run_in_executor
+    return await asyncio.get_running_loop().run_in_executor(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\software\myConda\envs\rag-test\Lib\concurrent\futures\thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\config.py", line 658, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\doc_generation\agents\draft_agent.py", line 57, in write_research_brief
+    response = structured_output_model.invoke([HumanMessage(content=prompt)])
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\base.py", line 3333, in invoke
+    input_ = context.run(step.invoke, input_, config, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\base.py", line 5881, in invoke
+    return self.bound.invoke(
+           ^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\language_models\chat_models.py", line 474, in invoke
+    self.generate_prompt(
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\language_models\chat_models.py", line 1823, in generate_prompt
+    return self.generate(prompt_messages, stop=stop, callbacks=callbacks, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\language_models\chat_models.py", line 1630, in generate
+    self._generate_with_cache(
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\language_models\chat_models.py", line 1927, in _generate_with_cache
+    for chunk in self._stream(messages, stop=stop, **kwargs):
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_deepseek\chat_models.py", line 331, in _stream
+    yield from super()._stream(
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_openai\chat_models\base.py", line 1612, in _stream
+    _handle_openai_api_error(e)
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_openai\chat_models\base.py", line 1585, in _stream
+    response = self.client.create(**payload)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\openai\_utils\_utils.py", line 298, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\openai\resources\chat\completions\completions.py", line 1215, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\openai\_base_client.py", line 1332, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\openai\_base_client.py", line 1105, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.AuthenticationError: Error code: 401 - {'error': {'message': 'Authentication Fails, Your api key: ****23a4 is invalid', 'type': 'authentication_error', 'param': None, 'code': 'invalid_request_error'}}
+During task with name 'write_research_brief' and id '1d4d0186-804e-c7f4-0acf-5ee19ace32cf'
+
