@@ -26,7 +26,9 @@ stages:
       chroma:
         persist_directory: data/chroma
         collection_name: doc_generation
-        embedding_model: text-embedding-3-small
+        embedding_model: bge-m3
+        api_key: aaaa
+        base_url: http://127.0.0.1:11434/v1
         top_k: 5
         # score_threshold: 1.5
     search:
@@ -41,7 +43,7 @@ stages:
     roles:
       supervisor:
         backend: deepseek
-        handle: deepseek-v4-flash
+        handle: deepseek-v4-pro
         max_tokens: 128000
         timeout_seconds: 600
       red_team:

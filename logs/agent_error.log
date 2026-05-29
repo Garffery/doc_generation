@@ -414,3 +414,218 @@ Traceback (most recent call last):
 openai.AuthenticationError: Error code: 401 - {'error': {'message': 'Authentication Fails, Your api key: ****23a4 is invalid', 'type': 'authentication_error', 'param': None, 'code': 'invalid_request_error'}}
 During task with name 'write_research_brief' and id '1d4d0186-804e-c7f4-0acf-5ee19ace32cf'
 
+
+============================================================
+Traceback (most recent call last):
+  File "E:\project\agent\doc_generation\.venv\Lib\site-packages\httpx\_transports\default.py", line 101, in map_httpcore_exceptions
+    yield
+  File "E:\project\agent\doc_generation\.venv\Lib\site-packages\httpx\_transports\default.py", line 250, in handle_request
+    resp = self._pool.handle_request(req)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\project\agent\doc_generation\.venv\Lib\site-packages\httpcore\_sync\connection_pool.py", line 256, in handle_request
+    raise exc from None
+  File "E:\project\agent\doc_generation\.venv\Lib\site-packages\httpcore\_sync\connection_pool.py", line 236, in handle_request
+    response = connection.handle_request(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\project\agent\doc_generation\.venv\Lib\site-packages\httpcore\_sync\http_proxy.py", line 316, in handle_request
+    stream = stream.start_tls(**kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\project\agent\doc_generation\.venv\Lib\site-packages\httpcore\_sync\http11.py", line 376, in start_tls
+    return self._stream.start_tls(ssl_context, server_hostname, timeout)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\project\agent\doc_generation\.venv\Lib\site-packages\httpcore\_backends\sync.py", line 154, in start_tls
+    with map_exceptions(exc_map):
+  File "D:\software\python11\Lib\contextlib.py", line 158, in __exit__
+    self.gen.throw(typ, value, traceback)
+  File "E:\project\agent\doc_generation\.venv\Lib\site-packages\httpcore\_exceptions.py", line 14, in map_exceptions
+    raise to_exc(exc) from exc
+httpcore.ConnectError: [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1006)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "E:\project\agent\doc_generation\.venv\Lib\site-packages\openai\_base_client.py", line 1037, in request
+    response = self._send_request(
+               ^^^^^^^^^^^^^^^^^^^
+  File "E:\project\agent\doc_generation\.venv\Lib\site-packages\openai\_client.py", line 440, in _send_request
+    return self._send_with_auth_retry(request, stream=stream, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\project\agent\doc_generation\.venv\Lib\site-packages\openai\_client.py", line 418, in _send_with_auth_retry
+    response = super()._send_request(request, stream=stream, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\project\agent\doc_generation\.venv\Lib\site-packages\openai\_base_client.py", line 964, in _send_request
+    return self._client.send(request, stream=stream, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\project\agent\doc_generation\.venv\Lib\site-packages\httpx\_client.py", line 914, in send
+    response = self._send_handling_auth(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\project\agent\doc_generation\.venv\Lib\site-packages\httpx\_client.py", line 942, in _send_handling_auth
+    response = self._send_handling_redirects(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\project\agent\doc_generation\.venv\Lib\site-packages\httpx\_client.py", line 979, in _send_handling_redirects
+    response = self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\project\agent\doc_generation\.venv\Lib\site-packages\httpx\_client.py", line 1014, in _send_single_request
+    response = transport.handle_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\project\agent\doc_generation\.venv\Lib\site-packages\httpx\_transports\default.py", line 249, in handle_request
+    with map_httpcore_exceptions():
+  File "D:\software\python11\Lib\contextlib.py", line 158, in __exit__
+    self.gen.throw(typ, value, traceback)
+  File "E:\project\agent\doc_generation\.venv\Lib\site-packages\httpx\_transports\default.py", line 118, in map_httpcore_exceptions
+    raise mapped_exc(message) from exc
+httpx.ConnectError: [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1006)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "E:\project\agent\doc_generation\backend\service.py", line 31, in run_agent_stream
+    async for event in agent.astream_events(input_state, config=config, version="v2"):
+  File "E:\project\agent\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\base.py", line 1607, in _astream_events_v1_v2
+    async for event in event_stream:
+  File "E:\project\agent\doc_generation\.venv\Lib\site-packages\langchain_core\tracers\event_stream.py", line 1100, in _astream_events_implementation_v2
+    await task
+  File "E:\project\agent\doc_generation\.venv\Lib\site-packages\langchain_core\tracers\event_stream.py", line 1055, in consume_astream
+    async for _ in event_streamer.tap_output_aiter(run_id, stream):
+  File "E:\project\agent\doc_generation\.venv\Lib\site-packages\langchain_core\tracers\event_stream.py", line 199, in tap_output_aiter
+    first = await anext(output, sentinel)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\project\agent\doc_generation\.venv\Lib\site-packages\langgraph\pregel\main.py", line 3407, in astream
+    async for _ in runner.atick(
+  File "E:\project\agent\doc_generation\.venv\Lib\site-packages\langgraph\pregel\_runner.py", line 396, in atick
+    await arun_with_retry(
+  File "E:\project\agent\doc_generation\.venv\Lib\site-packages\langgraph\pregel\_retry.py", line 703, in arun_with_retry
+    async for _ in task.proc.astream(task.input, config):
+  File "E:\project\agent\doc_generation\.venv\Lib\site-packages\langgraph\_internal\_runnable.py", line 867, in astream
+    output = await asyncio.create_task(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\project\agent\doc_generation\.venv\Lib\site-packages\langgraph\_internal\_runnable.py", line 932, in _consume_aiter
+    async for chunk in it:
+  File "E:\project\agent\doc_generation\.venv\Lib\site-packages\langchain_core\tracers\event_stream.py", line 199, in tap_output_aiter
+    first = await anext(output, sentinel)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\project\agent\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\base.py", line 1767, in atransform
+    async for ichunk in input:
+  File "E:\project\agent\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\base.py", line 1171, in astream
+    yield await self.ainvoke(input, config, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\project\agent\doc_generation\.venv\Lib\site-packages\langgraph\_internal\_runnable.py", line 501, in ainvoke
+    ret = await self.afunc(*args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\project\agent\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\config.py", line 667, in run_in_executor
+    return await asyncio.get_running_loop().run_in_executor(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\software\python11\Lib\concurrent\futures\thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\project\agent\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\config.py", line 658, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "E:\project\agent\doc_generation\doc_generation\agents\draft_agent.py", line 57, in write_research_brief
+    response = structured_output_model.invoke([HumanMessage(content=prompt)])
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\project\agent\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\base.py", line 3333, in invoke
+    input_ = context.run(step.invoke, input_, config, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\project\agent\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\base.py", line 5881, in invoke
+    return self.bound.invoke(
+           ^^^^^^^^^^^^^^^^^^
+  File "E:\project\agent\doc_generation\.venv\Lib\site-packages\langchain_core\language_models\chat_models.py", line 474, in invoke
+    self.generate_prompt(
+  File "E:\project\agent\doc_generation\.venv\Lib\site-packages\langchain_core\language_models\chat_models.py", line 1823, in generate_prompt
+    return self.generate(prompt_messages, stop=stop, callbacks=callbacks, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\project\agent\doc_generation\.venv\Lib\site-packages\langchain_core\language_models\chat_models.py", line 1630, in generate
+    self._generate_with_cache(
+  File "E:\project\agent\doc_generation\.venv\Lib\site-packages\langchain_core\language_models\chat_models.py", line 1927, in _generate_with_cache
+    for chunk in self._stream(messages, stop=stop, **kwargs):
+  File "E:\project\agent\doc_generation\.venv\Lib\site-packages\langchain_deepseek\chat_models.py", line 331, in _stream
+    yield from super()._stream(
+  File "E:\project\agent\doc_generation\.venv\Lib\site-packages\langchain_openai\chat_models\base.py", line 1600, in _stream
+    _handle_openai_api_error(e)
+  File "E:\project\agent\doc_generation\.venv\Lib\site-packages\langchain_openai\chat_models\base.py", line 1573, in _stream
+    response = self.client.create(**payload)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\project\agent\doc_generation\.venv\Lib\site-packages\openai\_utils\_utils.py", line 298, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "E:\project\agent\doc_generation\.venv\Lib\site-packages\openai\resources\chat\completions\completions.py", line 1215, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "E:\project\agent\doc_generation\.venv\Lib\site-packages\openai\_base_client.py", line 1332, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\project\agent\doc_generation\.venv\Lib\site-packages\openai\_base_client.py", line 1072, in request
+    raise APIConnectionError(request=request) from err
+openai.APIConnectionError: Connection error.
+During task with name 'write_research_brief' and id 'c7f2a08a-b74a-4a16-e9c1-9b5f13fa3fab'
+
+
+============================================================
+Traceback (most recent call last):
+  File "E:\project\agent\doc_generation\backend\service.py", line 31, in run_agent_stream
+    async for event in agent.astream_events(input_state, config=config, version="v2"):
+  File "E:\project\agent\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\base.py", line 1607, in _astream_events_v1_v2
+    async for event in event_stream:
+  File "E:\project\agent\doc_generation\.venv\Lib\site-packages\langchain_core\tracers\event_stream.py", line 1100, in _astream_events_implementation_v2
+    await task
+  File "E:\project\agent\doc_generation\.venv\Lib\site-packages\langchain_core\tracers\event_stream.py", line 1055, in consume_astream
+    async for _ in event_streamer.tap_output_aiter(run_id, stream):
+  File "E:\project\agent\doc_generation\.venv\Lib\site-packages\langchain_core\tracers\event_stream.py", line 199, in tap_output_aiter
+    first = await anext(output, sentinel)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\project\agent\doc_generation\.venv\Lib\site-packages\langgraph\pregel\main.py", line 3407, in astream
+    async for _ in runner.atick(
+  File "E:\project\agent\doc_generation\.venv\Lib\site-packages\langgraph\pregel\_runner.py", line 396, in atick
+    await arun_with_retry(
+  File "E:\project\agent\doc_generation\.venv\Lib\site-packages\langgraph\pregel\_retry.py", line 703, in arun_with_retry
+    async for _ in task.proc.astream(task.input, config):
+  File "E:\project\agent\doc_generation\.venv\Lib\site-packages\langgraph\_internal\_runnable.py", line 867, in astream
+    output = await asyncio.create_task(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\project\agent\doc_generation\.venv\Lib\site-packages\langgraph\_internal\_runnable.py", line 932, in _consume_aiter
+    async for chunk in it:
+  File "E:\project\agent\doc_generation\.venv\Lib\site-packages\langchain_core\tracers\event_stream.py", line 199, in tap_output_aiter
+    first = await anext(output, sentinel)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\project\agent\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\base.py", line 1767, in atransform
+    async for ichunk in input:
+  File "E:\project\agent\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\base.py", line 1171, in astream
+    yield await self.ainvoke(input, config, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\project\agent\doc_generation\.venv\Lib\site-packages\langgraph\_internal\_runnable.py", line 501, in ainvoke
+    ret = await self.afunc(*args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\project\agent\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\config.py", line 667, in run_in_executor
+    return await asyncio.get_running_loop().run_in_executor(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\software\python11\Lib\concurrent\futures\thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\project\agent\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\config.py", line 658, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "E:\project\agent\doc_generation\doc_generation\agents\draft_agent.py", line 57, in write_research_brief
+    response = structured_output_model.invoke([HumanMessage(content=prompt)])
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\project\agent\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\base.py", line 3333, in invoke
+    input_ = context.run(step.invoke, input_, config, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\project\agent\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\base.py", line 5881, in invoke
+    return self.bound.invoke(
+           ^^^^^^^^^^^^^^^^^^
+  File "E:\project\agent\doc_generation\.venv\Lib\site-packages\langchain_core\language_models\chat_models.py", line 474, in invoke
+    self.generate_prompt(
+  File "E:\project\agent\doc_generation\.venv\Lib\site-packages\langchain_core\language_models\chat_models.py", line 1823, in generate_prompt
+    return self.generate(prompt_messages, stop=stop, callbacks=callbacks, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\project\agent\doc_generation\.venv\Lib\site-packages\langchain_core\language_models\chat_models.py", line 1630, in generate
+    self._generate_with_cache(
+  File "E:\project\agent\doc_generation\.venv\Lib\site-packages\langchain_core\language_models\chat_models.py", line 1968, in _generate_with_cache
+    result = generate_from_stream(iter(chunks))
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\project\agent\doc_generation\.venv\Lib\site-packages\langchain_core\language_models\chat_models.py", line 224, in generate_from_stream
+    raise ValueError(msg)
+ValueError: No generations found in stream.
+During task with name 'write_research_brief' and id 'd3d64b39-f606-3c40-2aa3-a3bff59df640'
+

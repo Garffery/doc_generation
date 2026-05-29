@@ -14,7 +14,7 @@ import logging
 from langchain_chroma import Chroma
 from langchain_core.documents import Document
 from langchain_openai import OpenAIEmbeddings
-from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain_text_splitters import MarkdownHeaderTextSplitter, RecursiveCharacterTextSplitter
 
 from doc_generation.rag.errors import RagConfigError
 
@@ -80,11 +80,23 @@ class ChromaRagStore:
 
         embedding_model = backend_cfg.get("embedding_model", "text-embedding-3-small")
         openai_cfg = (stage_cfg.get("cognition") or {}).get("openai") or {}
-        api_key = _resolve_openai_api_key(openai_cfg.get("api_key"))
-        base_url = _resolve_openai_base_url(openai_cfg.get("base_url"))
+
+        rag_api_key = backend_cfg.get("api_key")
+        rag_base_url = backend_cfg.get("base_url")
+
+        if rag_api_key and rag_api_key not in _PLACEHOLDER_API_KEYS:
+            api_key = rag_api_key
+        else:
+            api_key = _resolve_openai_api_key(openai_cfg.get("api_key"))
+
+        if rag_base_url and rag_base_url not in _PLACEHOLDER_BASE_URLS:
+            base_url = rag_base_url
+        else:
+            base_url = _resolve_openai_base_url(openai_cfg.get("base_url"))
         embedding_kwargs: Dict[str, Any] = {
             "model": embedding_model,
             "api_key": api_key,
+            "check_embedding_ctx_length": False,
         }
         if base_url:
             embedding_kwargs["base_url"] = base_url
@@ -155,7 +167,21 @@ class ChromaRagStore:
         encoding: str = "utf-8",
     ) -> int:
         """从文件路径读取、分块并写入向量库。返回写入的 chunk 数量。"""
-        splitter = RecursiveCharacterTextSplitter(
+        md_headers_to_split_on = [
+            ("#", "h1"),
+            ("##", "h2"),
+            ("###", "h3"),
+            ("####", "h4"),
+        ]
+        md_splitter = MarkdownHeaderTextSplitter(
+            headers_to_split_on=md_headers_to_split_on,
+            strip_headers=False,
+        )
+        sub_splitter = RecursiveCharacterTextSplitter(
+            chunk_size=chunk_size,
+            chunk_overlap=chunk_overlap,
+        )
+        plain_splitter = RecursiveCharacterTextSplitter(
             chunk_size=chunk_size,
             chunk_overlap=chunk_overlap,
         )
@@ -168,13 +194,36 @@ class ChromaRagStore:
                 continue
             text = path.read_text(encoding=encoding)
             source = str(path.resolve())
-            for chunk in splitter.split_text(text):
-                documents.append(
-                    Document(
-                        page_content=chunk,
-                        metadata={"source": source, "filename": path.name},
+
+            if path.suffix.lower() in (".md", ".markdown"):
+                md_docs = md_splitter.split_text(text)
+                for md_doc in md_docs:
+                    if len(md_doc.page_content) > chunk_size:
+                        sub_chunks = sub_splitter.split_text(md_doc.page_content)
+                        for chunk in sub_chunks:
+                            documents.append(
+                                Document(
+                                    page_content=chunk,
+                                    metadata={"source": source, "filename": path.name, **md_doc.metadata},
+                                )
+                            )
+                    else:
+                        md_doc.metadata["source"] = source
+                        md_doc.metadata["filename"] = path.name
+                        documents.append(md_doc)
+            else:
+                for chunk in plain_splitter.split_text(text):
+                    documents.append(
+                        Document(
+                            page_content=chunk,
+                            metadata={"source": source, "filename": path.name},
+                        )
                     )
-                )
+
+        if not documents:
+            return 0
+
+        documents = [doc for doc in documents if doc.page_content and doc.page_content.strip()]
 
         if not documents:
             return 0

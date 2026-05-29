@@ -160,6 +160,7 @@ def _build_deepseek_kwargs(
     kwargs: Dict[str, Any] = {
         "model": model,
         "model_provider": "deepseek",
+        "streaming": False,
     }
 
     api_key = _resolve_openai_credential(
