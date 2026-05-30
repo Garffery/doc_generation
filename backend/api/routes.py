@@ -4,8 +4,8 @@ from fastapi import APIRouter
 from fastapi.responses import StreamingResponse
 
 from backend.schemas import GenerateRequest, ResumeRequest
-from backend.service import run_agent_stream, resume_agent_stream
-from backend.db import list_tickets, get_ticket_with_report
+from backend.service import run_agent_stream, resume_agent_stream, retry_agent_stream
+from backend.db import list_tickets, get_ticket_with_report, get_ticket
 
 logger = logging.getLogger(__name__)
 
@@ -55,3 +55,25 @@ async def ticket_detail(ticket_id: str):
         from fastapi import HTTPException
         raise HTTPException(status_code=404, detail="Ticket not found")
     return result
+
+
+@router.post("/retry/{ticket_id}")
+async def retry(ticket_id: str):
+    """进程崩溃后从 checkpoint 恢复执行"""
+    from fastapi import HTTPException
+
+    ticket = await get_ticket(ticket_id)
+    if ticket is None:
+        raise HTTPException(status_code=404, detail="Ticket not found")
+    if ticket["status"] not in ("error", "running"):
+        raise HTTPException(status_code=400, detail="Only error/running tickets can be retried")
+
+    return StreamingResponse(
+        retry_agent_stream(ticket_id, ticket["thread_id"]),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no",
+        },
+    )

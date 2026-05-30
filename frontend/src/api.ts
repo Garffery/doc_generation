@@ -126,9 +126,38 @@ export async function fetchTicketDetail(ticketId: string): Promise<{
   message: string;
   status: string;
   created_at: string;
+  thread_id: string;
   report: { research_brief?: string; draft_report?: string; final_report?: string };
 }> {
   const res = await fetch(`${API_BASE}/tickets/${ticketId}`);
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   return res.json();
+}
+
+export function streamRetry(
+  ticketId: string,
+  onEvent: (event: SSEEvent) => void,
+  onError: (error: Error) => void,
+  onDone: () => void,
+): AbortController {
+  const controller = new AbortController();
+
+  fetch(`${API_BASE}/retry/${ticketId}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    signal: controller.signal,
+  })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      parseSSEStream(response, { onEvent, onError, onDone });
+    })
+    .catch((err) => {
+      if (err.name !== 'AbortError') {
+        onError(err);
+      }
+    });
+
+  return controller;
 }

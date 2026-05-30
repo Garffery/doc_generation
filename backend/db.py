@@ -1,9 +1,11 @@
 import uuid
 from datetime import datetime, timezone
 
+import os
+
 from motor.motor_asyncio import AsyncIOMotorClient
 
-_client = AsyncIOMotorClient("mongodb://localhost:27017")
+_client = AsyncIOMotorClient(os.environ.get("MONGODB_URI", "mongodb://localhost:27017"))
 _db = _client["doc_generation"]
 _tickets = _db["tickets"]
 _reports = _db["reports"]
@@ -56,6 +58,10 @@ async def list_tickets(skip: int = 0, limit: int = 20) -> list[dict]:
         {}, {"_id": 0, "id": 1, "message": 1, "status": 1, "created_at": 1}
     ).sort("created_at", -1).skip(skip).limit(limit)
     return await cursor.to_list(length=limit)
+
+
+async def get_ticket(ticket_id: str) -> dict | None:
+    return await _tickets.find_one({"id": ticket_id}, {"_id": 0})
 
 
 async def get_ticket_with_report(ticket_id: str) -> dict | None:

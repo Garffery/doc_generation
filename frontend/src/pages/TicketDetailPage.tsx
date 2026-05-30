@@ -8,6 +8,7 @@ interface TicketDetail {
   message: string;
   status: string;
   created_at: string;
+  thread_id: string;
   report: {
     research_brief?: string;
     draft_report?: string;
@@ -37,6 +38,11 @@ export default function TicketDetailPage() {
       .finally(() => setLoading(false));
   }, [id]);
 
+  const handleRetry = () => {
+    if (!ticket) return;
+    navigate(`/generate?retry=${ticket.id}`);
+  };
+
   if (loading) {
     return (
       <div className="h-full flex items-center justify-center text-gray-400 text-sm">加载中...</div>
@@ -63,12 +69,22 @@ export default function TicketDetailPage() {
               <polyline points="15 18 9 12 15 6" />
             </svg>
           </button>
-          <div>
+          <div className="flex-1">
             <h1 className="text-xl font-bold text-orange-700 dark:text-orange-300">工单详情</h1>
             <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5 truncate max-w-lg">
               {ticket.message}
             </p>
           </div>
+          {(ticket.status === 'error' || ticket.status === 'running') && (
+            <div className="flex items-center gap-3">
+              <button
+                onClick={handleRetry}
+                className="px-4 py-2 text-sm font-medium rounded-lg bg-orange-500 text-white hover:bg-orange-600 transition-colors"
+              >
+                从断点恢复
+              </button>
+            </div>
+          )}
         </div>
       </header>
 

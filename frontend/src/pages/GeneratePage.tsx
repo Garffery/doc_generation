@@ -1,9 +1,10 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import InputForm from '../components/InputForm';
 import ProgressBar from '../components/ProgressBar';
 import ReportView from '../components/ReportView';
 import ClarificationPanel from '../components/ClarificationPanel';
-import { streamGenerate, streamResume } from '../api';
+import { streamGenerate, streamResume, streamRetry } from '../api';
 import type { SSEEvent } from '../api';
 
 type AppState = 'idle' | 'generating' | 'awaiting_answers' | 'done' | 'error';
@@ -18,6 +19,7 @@ const STAGE_TABS = [
 type TabKey = (typeof STAGE_TABS)[number]['key'];
 
 export default function GeneratePage() {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [state, setState] = useState<AppState>('idle');
   const [stage, setStage] = useState('');
   const [stageMessage, setStageMessage] = useState('');
@@ -29,6 +31,35 @@ export default function GeneratePage() {
   const [questions, setQuestions] = useState<{question: string, options: string[]}[]>([]);
   const [activeTab, setActiveTab] = useState<TabKey>('research_brief');
   const controllerRef = useRef<AbortController | null>(null);
+
+  useEffect(() => {
+    const retryTicketId = searchParams.get('retry');
+    if (retryTicketId) {
+      setSearchParams({}, { replace: true });
+      startRetry(retryTicketId);
+    }
+  }, []);
+
+  const startRetry = (ticketId: string) => {
+    setState('generating');
+    setStage('retry');
+    setStageMessage('正在从断点恢复...');
+    setError('');
+
+    const controller = streamRetry(
+      ticketId,
+      handleSSEEvent,
+      (err) => {
+        setError(err.message);
+        setState('error');
+      },
+      () => {
+        setState((prev) => (prev === 'generating' ? 'done' : prev));
+      },
+    );
+
+    controllerRef.current = controller;
+  };
 
   const handleSSEEvent = (event: SSEEvent) => {
     switch (event.type) {

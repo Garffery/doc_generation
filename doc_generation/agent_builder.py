@@ -6,7 +6,7 @@
 
 from langchain_core.messages import HumanMessage
 from langgraph.graph import StateGraph, START, END
-from langgraph.checkpoint.memory import MemorySaver
+from langgraph.checkpoint.mongodb import MongoDBSaver
 
 from doc_generation.utils import get_today_str
 from doc_generation.states import AgentState, AgentInputState
@@ -68,6 +68,10 @@ deep_researcher_builder.add_edge("write_draft_report", "supervisor_subgraph")
 deep_researcher_builder.add_edge("supervisor_subgraph", "final_report_generation")
 deep_researcher_builder.add_edge("final_report_generation", END)
 
-# 编译graph（使用 MemorySaver 支持 interrupt/resume）
-checkpointer = MemorySaver()
+# 编译graph（使用 MongoDB 持久化 checkpoint，支持 interrupt/resume 跨重启恢复）
+import os
+from pymongo import MongoClient
+
+_mongo_client = MongoClient(os.environ.get("MONGODB_URI", "mongodb://localhost:27017"))
+checkpointer = MongoDBSaver(_mongo_client, db_name="doc_generation")
 agent = deep_researcher_builder.compile(checkpointer=checkpointer)

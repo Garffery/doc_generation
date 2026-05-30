@@ -169,6 +169,107 @@ async def resume_agent_stream(thread_id: str, answers: str) -> AsyncGenerator[st
         yield _sse_event("error", {"message": str(e)})
 
 
+async def retry_agent_stream(ticket_id: str, thread_id: str) -> AsyncGenerator[str, None]:
+    """进程崩溃后，从 MongoDB checkpoint 恢复执行"""
+
+    from doc_generation.agent_builder import agent
+
+    config = {"configurable": {"thread_id": thread_id}}
+
+    try:
+        await update_ticket_status(ticket_id, "running")
+        yield _sse_event("session", {"thread_id": thread_id, "ticket_id": ticket_id})
+
+        # 先检查 checkpoint 中是否有 interrupt（上次停在 question_to_user）
+        state = await agent.aget_state(config)
+        if state.tasks and any(
+            hasattr(t, "interrupts") and t.interrupts for t in state.tasks
+        ):
+            interrupt_value = state.tasks[0].interrupts[0].value
+            yield _sse_event("interrupt", {
+                "thread_id": thread_id,
+                "questions": json.dumps(interrupt_value.get("questions", []), ensure_ascii=False),
+            })
+            return
+
+        # 从 checkpoint 恢复执行：传 None 让 LangGraph 从上次完成的节点继续
+        yield _sse_event("status", {"stage": "retry", "message": "正在从断点恢复..."})
+
+        async for event in agent.astream_events(None, config=config, version="v2"):
+            kind = event.get("event")
+            name = event.get("name", "")
+
+            if kind == "on_chain_start" and name in (
+                "write_research_brief",
+                "question_to_user",
+                "write_draft_report",
+                "supervisor_subgraph",
+                "final_report_generation",
+            ):
+                stage_labels = {
+                    "write_research_brief": "正在拆解需求...",
+                    "question_to_user": "正在生成澄清问题...",
+                    "write_draft_report": "正在生成文档草稿...",
+                    "supervisor_subgraph": "正在深度研究与优化...",
+                    "final_report_generation": "正在生成最终报告...",
+                }
+                yield _sse_event("status", {
+                    "stage": name,
+                    "message": stage_labels.get(name, name),
+                })
+
+            elif kind == "on_chain_end" and name in (
+                "write_research_brief",
+                "write_draft_report",
+            ):
+                output = event.get("data", {}).get("output", {})
+                if isinstance(output, dict):
+                    if "research_brief" in output:
+                        await update_report_stage(ticket_id, "research_brief", output["research_brief"])
+                        yield _sse_event("progress", {
+                            "stage": "research_brief",
+                            "content": output["research_brief"],
+                        })
+                    if "draft_report" in output:
+                        await update_report_stage(ticket_id, "draft_report", output["draft_report"])
+                        yield _sse_event("progress", {
+                            "stage": "draft_report",
+                            "content": output["draft_report"],
+                        })
+
+            elif kind == "on_chain_end" and name == "final_report_generation":
+                output = event.get("data", {}).get("output", {})
+                if isinstance(output, dict) and "final_report" in output:
+                    await update_report_stage(ticket_id, "final_report", output["final_report"])
+                    yield _sse_event("result", {
+                        "content": output["final_report"],
+                    })
+
+        # 流结束后检查是否因 interrupt 暂停
+        state = await agent.aget_state(config)
+        if state.tasks and any(
+            hasattr(t, "interrupts") and t.interrupts for t in state.tasks
+        ):
+            interrupt_value = state.tasks[0].interrupts[0].value
+            yield _sse_event("interrupt", {
+                "thread_id": thread_id,
+                "questions": json.dumps(interrupt_value.get("questions", []), ensure_ascii=False),
+            })
+        else:
+            await update_ticket_status(ticket_id, "done")
+
+    except Exception as e:
+        logger.exception("Agent retry failed")
+        tb = traceback.format_exc()
+        import pathlib
+        log_path = pathlib.Path(__file__).resolve().parent.parent / "logs" / "agent_error.log"
+        log_path.parent.mkdir(parents=True, exist_ok=True)
+        with open(log_path, "a", encoding="utf-8") as f:
+            f.write(f"\n{'='*60}\n{tb}\n")
+        await update_ticket_status(ticket_id, "error")
+        yield _sse_event("error", {"message": str(e)})
+
+
 def _sse_event(event_type: str, data: dict) -> str:
     """格式化 SSE 事件"""
     return f"event: {event_type}\ndata: {json.dumps(data, ensure_ascii=False)}\n\n"
