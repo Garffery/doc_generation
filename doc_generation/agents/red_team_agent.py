@@ -4,7 +4,6 @@
 #***********************************************
 
 from langchain_core.messages import SystemMessage, HumanMessage
-from langchain.chat_models import init_chat_model
 
 from doc_generation.prompts import RED_TEAM_PROMPT
 from doc_generation.llm import get_chat_model

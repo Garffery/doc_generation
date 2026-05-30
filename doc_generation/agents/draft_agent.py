@@ -1,10 +1,11 @@
 # 初始化模型
 
 import os
+from http.client import responses
 
 from langgraph.constants import START, END
 from langgraph.graph import StateGraph
-from langgraph.types import interrupt
+from langgraph.types import interrupt, Command
 from doc_generation.llm import get_chat_model
 from doc_generation import AgentState
 from doc_generation.prompts import RESEARCH_BRIEF_PROMPT, DRAFT_REPORT_PROMPT, QUESTION_TO_USER_PROMPT
@@ -22,6 +23,8 @@ from doc_generation.skills.registry import get_or_new_skill_storage, load_skills
 
 logger = logging.getLogger(__name__)
 draft_model = get_chat_model("draft")
+
+MAX_RETRY_TIME = 5
 
 
 def _load_skills_config() -> SkillsConfig:
@@ -54,7 +57,8 @@ def write_research_brief(state: AgentState):
 
     # 结构化输出
     structured_output_model = draft_model.with_structured_output(ResearchQuestion)
-    response = structured_output_model.invoke([HumanMessage(content=prompt)])
+    handler = make_safe_invoke(structured_output_model, prompt)
+    response = handler()
     logger.debug("write_research_brief produced research_brief length=%d", len(response.research_brief))
 
     return {"research_brief": response.research_brief}
@@ -71,7 +75,8 @@ def question_to_user(state: AgentState):
     )
 
     structured_model = draft_model.with_structured_output(ClarificationQuestions)
-    response = structured_model.invoke([HumanMessage(content=prompt)])
+    handler = make_safe_invoke(structured_model, prompt)
+    response = handler()
     items = [{"question": item.question, "options": item.options} for item in response.items]
 
     logger.info("question_to_user generated %d questions, interrupting for user input", len(items))
@@ -105,9 +110,10 @@ def write_draft_report(state: AgentState):
     if clarification_answers:
         draft_report_prompt += f"\n\n<用户补充说明>\n{clarification_answers}\n</用户补充说明>\n"
 
-    # 结构化输出
     structured_output_model = draft_model.with_structured_output(DraftReport)
-    response = structured_output_model.invoke([HumanMessage(content=draft_report_prompt)])
+    handler = make_safe_invoke(structured_output_model, draft_report_prompt)
+    response = handler()
+
     logger.debug("write_draft_report produced draft_report length=%d", len(response.draft_report))
 
     return {
@@ -116,6 +122,19 @@ def write_draft_report(state: AgentState):
         "supervisor_messages": ["Here is the backend dev doc draft: " + response.draft_report, research_brief]
     }
 
+def make_safe_invoke(model, input_message):
+    def safe_invoke(time: int = 1, new_message=None):
+        if time >= MAX_RETRY_TIME:
+            return Command(goto=END)
+        try:
+            msgs = [HumanMessage(content=input_message)]
+            if new_message:
+                msgs.append(new_message)
+            return model.invoke(msgs)
+        except Exception as e:
+            logger.error(f"Error: {e}")
+            return safe_invoke(time + 1, HumanMessage(content=f"Error: {e}"))
+    return safe_invoke
 
 if __name__  == "__main__":
     configure_logging(level=os.environ.get("LOG_LEVEL", "DEBUG"))

@@ -629,3 +629,151 @@ Traceback (most recent call last):
 ValueError: No generations found in stream.
 During task with name 'write_research_brief' and id 'd3d64b39-f606-3c40-2aa3-a3bff59df640'
 
+
+============================================================
+Traceback (most recent call last):
+  File "D:\project\doc_generation\backend\service.py", line 31, in run_agent_stream
+    async for event in agent.astream_events(input_state, config=config, version="v2"):
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\base.py", line 1607, in _astream_events_v1_v2
+    async for event in event_stream:
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\tracers\event_stream.py", line 1100, in _astream_events_implementation_v2
+    await task
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\tracers\event_stream.py", line 1055, in consume_astream
+    async for _ in event_streamer.tap_output_aiter(run_id, stream):
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\tracers\event_stream.py", line 199, in tap_output_aiter
+    first = await anext(output, sentinel)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\pregel\main.py", line 3407, in astream
+    async for _ in runner.atick(
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\pregel\_runner.py", line 396, in atick
+    await arun_with_retry(
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\pregel\_retry.py", line 703, in arun_with_retry
+    async for _ in task.proc.astream(task.input, config):
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\_internal\_runnable.py", line 867, in astream
+    output = await asyncio.create_task(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\_internal\_runnable.py", line 932, in _consume_aiter
+    async for chunk in it:
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\tracers\event_stream.py", line 199, in tap_output_aiter
+    first = await anext(output, sentinel)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\base.py", line 1767, in atransform
+    async for ichunk in input:
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\base.py", line 1171, in astream
+    yield await self.ainvoke(input, config, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\_internal\_runnable.py", line 501, in ainvoke
+    ret = await self.afunc(*args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\config.py", line 667, in run_in_executor
+    return await asyncio.get_running_loop().run_in_executor(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\software\myConda\envs\rag-test\Lib\concurrent\futures\thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\config.py", line 658, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\doc_generation\agents\draft_agent.py", line 60, in write_research_brief
+    response = structured_output_model.invoke([HumanMessage(content=prompt)])
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\base.py", line 3335, in invoke
+    input_ = context.run(step.invoke, input_, config)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\output_parsers\base.py", line 207, in invoke
+    return self._call_with_config(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\base.py", line 2238, in _call_with_config
+    context.run(
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\config.py", line 486, in call_func_with_variable_args
+    return func(input, **kwargs)  # type: ignore[call-arg]
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\output_parsers\base.py", line 208, in <lambda>
+    lambda inner_input: self.parse_result(
+                        ^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\output_parsers\openai_tools.py", line 369, in parse_result
+    pydantic_objects.append(tool(**res["args"]))
+                            ^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\pydantic\main.py", line 263, in __init__
+    validated_self = self.__pydantic_validator__.validate_python(data, self_instance=self)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pydantic_core._pydantic_core.ValidationError: 1 validation error for ResearchQuestion
+research_brief
+  Field required [type=missing, input_value={}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.13/v/missing
+During task with name 'write_research_brief' and id 'c23d39e5-e20d-cebe-fcd1-163774e4ccda'
+
+
+============================================================
+Traceback (most recent call last):
+  File "D:\project\doc_generation\backend\service.py", line 31, in run_agent_stream
+    async for event in agent.astream_events(input_state, config=config, version="v2"):
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\base.py", line 1607, in _astream_events_v1_v2
+    async for event in event_stream:
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\tracers\event_stream.py", line 1100, in _astream_events_implementation_v2
+    await task
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\tracers\event_stream.py", line 1055, in consume_astream
+    async for _ in event_streamer.tap_output_aiter(run_id, stream):
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\tracers\event_stream.py", line 199, in tap_output_aiter
+    first = await anext(output, sentinel)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\pregel\main.py", line 3407, in astream
+    async for _ in runner.atick(
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\pregel\_runner.py", line 396, in atick
+    await arun_with_retry(
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\pregel\_retry.py", line 703, in arun_with_retry
+    async for _ in task.proc.astream(task.input, config):
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\_internal\_runnable.py", line 867, in astream
+    output = await asyncio.create_task(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\_internal\_runnable.py", line 932, in _consume_aiter
+    async for chunk in it:
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\tracers\event_stream.py", line 199, in tap_output_aiter
+    first = await anext(output, sentinel)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\base.py", line 1767, in atransform
+    async for ichunk in input:
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\base.py", line 1171, in astream
+    yield await self.ainvoke(input, config, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\_internal\_runnable.py", line 501, in ainvoke
+    ret = await self.afunc(*args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\config.py", line 667, in run_in_executor
+    return await asyncio.get_running_loop().run_in_executor(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\software\myConda\envs\rag-test\Lib\concurrent\futures\thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\config.py", line 658, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\doc_generation\agents\draft_agent.py", line 60, in write_research_brief
+    response = structured_output_model.invoke([HumanMessage(content=prompt)])
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\base.py", line 3335, in invoke
+    input_ = context.run(step.invoke, input_, config)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\output_parsers\base.py", line 207, in invoke
+    return self._call_with_config(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\base.py", line 2238, in _call_with_config
+    context.run(
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\config.py", line 486, in call_func_with_variable_args
+    return func(input, **kwargs)  # type: ignore[call-arg]
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\output_parsers\base.py", line 208, in <lambda>
+    lambda inner_input: self.parse_result(
+                        ^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\output_parsers\openai_tools.py", line 369, in parse_result
+    pydantic_objects.append(tool(**res["args"]))
+                            ^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\pydantic\main.py", line 263, in __init__
+    validated_self = self.__pydantic_validator__.validate_python(data, self_instance=self)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pydantic_core._pydantic_core.ValidationError: 1 validation error for ResearchQuestion
+research_brief
+  Field required [type=missing, input_value={}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.13/v/missing
+During task with name 'write_research_brief' and id 'bb70a092-042a-469b-fc03-a1608823132f'
+

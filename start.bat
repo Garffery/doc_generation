@@ -9,7 +9,7 @@ echo.
 cd /d "%~dp0"
 
 echo [1/2] Starting backend (FastAPI)...
-start "Backend - FastAPI" cmd /k "cd /d "%~dp0" && .venv\Scripts\activate && uvicorn backend.app:app --host 0.0.0.0 --port 8000 --reload"
+start "Backend - FastAPI" cmd /k "cd /d "%~dp0" && .venv\Scripts\activate && uvicorn backend.app:app --host 127.0.0.1 --port 8000 --reload"
 
 echo [2/2] Starting frontend (Vite)...
 start "Frontend - Vite" cmd /k "cd /d "%~dp0frontend" && npm run dev"
