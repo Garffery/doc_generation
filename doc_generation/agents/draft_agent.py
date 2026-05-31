@@ -59,6 +59,7 @@ def write_research_brief(state: AgentState):
     structured_output_model = draft_model.with_structured_output(ResearchQuestion)
     handler = make_safe_invoke(structured_output_model, prompt)
     response = handler()
+    logger.info(f"结构化输出：{response}")
     logger.debug("write_research_brief produced research_brief length=%d", len(response.research_brief))
 
     return {"research_brief": response.research_brief}
@@ -77,6 +78,7 @@ def question_to_user(state: AgentState):
     structured_model = draft_model.with_structured_output(ClarificationQuestions)
     handler = make_safe_invoke(structured_model, prompt)
     response = handler()
+    logger.info(f"提问结果：{response}")
     items = [{"question": item.question, "options": item.options} for item in response.items]
 
     logger.info("question_to_user generated %d questions, interrupting for user input", len(items))
@@ -113,7 +115,7 @@ def write_draft_report(state: AgentState):
     structured_output_model = draft_model.with_structured_output(DraftReport)
     handler = make_safe_invoke(structured_output_model, draft_report_prompt)
     response = handler()
-
+    logger.info(f"简报结果：{response}")
     logger.debug("write_draft_report produced draft_report length=%d", len(response.draft_report))
 
     return {
@@ -126,6 +128,9 @@ def make_safe_invoke(model, input_message):
     def safe_invoke(time: int = 1, new_message=None):
         if time >= MAX_RETRY_TIME:
             return Command(goto=END)
+        if time > 1:
+            import time as time_mod
+            time_mod.sleep(2 ** (time - 1))
         try:
             msgs = [HumanMessage(content=input_message)]
             if new_message:

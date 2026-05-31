@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import os
 from typing import Optional
 
 from typing_extensions import Annotated
@@ -22,7 +23,19 @@ from claude_code_sdk import (
     query,
 )
 
+from doc_generation.utils import load_config
+
 logger = logging.getLogger(__name__)
+
+
+def _get_claude_code_cwd() -> str | None:
+    """从 config.yml 读取 claude_code.cwd 配置"""
+    try:
+        stage = os.environ.get("STAGE") or "prod"
+        cfg = load_config(stage_name=stage, config_path=os.environ.get("CONFIG_PATH", "config.yml"))
+        return cfg.get("claude_code", {}).get("cwd")
+    except Exception:
+        return None
 
 
 async def _run_claude_code(
@@ -65,7 +78,6 @@ def claude_code(
     prompt: str,
     system_prompt: Annotated[Optional[str], InjectedToolArg] = None,
     model: Annotated[Optional[str], InjectedToolArg] = None,
-    cwd: Annotated[Optional[str], InjectedToolArg] = None,
     max_turns: Annotated[Optional[int], InjectedToolArg] = None,
     allowed_tools: Annotated[Optional[list[str]], InjectedToolArg] = None,
 ) -> str:
@@ -78,13 +90,14 @@ def claude_code(
         prompt: 发送给 Claude Code 的提示词/任务描述。
         system_prompt: 自定义系统提示词（可选）。
         model: 指定使用的模型（可选，默认使用 CLI 配置的模型）。
-        cwd: 工作目录路径（可选，默认使用当前目录）。
         max_turns: 最大对话轮次（可选）。
         allowed_tools: 允许使用的工具列表（可选）。
 
     Returns:
         Claude Code 的文本响应结果。
     """
+    cwd = _get_claude_code_cwd()
+
     try:
         loop = asyncio.get_running_loop()
     except RuntimeError:

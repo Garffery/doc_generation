@@ -217,16 +217,53 @@ async def supervisor_tools(state: SupervisorState) -> Command[Literal["superviso
 
             # 调用 ConductResearch工具 (asynchronous)
             if conduct_research_calls:
-                # 并行启动多个 research agents
-                coros = [
-                    researcher_agent.ainvoke({
+                # 并行启动多个 research agents，每个使用独立 thread_id 以支持 interrupt
+                import uuid as _uuid
+
+                async def _run_researcher(tool_call):
+                    """运行单个 researcher agent，处理 interrupt/resume 循环"""
+                    thread_id = str(_uuid.uuid4())
+                    config = {"configurable": {"thread_id": thread_id}}
+                    input_state = {
                         "researcher_messages": [
                             HumanMessage(content=tool_call["args"]["research_topic"])
                         ],
                         "research_topic": tool_call["args"]["research_topic"]
-                    })
-                    for tool_call in conduct_research_calls
-                ]
+                    }
+
+                    result = await researcher_agent.ainvoke(input_state, config=config)
+
+                    # 检查是否因 interrupt 暂停（claude_code 异步任务未完成）
+                    state_snapshot = await researcher_agent.aget_state(config)
+                    while state_snapshot.tasks and any(
+                        hasattr(t, "interrupts") and t.interrupts for t in state_snapshot.tasks
+                    ):
+                        # 等待 ARQ worker 完成任务并写入 Redis
+                        import redis.asyncio as aioredis
+                        import os as _os
+                        redis_url = _os.environ.get("REDIS_URL", "redis://localhost:6379")
+                        r = aioredis.from_url(redis_url, decode_responses=True)
+
+                        interrupt_value = state_snapshot.tasks[0].interrupts[0].value
+                        job_id = interrupt_value.get("job_id", "")
+
+                        # 轮询等待结果
+                        while True:
+                            res = await r.get(f"claude_code_job:{job_id}")
+                            err = await r.get(f"claude_code_job:{job_id}:error")
+                            if res is not None or err is not None:
+                                break
+                            await asyncio.sleep(5)
+                        await r.aclose()
+
+                        # 恢复子图
+                        from langgraph.types import Command as _Cmd
+                        result = await researcher_agent.ainvoke(_Cmd(resume=True), config=config)
+                        state_snapshot = await researcher_agent.aget_state(config)
+
+                    return result
+
+                coros = [_run_researcher(tc) for tc in conduct_research_calls]
 
                 # 等待所有research agents 返回研究结果
                 tool_results = await asyncio.gather(*coros)
@@ -308,6 +345,10 @@ async def supervisor_tools(state: SupervisorState) -> Command[Literal["superviso
             return Command(goto=next_step, update=updates)
 
         except Exception as e:
+            from langgraph.errors import GraphBubbleUp
+            if isinstance(e, GraphBubbleUp):
+                raise
+            logger.exception("[SUPERVISOR] supervisor_tools failed: %s", e)
             return Command(
                 goto=END,
                 update={

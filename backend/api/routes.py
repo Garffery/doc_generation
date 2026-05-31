@@ -77,3 +77,35 @@ async def retry(ticket_id: str):
             "X-Accel-Buffering": "no",
         },
     )
+
+
+@router.post("/internal/resume/researcher/{thread_id}")
+async def resume_researcher(thread_id: str):
+    """ARQ Worker 完成 claude_code_tool 后的回调端点，恢复 researcher 子图执行。"""
+    import os
+    import redis.asyncio as aioredis
+    from langgraph.types import Command
+
+    from doc_generation.agent_builder import agent
+
+    redis_url = os.environ.get("REDIS_URL", "redis://localhost:6379")
+    r = aioredis.from_url(redis_url, decode_responses=True)
+
+    config = {"configurable": {"thread_id": thread_id}}
+
+    try:
+        state = await agent.aget_state(config)
+        if not (state.tasks and any(
+            hasattr(t, "interrupts") and t.interrupts for t in state.tasks
+        )):
+            return {"status": "no_interrupt", "thread_id": thread_id}
+
+        await agent.ainvoke(Command(resume=True), config=config)
+        return {"status": "resumed", "thread_id": thread_id}
+
+    except Exception as e:
+        logger.exception("Failed to resume researcher for thread_id=%s", thread_id)
+        from fastapi import HTTPException
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        await r.aclose()

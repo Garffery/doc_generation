@@ -25,6 +25,10 @@ class ResearcherState(TypedDict):
     research_topic: str
     compressed_research: str
     raw_notes: Annotated[List[str], operator.add]
+    claude_code_job_id: str
+    claude_code_result: str
+    claude_code_tool_call_id: str
+    _claude_code_dispatched: bool
 
 class ResearcherOutputState(TypedDict):
     """Research Agent的输出状态，包含最终的研究结果。

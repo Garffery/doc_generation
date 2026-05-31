@@ -337,23 +337,10 @@ def think_tool(reflection: str) -> str:
 
 
 
-def refine_draft_report(research_brief: Annotated[str, InjectedToolArg], 
-                        findings: Annotated[str, InjectedToolArg], 
+def refine_draft_report(research_brief: Annotated[str, InjectedToolArg],
+                        findings: Annotated[str, InjectedToolArg],
                         draft_report: Annotated[str, InjectedToolArg]):
-
-    """根据新的研究发现(findings)完善目前的报告草稿(draft_report)
-
-    该工具会综合当前所有研究结果整理输出一份更全面的报告草稿。
-
-    Args:
-        research_brief：用户的研究请求。
-        findings：针对用户请求收集的研究结果。
-        draft_report：基于研究结果和用户请求的报告草稿。
-
-    Returns:
-        精炼后的报告草案
-    """
-
+    """根据最新研究发现自动完善当前报告草稿，无需手动传入参数。"""
     # 组装提示词
     draft_report_prompt = REFINE_DRAFT_REPORT_PROMPT.format(
         research_brief=research_brief,
@@ -378,5 +365,5 @@ _tavily_search_tool = tool(parse_docstring=True)(tavily_search)
 _think_tool = tool(parse_docstring=True)(think_tool)
 
 # 精修tool
-_refine_draft_report_tool = tool(parse_docstring=True)(refine_draft_report)
+_refine_draft_report_tool = tool(parse_docstring=False)(refine_draft_report)
 
