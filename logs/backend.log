@@ -24515,3 +24515,975 @@ reason
 2026-05-31 15:44:26 INFO [watchfiles.main] 1 change detected
 2026-05-31 15:44:38 INFO [watchfiles.main] 1 change detected
 2026-05-31 15:44:38 INFO [watchfiles.main] 4 changes detected
+2026-05-31 21:53:00 INFO [watchfiles.main] 2 changes detected
+2026-05-31 21:53:05 INFO [doc_generation.llm] Selected cognition backend 'deepseek' for role 'draft' with handle 'deepseek-v4-flash' (timeout=600)
+2026-05-31 21:53:08 INFO [doc_generation.llm] Selected cognition backend 'deepseek' for role 'evaluator' with handle 'deepseek-v4-flash' (timeout=600)
+2026-05-31 21:53:08 INFO [watchfiles.main] 5 changes detected
+2026-05-31 21:53:10 INFO [doc_generation.llm] Selected cognition backend 'deepseek' for role 'red_team' with handle 'deepseek-v4-flash' (timeout=600)
+2026-05-31 21:53:11 INFO [doc_generation.llm] Selected cognition backend 'deepseek' for role 'researcher_summarizer' with handle 'deepseek-v4-flash' (timeout=600)
+2026-05-31 21:53:11 INFO [watchfiles.main] 5 changes detected
+2026-05-31 21:53:13 INFO [doc_generation.llm] Selected cognition backend 'deepseek' for role 'writer' with handle 'deepseek-v4-flash' (timeout=600)
+2026-05-31 21:53:15 INFO [doc_generation.llm] Selected cognition backend 'deepseek' for role 'researcher_main' with handle 'deepseek-v4-flash' (timeout=600)
+2026-05-31 21:53:17 INFO [doc_generation.llm] Selected cognition backend 'deepseek' for role 'researcher_compressor' with handle 'deepseek-v4-flash' (timeout=600)
+2026-05-31 21:53:18 INFO [doc_generation.llm] Selected cognition backend 'deepseek' for role 'supervisor' with handle 'deepseek-v4-pro' (timeout=600)
+2026-05-31 21:53:20 INFO [doc_generation.llm] Selected cognition backend 'deepseek' for role 'writer' with handle 'deepseek-v4-flash' (timeout=600)
+2026-05-31 21:53:21 INFO [watchfiles.main] 3 changes detected
+2026-05-31 21:53:42 INFO [httpx] HTTP Request: POST https://api.zhizengzeng.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-31 21:53:42 INFO [doc_generation.agents.draft_agent] 结构化输出：research_brief='## 1. 需求摘要\n\n资源找回功能允许玩家在错过日常功能后，通过消耗绑钻或金币来买回错过的奖励。系统需记录玩家最近2天内未完成的日常功能，并在玩家登录时统计可找回的资源。找回分为"绑钻找回"和"金币找回"两种方式，绑钻找回可覆盖普通次数和额外付费次数，金币找回仅限普通次数。后端需负责离线记录、登录统计、找回扣费与奖励发放等核心逻辑。\n\n## 2. 需求分析\n\n### 已确认\n\n1. **功能入口**：资源找回作为日常功能界面的一个页签，点击"资源找回"即可切换。\n2. **找回内容展示**：显示功能名、可找回次数、找回按钮、找回金额和奖励内容。\n3. **玩法提示**：点击按钮打开三级弹窗，玩法内容由策划配置。\n4. **追回类型**：分为"绑钻找回"和"金币找回"，默认选中绑钻找回。\n5. **离线记录**：玩家离线前，服务端记录当天尚未完成的日常功能。\n6. **记录保留期**：2天内玩家若均有上线，则两天内未完成的日常功能都需要存储记录；超过2天后清除2天前记录的未完成功能。\n7. **登录统计**：玩家每天第一次登录时，服务端统计目前可找回的所有资源。\n8. **统计范围**：不仅统计正常可找回的功能次数，也要统计可付费购买次数的功能次数，两者分开记录。\n9. **未开放功能**：玩家上次离线前未开放的功能不允许找回。\n10. **绑钻找回**：消耗绑钻，若绑钻不足则弹窗询问是否消耗钻石找回。\n11. **绑钻找回范围**：可找回普通次数和额外次数（额外次数单价更高）。\n12. **金币找回**：只能找回普通次数的功能资源，不能找回额外次数。\n13. **次数互斥**：绑钻找回和金币找回共有次数，即绑钻找过的资源不能再用金币找回。\n14. **日常任务找回奖励**：包括经验和金币；经验根据玩家等级由数值公式计算。\n15. **装备副本找回奖励**：包括经验丹（配置道具）和装备（由策划配置宝箱，在多件装备中随机产出少量装备）。\n\n### 待澄清\n\n1. **可找回的具体功能列表**：需求提到"具体可找回的功能内容由策划补充确定"，需明确哪些日常功能支持资源找回（如日常任务、装备副本之外是否还有其它功能）。\n2. **额外次数的定义与来源**：哪些功能有额外付费次数？额外次数的上限、单价配置方式未说明。\n3. **绑钻不足时的弹窗交互**：弹窗询问是否消耗钻石找回，此弹窗是前端本地处理还是需要后端返回特定状态码触发？后端是否需要返回"绑钻不足"的标识。\n4. **玩法提示的三级弹窗内容**：由策划配置，后端是否需要提供配置接口或下发配置数据？\n5. **经验计算公式**：日常任务找回经验的具体公式未给出，需数值提供。\n6. **装备副本宝箱配置**：宝箱ID、随机产出规则、产出数量等需策划提供配置。\n7. **清除时机**：超过2天后清除记录，是定时任务清除还是登录时判断清除？精确到天还是小时？\n8. **找回费用定价**：绑钻找回和金币找回的具体费用数值由谁配置？是否区分不同功能的不同定价？\n9. **奖励发放方式**：找回成功后奖励是直接发放到背包/角色，还是通过邮件发送？\n\n### 合理推断\n\n1. **功能配置化**（推断）：可找回的功能列表、找回费用、额外次数单价等应通过策划配置表管理，而非硬编码。\n2. **跨天判断**（推断）："2天内"应基于自然日或最近48小时判断，需明确具体规则。\n3. **奖励预览**（推断）：界面展示的奖励内容需要后端返回可找回的奖励预览数据，而非仅前端静态展示。\n\n## 3. 功能模块\n\n### F-001：离线未完成功能记录\n\n- **描述**：玩家离线时，服务端记录当天尚未完成的日常功能列表，作为后续资源找回的数据基础。\n- **接口类型**：内部自用接口\n- **触发与交互**：玩家离线事件触发。服务端在玩家离线时，检查当天所有可找回的日常功能完成状态，将未完成的功能ID及对应次数信息写入存储。\n- **依赖**：无（依赖日常功能系统的完成状态判定，但此为外部系统依赖，非本需求内功能点）\n\n### F-002：可找回数据存储与过期清理\n\n- **描述**：存储玩家最近2天内所有未完成的日常功能记录，并在超过2天后自动清除过期数据。\n- **接口类型**：内部自用接口\n- **触发与交互**：由F-001写入数据；由定时任务或登录时触发检查，清除超过2天的旧记录。存储内容需区分普通次数和额外付费次数。\n- **依赖**：依赖F-001（写入数据来源）\n\n### F-003：登录时可找回资源统计\n\n- **描述**：玩家每天第一次登录时，服务端统计当前所有可找回的资源，包括正常次数和可付费购买次数的功能，两者分开记录。\n- **接口类型**：内部自用接口\n- **触发与交互**：玩家每日首次登录事件触发。服务端读取F-002中存储的未完成记录，结合当前玩家等级、功能开放状态等，计算每项功能可找回的次数（普通次数/额外次数）及对应奖励预览。\n- **依赖**：依赖F-002（读取存储数据）；依赖外部系统（玩家等级、功能开放状态查询）\n\n### F-004：可找回资源信息查询接口\n\n- **描述**：前端打开资源找回页签时，向服务端请求当前玩家可找回的资源列表。\n- **接口类型**：与外部（客户端）交互的接口\n- **触发与交互**：玩家点击"资源找回"页签时，前端发起请求。服务端返回可找回的功能列表，每项包含：功能名、可找回次数（普通/额外分开）、找回费用（绑钻价/金币价）、奖励内容预览。\n- **依赖**：依赖F-003（统计结果作为数据来源）；依赖F-005（费用计算）\n\n### F-005：找回费用计算\n\n- **描述**：根据功能类型、找回方式（绑钻/金币）、次数类型（普通/额外），计算每次找回所需消耗的货币数量。\n- **接口类型**：内部自用接口\n- **触发与交互**：由F-004（查询时返回费用）和F-006（执行找回时校验费用）调用。读取策划配置的费用表，按规则计算。\n- **依赖**：依赖外部配置表（找回费用定价配置）\n\n### F-006：资源找回执行\n\n- **描述**：玩家选择找回方式（绑钻/金币）并确认后，服务端执行扣费并发放奖励。\n- **接口类型**：与外部（客户端）交互的接口\n- **触发与交互**：玩家点击"找回"按钮，前端传入功能ID、找回方式（绑钻/金币）、找回次数。服务端校验：玩家货币是否充足、次数是否可找回（绑钻/金币互斥规则）、该功能是否已开放。扣费成功后发放对应奖励，并更新可找回次数记录。\n- **依赖**：依赖F-005（费用计算与校验）；依赖F-002（更新可找回次数）；依赖外部系统（货币扣减、奖励发放）\n\n### F-007：绑钻不足时钻石找回提示\n\n- **描述**：绑钻找回时若绑钻不足，服务端返回特定状态码，告知前端弹窗询问是否消耗钻石找回。\n- **接口类型**：与外部（客户端）交互的接口（作为F-006的补充响应）\n- **触发与交互**：在F-006执行绑钻找回时，若绑钻不足，服务端不直接失败，而是返回"绑钻不足，是否使用钻石"的标识及钻石价格。前端据此弹窗询问玩家，玩家确认后重新发起钻石找回请求。\n- **依赖**：依赖F-006（作为其特殊分支处理）\n\n### F-008：玩法提示配置下发\n\n- **描述**：提供玩法提示三级弹窗的内容数据，由策划配置。\n- **接口类型**：与外部（客户端）交互的接口\n- **触发与交互**：玩家点击"玩法提示"按钮时，前端请求玩法提示内容。服务端返回策划配置的文本/图文内容。\n- **依赖**：依赖外部配置表（玩法提示内容配置）\n\n### F-009：日常任务奖励计算\n\n- **描述**：计算日常任务找回时产出的经验和金币数量。经验根据玩家等级由数值公式计算，金币按配置值发放。\n- **接口类型**：内部自用接口\n- **触发与交互**：由F-004（查询奖励预览）和F-006（发放奖励）调用。根据玩家等级代入经验公式计算经验值，读取金币配置值。\n- **依赖**：依赖外部系统（玩家等级查询）；依赖外部配置（经验计算公式参数、金币数值配置）\n\n### F-010：装备副本奖励计算\n\n- **描述**：计算装备副本找回时产出的经验丹和装备。经验丹为配置道具直接发放；装备从策划配置的宝箱中随机产出。\n- **接口类型**：内部自用接口\n- **触发与交互**：由F-004（查询奖励预览）和F-006（发放奖励）调用。读取宝箱配置，按随机规则产出装备。\n- **依赖**：依赖外部配置（经验丹道具ID、宝箱配置、随机产出规则）\n\n## 4. 功能点关系\n\n### 依赖顺序\n\n- **F-001（离线记录）** → **F-002（存储与清理）**：F-001写入数据到F-002的存储\n- **F-002（存储与清理）** → **F-003（登录统计）**：F-003读取F-002的数据进行统计\n- **F-003（登录统计）** → **F-004（查询接口）**：F-004返回F-003的统计结果\n- **F-005（费用计算）** 被 **F-004** 和 **F-006** 依赖\n- **F-006（找回执行）** 依赖 **F-005**（费用校验）和 **F-002**（更新次数）\n- **F-007（绑钻不足提示）** 是 **F-006** 的分支流程\n- **F-009（日常任务奖励）** 和 **F-010（装备副本奖励）** 被 **F-004** 和 **F-006** 依赖\n\n### 可并行\n\n- **F-001（离线记录）** 与 **F-008（玩法提示配置）** 可并行开发\n- **F-005（费用计算）** 与 **F-009（日常任务奖励）**、**F-010（装备副本奖励）** 可并行开发\n- **F-008（玩法提示配置）** 与所有其他功能点无强依赖，可独立推进'
+2026-05-31 21:53:49 INFO [httpx] HTTP Request: POST https://api.zhizengzeng.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-31 21:53:49 INFO [doc_generation.agents.draft_agent] 提问结果：items=[ClarificationItem(question='【清除时机与精度】F-002中“超过2天后清除记录”，清除的触发时机和精度如何定义？', options=['登录时判断清除，按自然日计算（例如：第1天离线记录，第4天首次登录时清除）', '定时任务每天凌晨清除，按自然日计算（例如：每天00:00清除2天前的记录）', '登录时判断清除，按48小时精确计算（例如：记录时间戳，超过48小时后登录时清除）']), ClarificationItem(question='【找回费用定价权】绑钻找回和金币找回的具体费用由谁配置？是否区分不同功能的不同定价？', options=['策划配置表统一管理，每个功能独立配置绑钻价和金币价，支持不同功能不同定价', '策划配置表统一管理，所有功能共用一套定价（如统一单价），不区分功能', '部分功能由策划配置，部分功能由数值公式根据玩家等级动态计算']), ClarificationItem(question='【奖励发放方式】找回成功后奖励是直接发放到背包/角色属性，还是通过邮件发送？', options=['直接发放到背包/角色属性（即时到账，无邮件）', '通过邮件发送（玩家需从邮件领取，可处理背包满等异常情况）', '普通道具直接发放，装备等可能超背包上限的道具通过邮件补发']), ClarificationItem(question='【额外次数的定义与来源】哪些功能有额外付费次数？额外次数的上限和单价配置方式是什么？', options=['所有可找回功能均有额外次数，上限和单价在功能配置表中独立配置', '仅部分功能（如装备副本）有额外次数，由策划在功能配置表中标记并配置上限和单价', '额外次数与VIP等级或玩家特权挂钩，不同VIP等级可购买的额外次数上限不同']), ClarificationItem(question='【绑钻不足弹窗交互】F-007中绑钻不足时弹窗询问是否消耗钻石，此流程是前端本地处理还是需要后端返回特定状态码触发？', options=['后端返回特定状态码（如BIND_DIAMOND_NOT_ENOUGH）及钻石价格，前端据此弹窗，玩家确认后重新请求钻石找回接口', '后端直接返回钻石找回的完整费用信息，前端弹窗确认后调用同一个找回接口但传入支付方式为钻石', '前端本地预判绑钻数量，不足时直接弹窗询问，无需后端特殊状态码，确认后直接发起钻石找回请求'])]
+2026-05-31 21:53:49 INFO [doc_generation.agents.draft_agent] question_to_user generated 5 questions, interrupting for user input
+2026-05-31 21:54:56 INFO [httpx] HTTP Request: POST https://api.zhizengzeng.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-31 21:54:56 ERROR [doc_generation.agents.draft_agent] Error: 1 validation error for ClarificationQuestions
+items
+  Field required [type=missing, input_value={}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.13/v/missing
+2026-05-31 21:55:05 INFO [httpx] HTTP Request: POST https://api.zhizengzeng.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-31 21:55:05 INFO [doc_generation.agents.draft_agent] 提问结果：None
+2026-05-31 21:55:05 ERROR [backend.service] Agent resume failed
+Traceback (most recent call last):
+  File "D:\project\doc_generation\backend\service.py", line 122, in resume_agent_stream
+    async for event in agent.astream_events(
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\base.py", line 1607, in _astream_events_v1_v2
+    async for event in event_stream:
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\tracers\event_stream.py", line 1100, in _astream_events_implementation_v2
+    await task
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\tracers\event_stream.py", line 1055, in consume_astream
+    async for _ in event_streamer.tap_output_aiter(run_id, stream):
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\tracers\event_stream.py", line 199, in tap_output_aiter
+    first = await anext(output, sentinel)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\pregel\main.py", line 3407, in astream
+    async for _ in runner.atick(
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\pregel\_runner.py", line 396, in atick
+    await arun_with_retry(
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\pregel\_retry.py", line 703, in arun_with_retry
+    async for _ in task.proc.astream(task.input, config):
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\_internal\_runnable.py", line 867, in astream
+    output = await asyncio.create_task(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\_internal\_runnable.py", line 932, in _consume_aiter
+    async for chunk in it:
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\tracers\event_stream.py", line 199, in tap_output_aiter
+    first = await anext(output, sentinel)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\base.py", line 1767, in atransform
+    async for ichunk in input:
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\base.py", line 1171, in astream
+    yield await self.ainvoke(input, config, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\_internal\_runnable.py", line 501, in ainvoke
+    ret = await self.afunc(*args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\config.py", line 667, in run_in_executor
+    return await asyncio.get_running_loop().run_in_executor(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\software\myConda\envs\rag-test\Lib\concurrent\futures\thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\config.py", line 658, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\doc_generation\agents\draft_agent.py", line 82, in question_to_user
+    items = [{"question": item.question, "options": item.options} for item in response.items]
+                                                                              ^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'items'
+During task with name 'question_to_user' and id '7b17a63d-5b1c-3da8-8a54-a8675b9a5ce4'
+2026-05-31 21:55:41 INFO [httpx] HTTP Request: POST https://api.zhizengzeng.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-31 21:55:41 ERROR [doc_generation.agents.draft_agent] Error: 1 validation error for ResearchQuestion
+research_brief
+  Field required [type=missing, input_value={}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.13/v/missing
+2026-05-31 21:56:03 INFO [httpx] HTTP Request: POST https://api.zhizengzeng.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-31 21:56:04 INFO [doc_generation.agents.draft_agent] 结构化输出：research_brief='## 1. 需求摘要\n\n资源找回功能允许玩家在错过日常功能后，通过消耗绑钻或金币来买回错过的奖励。系统需记录玩家最近2天内未完成的日常功能，并在玩家登录时统计可找回的资源。后端需承载离线记录、登录统计、找回扣费、奖励发放等核心逻辑，不涉及前端UI渲染。\n\n---\n\n## 2. 需求分析\n\n### 已确认\n\n1. 资源找回面向所有玩家，入口位于日常功能界面内的"资源找回"页签。\n2. 找回内容为最近2天内错过的日常功能（具体可找回的功能列表由策划补充确定）。\n3. 找回方式分为"绑钻找回"和"金币找回"两种，默认选中绑钻找回。\n4. 绑钻找回可找回普通次数和额外付费购买次数的资源；金币找回只能找回普通次数。\n5. 绑钻找回和金币找回共有次数（即绑钻找回过的资源不能再用金币找回）。\n6. 绑钻不足时弹窗询问是否消耗钻石找回（前端弹窗，后端需返回余额状态）。\n7. 玩家离线前，服务端记录当天未完成的日常功能。\n8. 2天内玩家若均有上线，则两天内未完成的日常功能均需存储记录。\n9. 超过2天后，服务端清除2天前记录的未完成功能。\n10. 玩家每天第一次登录时，服务端统计当前可找回的所有资源。\n11. 统计内容包括：正常可找回的功能次数 + 可付费购买次数的功能次数，两者分开记录。\n12. 玩家上次离线前未开放的功能不允许找回。\n13. 日常任务找回奖励：经验和金币；经验按玩家等级由数值公式计算。\n14. 装备副本找回奖励：经验丹（配置道具）和装备（配置宝箱，多件装备中随机产出少量装备）。\n15. 玩法提示：点击按钮打开三级弹窗，内容由策划配置（后端需提供配置读取接口）。\n\n### 待澄清\n\n1. **可找回的功能列表**：具体哪些日常功能可被资源找回？策划补充确认前，需预留配置扩展能力。\n2. **额外付费购买次数的定义与上限**：哪些功能支持额外购买次数？购买次数上限是多少？单价如何配置？\n3. **绑钻找回额外次数的单价**：额外次数的单价费用更高，具体倍率或数值由谁配置？\n4. **经验计算公式**：日常任务找回经验时，根据玩家等级计算的公式具体由数值提供，需预留公式配置接口。\n5. **装备副本宝箱配置**：宝箱ID、随机产出规则、装备列表等由策划配置，后端需读取配置表。\n6. **玩法提示内容**：三级弹窗的具体内容由策划配置，后端需提供配置数据接口。\n7. **货币类型**：绑钻和钻石是否为同一货币体系的不同类型？绑钻不足时消耗钻石的兑换比例是多少？\n8. **清除时机**：超过2天后清除记录，是每天定时清理还是登录时清理？精确到秒还是天？\n9. **多角色/跨服场景**：是否涉及跨服角色数据？暂按单服处理。\n\n### 合理推断\n\n1. **配置驱动**：可找回功能列表、找回费用、奖励内容等均应由策划配置表驱动，后端不做硬编码（推断依据：多处提到"由策划补充/配置"）。\n2. **离线记录存储**：离线记录需持久化，建议使用 `#player_misc_extra{}` 按玩家+日期存储（推断依据：限时性数据，2天后可清理）。\n3. **登录统计触发**：每天第一次登录时触发统计，可通过玩家每日登录回调实现（推断依据：常见做法）。\n\n---\n\n## 3. 功能模块\n\n### F-001：离线未完成功能记录\n\n- **描述**：玩家离线前，服务端记录当天尚未完成的日常功能列表，供后续资源找回使用。\n- **接口类型**：内部自用接口\n- **触发与交互**：玩家离线时（或每日重置时）由服务端自动触发。输入：玩家ID、当天日期、未完成功能ID列表。输出：存储记录成功/失败。\n- **依赖**：无（依赖日常功能系统的完成状态判定接口，但该接口属于外部系统，不在本功能范围内）\n\n### F-002：过期记录清理\n\n- **描述**：超过2天的未完成功能记录自动清除，避免数据堆积。\n- **接口类型**：内部自用接口\n- **触发与交互**：定时任务或玩家登录时触发。输入：玩家ID、当前日期。输出：清理记录数。\n- **依赖**：F-001（需读取离线记录的时间戳判断是否过期）\n\n### F-003：每日首次登录资源统计\n\n- **描述**：玩家每天第一次登录时，服务端统计当前可找回的所有资源，包括正常次数和可付费购买次数，两者分开记录。\n- **接口类型**：内部自用接口\n- **触发与交互**：玩家每日首次登录时自动触发。输入：玩家ID。输出：统计结果（可找回资源列表，含功能ID、可找回次数、额外可购买次数、奖励预览等）。\n- **依赖**：F-001（读取离线记录）、F-002（确保过期数据已清理）\n\n### F-004：可找回功能列表查询\n\n- **描述**：前端打开资源找回页签时，查询当前玩家可找回的功能列表及详情（功能名、可找回次数、找回费用、奖励内容等）。\n- **接口类型**：客户端接口（前端请求）\n- **触发与交互**：玩家点击"资源找回"页签时，前端发起请求。输入：玩家ID。输出：可找回功能列表（每个功能含：功能ID、名称、可找回普通次数、可找回额外次数、绑钻费用、金币费用、奖励预览列表）。\n- **依赖**：F-003（依赖统计结果）、配置表（功能列表、费用、奖励配置）\n\n### F-005：资源找回执行\n\n- **描述**：玩家选择绑钻或金币找回方式，对指定功能执行找回操作，扣除货币并发放奖励。\n- **接口类型**：客户端接口（前端请求）\n- **触发与交互**：玩家选择找回方式并点击"找回"按钮，前端发起请求。输入：玩家ID、功能ID、找回类型（绑钻/金币）、找回次数（普通/额外）。输出：找回结果（成功/失败，失败原因如货币不足）。\n- **依赖**：F-004（需先查询可找回信息）、货币系统（扣费）、奖励发放系统\n\n### F-006：绑钻不足弹窗判定\n\n- **描述**：绑钻找回时，若玩家绑钻不足，后端返回状态告知前端弹窗询问是否消耗钻石找回。\n- **接口类型**：客户端接口（作为F-005的返回信息）\n- **触发与交互**：F-005执行时，若绑钻不足，后端返回特定状态码及所需差额。前端据此弹窗。输入：玩家ID、所需绑钻数量、当前绑钻数量。输出：弹窗提示信息（差额、是否允许钻石补足）。\n- **依赖**：F-005、货币系统（查询绑钻/钻石余额）\n\n### F-007：玩法提示配置读取\n\n- **描述**：读取策划配置的玩法提示内容，供前端三级弹窗展示。\n- **接口类型**：客户端接口（前端请求）\n- **触发与交互**：玩家点击"玩法提示"按钮时，前端发起请求。输入：无（或配置ID）。输出：玩法提示内容（文本/富文本，由策划配置）。\n- **依赖**：配置表（玩法提示内容配置）\n\n### F-008：奖励计算（日常任务经验）\n\n- **描述**：根据玩家等级和数值公式，计算日常任务找回时可获得的经验值。\n- **接口类型**：内部自用接口\n- **触发与交互**：F-005执行日常任务找回时调用。输入：玩家等级。输出：经验值数量。\n- **依赖**：F-005、数值配置表（经验公式参数）\n\n### F-009：奖励计算（装备副本宝箱随机）\n\n- **描述**：装备副本找回时，根据策划配置的宝箱规则，从多件装备中随机产出少量装备。\n- **接口类型**：内部自用接口\n- **触发与交互**：F-005执行装备副本找回时调用。输入：宝箱配置ID、随机次数。输出：随机产出的装备列表。\n- **依赖**：F-005、配置表（宝箱配置、装备池配置）\n\n### F-010：可找回功能配置管理\n\n- **描述**：策划通过配置表定义哪些日常功能可被资源找回，以及各功能的找回规则（费用、奖励、额外次数上限等）。\n- **接口类型**：内部自用接口（配置读取）\n- **触发与交互**：服务启动时加载配置，运行时按需读取。输入：功能ID。输出：该功能的找回配置（费用、奖励模板、额外次数上限等）。\n- **依赖**：无（纯配置读取，被F-004/F-005/F-003依赖）\n\n---\n\n## 4. 功能点关系\n\n### 依赖顺序\n\n| 前置功能点 | 后置功能点 | 说明 |\n|-----------|-----------|------|\n| F-001（离线记录） | F-002（过期清理）、F-003（登录统计） | 必须先有记录才能清理和统计 |\n| F-002（过期清理） | F-003（登录统计） | 统计前需确保过期数据已清理 |\n| F-003（登录统计） | F-004（列表查询） | 查询依赖统计结果 |\n| F-004（列表查询） | F-005（找回执行） | 找回前需先展示可找回信息 |\n| F-005（找回执行） | F-006（弹窗判定） | 弹窗是找回流程的子步骤 |\n| F-010（配置管理） | F-003、F-004、F-005、F-007、F-008、F-009 | 所有功能依赖配置读取 |\n| F-008（经验计算） | F-005（找回执行） | 日常任务找回时调用 |\n| F-009（宝箱随机） | F-005（找回执行） | 装备副本找回时调用 |\n\n### 可并行推进\n\n- F-001（离线记录）与 F-010（配置管理）可并行开发\n- F-007（玩法提示）与 F-010（配置管理）可并行开发\n- F-008（经验计算）与 F-009（宝箱随机）可并行开发（均为独立计算模块）\n- F-002（过期清理）可在 F-001 完成后独立开发'
+2026-05-31 21:56:09 INFO [httpx] HTTP Request: POST https://api.zhizengzeng.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-31 21:56:09 INFO [doc_generation.agents.draft_agent] 提问结果：items=[ClarificationItem(question='多角色/跨服场景下，资源找回数据是按角色独立存储还是账号共享？', options=['按角色独立存储，每个角色各自记录和找回自己的资源', '按账号共享，同一账号下所有角色共用可找回次数和找回额度', '暂不考虑多角色场景，先按单角色单服实现，后续再扩展'])]
+2026-05-31 21:56:09 INFO [doc_generation.agents.draft_agent] question_to_user generated 1 questions, interrupting for user input
+2026-05-31 21:56:20 INFO [httpx] HTTP Request: POST https://api.zhizengzeng.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-31 21:56:20 INFO [doc_generation.agents.draft_agent] 提问结果：items=[ClarificationItem(question='过期记录清理的触发时机和精度如何确定？', options=['每天凌晨定时清理（精确到天），清理所有超过2天（含第3天）的记录', '玩家每次登录时触发清理，检查记录日期与当前日期差值，超过2天（精确到秒）则清除', '每天凌晨定时清理 + 登录时补充清理，双重保障避免数据残留']), ClarificationItem(question='绑钻与钻石的货币关系及兑换比例如何定义？', options=['绑钻和钻石是同一货币体系的不同类型，1钻石=1绑钻，绑钻不足时按1:1消耗钻石补足', '绑钻和钻石是独立货币，绑钻不足时按固定比例（如1钻石=10绑钻）兑换抵扣', '绑钻和钻石是独立货币，绑钻不足时不允许用钻石替代，直接返回失败']), ClarificationItem(question='资源找回的扣费和奖励发放是要求强一致性事务（同时成功或同时失败），还是允许最终一致性？', options=['强一致性：扣费与发奖必须在同一事务内完成，任一失败则整体回滚', '最终一致性：先扣费后发奖，发奖失败时通过补偿任务重试，允许短暂不一致', '分步执行：扣费成功后立即记录扣费流水，奖励通过消息队列异步发放，不要求实时到账']), ClarificationItem(question='多角色/跨服场景下，资源找回数据是按角色独立存储还是按账号共享？', options=['按角色独立存储，每个角色的离线记录和找回状态互不影响（暂按单服处理）', '按账号共享，同一账号下所有角色共用2天内的找回次数和额度', '暂不支持多角色，一个账号仅一个角色，无需考虑共享问题']), ClarificationItem(question='额外付费购买次数的上限和单价配置是全局统一配置，还是按每个功能单独配置？', options=['全局统一配置：所有功能共用一套额外次数上限和单价倍率', '按功能单独配置：每个功能独立配置额外次数上限和单价（或倍率），配置表中定义', '混合模式：上限按功能单独配置，单价倍率全局统一，由策划在配置表中指定'])]
+2026-05-31 21:56:20 INFO [doc_generation.agents.draft_agent] question_to_user generated 5 questions, interrupting for user input
+2026-05-31 21:57:47 INFO [httpx] HTTP Request: POST https://api.zhizengzeng.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-31 21:57:47 ERROR [doc_generation.agents.draft_agent] Error: 1 validation error for DraftReport
+draft_report
+  Field required [type=missing, input_value={}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.13/v/missing
+2026-05-31 21:58:34 INFO [httpx] HTTP Request: POST https://api.zhizengzeng.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-31 21:58:34 INFO [doc_generation.agents.draft_agent] 简报结果：draft_report='# 资源找回系统 — 后端开发技术文档草稿\n\n## 1. 玩法概述\n\n资源找回功能允许玩家在错过日常功能后，通过消耗绑钻或金币来买回错过的奖励。系统需记录玩家最近2天内未完成的日常功能，并在玩家登录时统计可找回的资源。后端需承载离线记录、登录统计、找回扣费、奖励发放等核心逻辑。\n\n### 核心规则\n\n1. 资源找回面向所有玩家，入口位于日常功能界面内的"资源找回"页签。\n2. 找回内容为最近2天内错过的日常功能（具体可找回的功能列表由策划补充确定）。\n3. 找回方式分为"绑钻找回"和"金币找回"两种，默认选中绑钻找回。\n4. 绑钻找回可找回普通次数和额外付费购买次数的资源；金币找回只能找回普通次数。\n5. 绑钻找回和金币找回共有次数（即绑钻找回过的资源不能再用金币找回）。\n6. 绑钻不足时弹窗询问是否消耗钻石找回（前端弹窗，后端需返回余额状态）。\n7. 玩家离线前，服务端记录当天未完成的日常功能。\n8. 2天内玩家若均有上线，则两天内未完成的日常功能均需存储记录。\n9. 超过2天后，服务端清除2天前记录的未完成功能。\n10. 玩家每天第一次登录时，服务端统计当前可找回的所有资源。\n11. 统计内容包括：正常可找回的功能次数 + 可付费购买次数的功能次数，两者分开记录。\n12. 玩家上次离线前未开放的功能不允许找回。\n13. 日常任务找回奖励：经验和金币；经验按玩家等级由数值公式计算。\n14. 装备副本找回奖励：经验丹（配置道具）和装备（配置宝箱，多件装备中随机产出少量装备）。\n15. 玩法提示：点击按钮打开三级弹窗，内容由策划配置（后端需提供配置读取接口）。\n16. 数据按角色独立存储，每个角色各自记录和找回自己的资源。\n\n---\n\n## 2. 数据持久化（草稿级）\n\n### 2.1 存储选型分析\n\n资源找回数据具有以下特征：\n- **限时性**：数据有效期仅为2天，过期可清理\n- **按角色独立**：每个角色各自存储\n- **按日期分片**：以日期为 key 区分不同天的记录\n\n因此选用 **`#player_misc_extra{}`** 作为存储载体。\n\n### 2.2 存储方案\n\n#### 离线未完成功能记录\n\n使用 `#player_misc_extra{}`，按 `(player_id, key)` 定位，key 规则为 `{resource_recovery, Date}`，其中 Date 为当天的日期（如 `{2026, 5, 31}`）。\n\n| 逻辑字段 | 物理位置 | 类型 | 说明 |\n|----------|----------|------|------|\n| 玩家ID | player_id | integer | 角色ID |\n| 日期key | key | term | `{resource_recovery, Date}` |\n| 未完成功能ID列表 | value_text | list | 元素为功能ID（integer），当天未完成的日常功能ID列表 |\n| 各功能已找回次数 | value_text_1 | list | 元素为 `{FuncId, NormalRecovered, ExtraRecovered}`，记录该天各功能已找回的普通次数和额外次数 |\n| 记录创建时间 | time | integer | Unix时间戳，记录创建时的服务器时间 |\n| 记录日期 | time1 | integer | 日期数值，如 `20260531`，用于快速判断过期 |\n\n**key 取值规则**：`{resource_recovery, Date}`，Date 为 erlang date tuple `{Year, Month, Day}`。\n\n**生命周期**：记录保留2天，超过2天后在登录时或定时任务中清理。\n\n#### 每日首次登录统计缓存\n\n使用 `#player_misc_extra{}`，key 为 `{resource_recovery_cache, Date}`。\n\n| 逻辑字段 | 物理位置 | 类型 | 说明 |\n|----------|----------|------|------|\n| 玩家ID | player_id | integer | 角色ID |\n| 日期key | key | term | `{resource_recovery_cache, Date}` |\n| 可找回资源列表 | value_text | list | 元素为 `{FuncId, NormalTimes, ExtraTimes, CostBindDiamond, CostGold, RewardPreview}`，登录时统计结果缓存 |\n| 缓存生成时间 | time | integer | Unix时间戳 |\n| 统计日期 | time1 | integer | 日期数值，如 `20260531` |\n\n**生命周期**：当天有效，次日登录时重新生成并覆盖。\n\n---\n\n## 3. 配置表设计（草稿）\n\n### 3.1 可找回功能配置表 `resource_recovery_config`\n\n| 字段 | 类型(Erlang) | 说明 | 示例 |\n|------|-------------|------|------|\n| func_id | integer() | 功能ID，唯一标识一个日常功能 | 1001 |\n| func_name | string() | 功能名称，用于前端展示 | "日常任务" |\n| func_type | integer() | 功能类型：1=日常任务，2=装备副本，3=其他（预留） | 1 |\n| normal_recover_cost_bind | integer() | 绑钻找回普通次数的单价（单位：绑钻） | 50 |\n| normal_recover_cost_gold | integer() | 金币找回普通次数的单价（单位：金币） | 10000 |\n| extra_recover_cost_bind | integer() | 绑钻找回额外次数的单价（单位：绑钻） | 100 |\n| extra_times_limit | integer() | 额外可购买次数上限 | 2 |\n| reward_template_id | integer() | 奖励模板ID，关联奖励配置表 | 2001 |\n| is_open | boolean() | 是否启用资源找回 | true |\n\n### 3.2 奖励模板配置表 `resource_reward_template`\n\n| 字段 | 类型(Erlang) | 说明 | 示例 |\n|------|-------------|------|------|\n| template_id | integer() | 模板ID | 2001 |\n| func_type | integer() | 功能类型，与可找回功能配置表一致 | 1 |\n| reward_type | integer() | 奖励类型：1=经验+金币，2=经验丹+装备宝箱 | 1 |\n| exp_formula_params | list() | 经验公式参数列表，如 `[A, B, C]` 表示 `A * lv^2 + B * lv + C` | [10, 50, 100] |\n| gold_amount | integer() | 金币固定值（日常任务类型使用） | 5000 |\n| item_id | integer() | 道具ID（装备副本类型使用，如经验丹） | 3001 |\n| item_count | integer() | 道具数量 | 2 |\n| chest_id | integer() | 宝箱配置ID（装备副本类型使用） | 4001 |\n\n### 3.3 宝箱配置表 `resource_chest_config`\n\n| 字段 | 类型(Erlang) | 说明 | 示例 |\n|------|-------------|------|------|\n| chest_id | integer() | 宝箱ID | 4001 |\n| equip_pool | list() | 装备ID列表，从中随机产出 | [5001, 5002, 5003, 5004] |\n| drop_count | integer() | 每次随机产出的装备数量 | 2 |\n| weight_list | list() | 权重列表，与 equip_pool 一一对应 | [10, 20, 30, 40] |\n\n### 3.4 玩法提示配置表 `resource_tip_config`\n\n| 字段 | 类型(Erlang) | 说明 | 示例 |\n|------|-------------|------|------|\n| tip_id | integer() | 提示ID | 1 |\n| title | string() | 弹窗标题 | "资源找回说明" |\n| content | string() | 弹窗内容（富文本） | "资源找回功能允许您..." |\n| func_id_list | list() | 关联的功能ID列表，为空则全局展示 | [1001, 1002] |\n\n---\n\n## 4. 功能点技术设计\n\n### 4.1 F-001：离线未完成功能记录\n\n#### 需求回顾\n\n玩家离线前，服务端记录当天尚未完成的日常功能列表，供后续资源找回使用。\n\n#### 功能逻辑\n\n1. 玩家离线时（或每日重置时），服务端自动触发。\n2. 从日常功能系统获取当天该玩家未完成的日常功能ID列表。\n3. 获取当前服务器日期 Date = `{Year, Month, Day}`。\n4. 查询 `#player_misc_extra{}` 中 key 为 `{resource_recovery, Date}` 的记录。\n5. 若记录不存在，创建新记录；若已存在，更新未完成功能ID列表。\n6. 记录创建时间戳和日期数值。\n\n#### 接口设计（草稿）\n\n**类型**：内部自用接口（非Socket）\n\n```erlang\n%% 模块：resource_recovery_server\n%% 函数：record_unfinished/1\n%% 输入：PlayerId :: integer()\n%% 输出：ok | {error, Reason}\n%% 说明：由玩家离线回调触发，记录当天未完成的日常功能\n```\n\n#### 依赖与调用\n\n- 依赖日常功能系统的完成状态判定接口（外部系统，不在本功能范围内）\n- 依赖 `#player_misc_extra{}` 读写模块\n- 被 F-002、F-003 依赖\n\n---\n\n### 4.2 F-002：过期记录清理\n\n#### 需求回顾\n\n超过2天的未完成功能记录自动清除，避免数据堆积。\n\n#### 功能逻辑\n\n1. 触发时机：玩家每天第一次登录时 + 定时任务（每日凌晨执行）。\n2. 读取该玩家所有 key 匹配 `{resource_recovery, _}` 的记录。\n3. 计算当前日期与记录日期的差值，超过2天的记录删除。\n4. 同时清理对应的缓存记录 `{resource_recovery_cache, _}`。\n\n#### 接口设计（草稿）\n\n**类型**：内部自用接口\n\n```erlang\n%% 模块：resource_recovery_server\n%% 函数：clean_expired_records/1\n%% 输入：PlayerId :: integer()\n%% 输出：{ok, CleanedCount :: integer()}\n%% 说明：清理超过2天的过期记录\n```\n\n#### 依赖与调用\n\n- 依赖 F-001（需读取离线记录的时间戳判断是否过期）\n- 被 F-003 依赖\n\n---\n\n### 4.3 F-003：每日首次登录资源统计\n\n#### 需求回顾\n\n玩家每天第一次登录时，服务端统计当前可找回的所有资源，包括正常次数和可付费购买次数，两者分开记录。\n\n#### 功能逻辑\n\n1. 玩家每日首次登录时触发（通过每日登录回调）。\n2. 先调用 F-002 清理过期记录。\n3. 读取该玩家最近2天内所有 `{resource_recovery, Date}` 记录。\n4. 对每条记录中的每个未完成功能ID：\n   - 从配置表 `resource_recovery_config` 读取该功能的配置。\n   - 判断该功能在记录当天是否已对玩家开放（根据功能开放等级/条件判断，依赖外部系统）。\n   - 若未开放，跳过。\n   - 计算可找回普通次数：功能默认次数 - 已找回次数（从 `value_text_1` 中读取）。\n   - 计算可找回额外次数：`extra_times_limit` - 已找回额外次数。\n5. 将统计结果缓存到 `{resource_recovery_cache, Date}` 的 `value_text` 中。\n6. 统计结果包含：功能ID、可找回普通次数、可找回额外次数、绑钻费用、金币费用、奖励预览。\n\n#### 接口设计（草稿）\n\n**类型**：内部自用接口\n\n```erlang\n%% 模块：resource_recovery_server\n%% 函数：daily_login_stat/1\n%% 输入：PlayerId :: integer()\n%% 输出：{ok, StatResult :: list()} | {error, Reason}\n%% 说明：玩家每日首次登录时统计可找回资源\n```\n\n#### 依赖与调用\n\n- 依赖 F-001（读取离线记录）\n- 依赖 F-002（确保过期数据已清理）\n- 依赖 F-010（配置读取）\n- 依赖日常功能系统的开放条件判定接口（外部系统）\n\n---\n\n### 4.4 F-004：可找回功能列表查询\n\n#### 需求回顾\n\n前端打开资源找回页签时，查询当前玩家可找回的功能列表及详情。\n\n#### 功能逻辑\n\n1. 前端打开"资源找回"页签时发起请求。\n2. 服务端读取 F-003 生成的缓存统计结果 `{resource_recovery_cache, Date}`。\n3. 若缓存不存在或日期不匹配，重新执行统计（兜底逻辑）。\n4. 从配置表读取各功能的名称、费用等信息。\n5. 组装返回数据：功能ID、名称、可找回普通次数、可找回额外次数、绑钻费用、金币费用、奖励预览列表。\n\n#### 接口设计（草稿）— Socket\n\n**通信方式**：WebSocket / TCP\n\n**协议段**：待确认（建议分配新协议段，如 640）\n\n##### 消息一览\n\n| 方向 | 消息号 | 触发场景 | 处理模块（建议） |\n|------|--------|----------|------------------|\n| C2S | 64000 | 打开资源找回页签 | resource_recovery_server |\n| S2C | 64001 | 返回可找回功能列表 | resource_recovery_server |\n\n##### 64000 — 查询可找回功能列表（C2S）\n\n| 字段 | 类型 | 说明 |\n|------|------|------|\n| （无请求参数） | - | 仅需玩家身份，由连接上下文获取 |\n\n**C2S 载荷**：空\n\n**业务说明**：前端打开资源找回页签时发送，服务端根据玩家ID查询可找回功能列表。\n\n##### 64001 — 可找回功能列表返回（S2C）\n\n| 字段 | 类型 | 说明 |\n|------|------|------|\n| FuncList | list | 可找回功能列表，每个元素为结构体 |\n| FuncList[].func_id | int32 | 功能ID |\n| FuncList[].func_name | string | 功能名称 |\n| FuncList[].normal_times | int32 | 可找回普通次数 |\n| FuncList[].extra_times | int32 | 可找回额外次数 |\n| FuncList[].cost_bind_diamond | int32 | 绑钻找回单价 |\n| FuncList[].cost_gold | int32 | 金币找回单价 |\n| FuncList[].reward_preview | list | 奖励预览列表，每个元素为 `{item_id, item_count}` |\n\n**S2C 载荷**：FuncList\n\n**业务说明**：服务端返回可找回功能列表，前端据此展示。\n\n#### 依赖与调用\n\n- 依赖 F-003（依赖统计结果缓存）\n- 依赖 F-010（配置读取）\n\n---\n\n### 4.5 F-005：资源找回执行\n\n#### 需求回顾\n\n玩家选择绑钻或金币找回方式，对指定功能执行找回操作，扣除货币并发放奖励。\n\n#### 功能逻辑\n\n1. 前端发起找回请求，包含：功能ID、找回类型（绑钻/金币）、找回次数类型（普通/额外）。\n2. 服务端校验：\n   - 该功能是否在可找回列表中（读取缓存）。\n   - 请求的找回次数是否超过可找回次数。\n   - 绑钻找回和金币找回共有次数，已用绑钻找回的次数不能再用金币找回。\n3. 计算总费用：\n   - 普通次数费用 = 单价 × 次数\n   - 额外次数费用 = 额外单价 × 次数\n4. 检查玩家货币余额：\n   - 绑钻找回：检查绑钻余额，不足时返回特定状态码（触发 F-006）。\n   - 金币找回：检查金币余额。\n5. 扣除货币，发放奖励：\n   - 日常任务类型：调用 F-008 计算经验，发放经验和金币。\n   - 装备副本类型：调用 F-009 随机产出装备，发放经验丹和装备。\n6. 更新离线记录中的已找回次数（`value_text_1`）。\n7. 更新缓存中的可找回次数。\n8. 返回找回结果。\n\n#### 接口设计（草稿）— Socket\n\n**协议段**：640（与 F-004 同段）\n\n##### 消息一览\n\n| 方向 | 消息号 | 触发场景 | 处理模块（建议） |\n|------|--------|----------|------------------|\n| C2S | 64002 | 执行资源找回 | resource_recovery_server |\n| S2C | 64003 | 返回找回结果 | resource_recovery_server |\n\n##### 64002 — 执行资源找回（C2S）\n\n| 字段 | 类型 | 说明 |\n|------|------|------|\n| func_id | int32 | 功能ID |\n| recover_type | byte | 找回类型：1=绑钻找回，2=金币找回 |\n| times_type | byte | 次数类型：1=普通次数，2=额外次数 |\n| times | int32 | 找回次数 |\n\n**C2S 载荷**：`func_id`, `recover_type`, `times_type`, `times`\n\n**业务说明**：玩家选择找回方式后发送，服务端执行扣费和奖励发放。\n\n##### 64003 — 找回结果返回（S2C）\n\n| 字段 | 类型 | 说明 |\n|------|------|------|\n| result | byte | 结果码：0=成功，1=货币不足，2=次数不足，3=配置错误，4=其他错误 |\n| func_id | int32 | 功能ID |\n| reward_list | list | 实际发放的奖励列表，每个元素为 `{item_id, item_count}` |\n| cost_type | byte | 实际扣除的货币类型（绑钻不足转钻石时标记） |\n| cost_amount | int32 | 实际扣除的货币数量 |\n| bind_diamond_short | int32 | 绑钻不足时的差额（result=1时有效） |\n\n**S2C 载荷**：`result`, `func_id`, `reward_list`, `cost_type`, `cost_amount`, `bind_diamond_short`\n\n**业务说明**：服务端返回找回执行结果。若绑钻不足（result=1），前端根据 `bind_diamond_short` 弹窗询问是否用钻石补足。\n\n#### 依赖与调用\n\n- 依赖 F-004（需先查询可找回信息）\n- 依赖货币系统（扣费）\n- 依赖奖励发放系统\n- 依赖 F-008（日常任务经验计算）\n- 依赖 F-009（装备副本宝箱随机）\n- 依赖 F-010（配置读取）\n\n---\n\n### 4.6 F-006：绑钻不足弹窗判定\n\n#### 需求回顾\n\n绑钻找回时，若玩家绑钻不足，后端返回状态告知前端弹窗询问是否消耗钻石找回。\n\n#### 功能逻辑\n\n1. 该功能作为 F-005 的子流程实现，不独立对外提供接口。\n2. 在 F-005 执行绑钻找回时，检查玩家绑钻余额。\n3. 若绑钻不足，计算差额 = 总费用 - 当前绑钻数量。\n4. 返回 result=1（货币不足）及 `bind_diamond_short` 字段。\n5. 前端根据返回信息弹窗，询问玩家是否用钻石按比例补足差额。\n6. 若玩家确认，前端重新发起 F-005 请求，但 `recover_type` 标记为钻石找回（或通过另一字段标识）。\n7. **待确认**：绑钻与钻石的兑换比例。\n\n#### 接口设计（草稿）\n\n**类型**：作为 F-005 的返回信息，不独立设计接口。\n\nF-005 返回结果中：\n- `result = 1` 表示货币不足\n- `bind_diamond_short` 表示差额\n- 前端据此弹窗\n\n#### 依赖与调用\n\n- 依赖 F-005\n- 依赖货币系统（查询绑钻/钻石余额）\n\n---\n\n### 4.7 F-007：玩法提示配置读取\n\n#### 需求回顾\n\n读取策划配置的玩法提示内容，供前端三级弹窗展示。\n\n#### 功能逻辑\n\n1. 前端点击"玩法提示"按钮时发起请求。\n2. 服务端从 `resource_tip_config` 配置表读取提示内容。\n3. 可根据功能ID筛选，返回匹配的提示内容列表。\n4. 返回数据包含标题和内容（富文本）。\n\n#### 接口设计（草稿）— Socket\n\n**协议段**：640（与 F-004 同段）\n\n##### 消息一览\n\n| 方向 | 消息号 | 触发场景 | 处理模块（建议） |\n|------|--------|----------|------------------|\n| C2S | 64004 | 查询玩法提示 | resource_recovery_server |\n| S2C | 64005 | 返回玩法提示内容 | resource_recovery_server |\n\n##### 64004 — 查询玩法提示（C2S）\n\n| 字段 | 类型 | 说明 |\n|------|------|------|\n| func_id | int32 | 功能ID（可选，为空则返回全局提示） |\n\n**C2S 载荷**：`func_id`\n\n##### 64005 — 玩法提示返回（S2C）\n\n| 字段 | 类型 | 说明 |\n|------|------|------|\n| tip_list | list | 提示内容列表，每个元素为结构体 |\n| tip_list[].tip_id | int32 | 提示ID |\n| tip_list[].title | string | 弹窗标题 |\n| tip_list[].content | string | 弹窗内容（富文本） |\n\n**S2C 载荷**：`tip_list`\n\n#### 依赖与调用\n\n- 依赖 F-010（配置读取）\n\n---\n\n### 4.8 F-008：奖励计算（日常任务经验）\n\n#### 需求回顾\n\n根据玩家等级和数值公式，计算日常任务找回时可获得的经验值。\n\n#### 功能逻辑\n\n1. 由 F-005 在找回日常任务奖励时调用。\n2. 输入：玩家等级 Lv。\n3. 从 `resource_reward_template` 配置表读取经验公式参数。\n4. 计算公式示例：`Exp = A * Lv^2 + B * Lv + C`（具体公式由数值策划提供）。\n5. **待确认**：具体公式参数由数值策划提供，当前按二次函数预留。\n\n#### 接口设计（草稿）\n\n**类型**：内部自用接口\n\n```erlang\n%% 模块：resource_recovery_calc\n%% 函数：calc_exp_reward/2\n%% 输入：PlayerLv :: integer(), TemplateId :: integer()\n%% 输出：{ok, ExpAmount :: integer()}\n%% 说明：根据玩家等级和配置公式计算经验奖励\n```\n\n#### 依赖与调用\n\n- 依赖 F-010（配置读取）\n- 被 F-005 调用\n\n---\n\n### 4.9 F-009：奖励计算（装备副本宝箱随机）\n\n#### 需求回顾\n\n装备副本找回时，根据策划配置的宝箱规则，从多件装备中随机产出少量装备。\n\n#### 功能逻辑\n\n1. 由 F-005 在找回装备副本奖励时调用。\n2. 输入：宝箱配置ID、随机次数。\n3. 从 `resource_chest_config` 配置表读取宝箱配置。\n4. 根据权重列表进行加权随机，产出指定数量的装备。\n5. 返回产出的装备ID列表。\n\n#### 接口设计（草稿）\n\n**类型**：内部自用接口\n\n```erlang\n%% 模块：resource_recovery_calc\n%% 函数：roll_chest_reward/2\n%% 输入：ChestId :: integer(), RollCount :: integer()\n%% 输出：{ok, EquipList :: [integer()]}\n%% 说明：根据宝箱配置进行加权随机，产出装备\n```\n\n#### 依赖与调用\n\n- 依赖 F-010（配置读取）\n- 被 F-005 调用\n\n---\n\n### 4.10 F-010：可找回功能配置管理\n\n#### 需求回顾\n\n策划通过配置表定义哪些日常功能可被资源找回，以及各功能的找回规则。\n\n#### 功能逻辑\n\n1. 服务启动时加载 `resource_recovery_config`、`resource_reward_template`、`resource_chest_config`、`resource_tip_config` 等配置表。\n2. 提供按功能ID查询配置的接口。\n3. 提供按功能类型查询配置列表的接口。\n4. 配置热更新支持（如有）。\n\n#### 接口设计（草稿）\n\n**类型**：内部自用接口（配置读取）\n\n```erlang\n%% 模块：resource_recovery_config\n%% 函数：get_func_config/1\n%% 输入：FuncId :: integer()\n%% 输出：{ok, ConfigMap :: map()} | {error, not_found}\n\n%% 函数：get_func_config_by_type/1\n%% 输入：FuncType :: integer()\n%% 输出：{ok, ConfigList :: [map()]}\n\n%% 函数：get_reward_template/1\n%% 输入：TemplateId :: integer()\n%% 输出：{ok, TemplateMap :: map()} | {error, not_found}\n\n%% 函数：get_chest_config/1\n%% 输入：ChestId :: integer()\n%% 输出：{ok, ChestMap :: map()} | {error, not_found}\n\n%% 函数：get_tip_config/1\n%% 输入：TipId :: integer()\n%% 输出：{ok, TipMap :: map()} | {error, not_found}\n```\n\n#### 依赖与调用\n\n- 无（纯配置读取）\n- 被 F-003、F-004、F-005、F-007、F-008、F-009 依赖\n\n---\n\n## 5. 功能点依赖与实施顺序\n\n### 依赖关系图\n\n```\nF-010（配置管理） ← 基础依赖，可最先开发\n       │\n       ├──→ F-001（离线记录） ← 可并行开发\n       │        │\n       │        ├──→ F-002（过期清理） ← 依赖 F-001\n       │        │        │\n       │        └──→ F-003（登录统计） ← 依赖 F-001、F-002\n       │                 │\n       │                 └──→ F-004（列表查询） ← 依赖 F-003\n       │                          │\n       │                          └──→ F-005（找回执行） ← 依赖 F-004\n       │                                   │\n       │                                   ├──→ F-006（弹窗判定）← F-005子流程\n       │                                   ├──→ F-008（经验计算）← 可并行\n       │                                   └──→ F-009（宝箱随机）← 可并行\n       │\n       └──→ F-007（玩法提示）← 可并行开发\n```\n\n### 开发顺序建议\n\n| 阶段 | 功能点 | 说明 |\n|------|--------|------|\n| 第一阶段 | F-010 | 配置表设计与读取，基础依赖 |\n| 第二阶段 | F-001、F-007 | 可并行开发 |\n| 第三阶段 | F-002、F-008、F-009 | F-002 依赖 F-001；F-008/F-009 可并行 |\n| 第四阶段 | F-003 | 依赖 F-001、F-002 |\n| 第五阶段 | F-004 | 依赖 F-003 |\n| 第六阶段 | F-005、F-006 | 依赖 F-004，F-006 为 F-005 子流程 |\n\n### 关键路径\n\nF-010 → F-001 → F-002 → F-003 → F-004 → F-005 → F-006\n\n---\n\n## 6. 风险、假设与开放问题\n\n### 待澄清项\n\n| 编号 | 问题 | 影响范围 | 建议方案 |\n|------|------|----------|----------|\n| Q1 | 可找回的功能列表具体有哪些？ | F-010 配置表设计 | 预留配置扩展能力，策划补充后填充 |\n| Q2 | 额外付费购买次数的定义与上限？ | F-010、F-003、F-005 | 配置表中 `extra_times_limit` 字段预留 |\n| Q3 | 绑钻找回额外次数的单价倍率？ | F-010 | 配置表中 `extra_recover_cost_bind` 字段预留 |\n| Q4 | 经验计算公式具体参数？ | F-008 | 按二次函数预留，参数由数值提供 |\n| Q5 | 装备副本宝箱具体配置？ | F-009 | 配置表预留，策划填充 |\n| Q6 | 玩法提示具体内容？ | F-007 | 配置表预留，策划填充 |\n| Q7 | 绑钻与钻石的兑换比例？ | F-006 | 待确认，当前假设为1:1 |\n| Q8 | 过期记录清除时机（精确到秒还是天）？ | F-002 | 当前按天判断，登录时+定时任务清理 |\n| Q9 | 多角色/跨服场景？ | 全局 | 已确认按角色独立存储 |\n\n### 文档假设\n\n1. **配置驱动**：所有可找回功能列表、费用、奖励内容等均由策划配置表驱动，后端不做硬编码。\n2. **存储选型**：使用 `#player_misc_extra{}` 存储离线记录和统计缓存，按角色独立存储。\n3. **触发时机**：离线记录在玩家离线时触发；过期清理在登录时+每日定时任务触发；登录统计在每日首次登录时触发。\n4. **协议段分配**：资源找回相关协议使用新协议段 640（待确认最终分配）。\n5. **货币体系**：绑钻和钻石为同一货币体系的不同类型，绑钻不足时可消耗钻石补足，兑换比例待确认。\n6. **单服处理**：暂按单服处理，不涉及跨服数据同步。'
+2026-05-31 21:58:34 INFO [doc_generation.agents.supervisor] [SUPERVISOR] supervisor invoked (iteration=0, messages=2)
+2026-05-31 21:58:43 INFO [httpx] HTTP Request: POST https://api.zhizengzeng.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-31 21:58:43 INFO [doc_generation.agents.supervisor] supervisor model produced tool_calls=True num_tool_calls=1
+2026-05-31 21:58:43 ERROR [backend.service] Agent resume failed
+Traceback (most recent call last):
+  File "D:\project\doc_generation\backend\service.py", line 122, in resume_agent_stream
+    async for event in agent.astream_events(
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\base.py", line 1607, in _astream_events_v1_v2
+    async for event in event_stream:
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\tracers\event_stream.py", line 1100, in _astream_events_implementation_v2
+    await task
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\tracers\event_stream.py", line 1055, in consume_astream
+    async for _ in event_streamer.tap_output_aiter(run_id, stream):
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\tracers\event_stream.py", line 222, in tap_output_aiter
+    async for chunk in output:
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\pregel\main.py", line 3407, in astream
+    async for _ in runner.atick(
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\pregel\_runner.py", line 396, in atick
+    await arun_with_retry(
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\pregel\_retry.py", line 703, in arun_with_retry
+    async for _ in task.proc.astream(task.input, config):
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\_internal\_runnable.py", line 867, in astream
+    output = await asyncio.create_task(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\_internal\_runnable.py", line 932, in _consume_aiter
+    async for chunk in it:
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\tracers\event_stream.py", line 199, in tap_output_aiter
+    first = await anext(output, sentinel)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\base.py", line 1767, in atransform
+    async for ichunk in input:
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\pregel\main.py", line 3407, in astream
+    async for _ in runner.atick(
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\pregel\_runner.py", line 396, in atick
+    await arun_with_retry(
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\pregel\_retry.py", line 703, in arun_with_retry
+    async for _ in task.proc.astream(task.input, config):
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\_internal\_runnable.py", line 867, in astream
+    output = await asyncio.create_task(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\_internal\_runnable.py", line 932, in _consume_aiter
+    async for chunk in it:
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\tracers\event_stream.py", line 199, in tap_output_aiter
+    first = await anext(output, sentinel)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\base.py", line 1767, in atransform
+    async for ichunk in input:
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\base.py", line 1171, in astream
+    yield await self.ainvoke(input, config, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\_internal\_runnable.py", line 501, in ainvoke
+    ret = await self.afunc(*args, **kwargs)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: supervisor_tools() missing 1 required positional argument: 'config'
+During task with name 'supervisor_tools' and id '9941a2ef-00b9-97a9-0f58-5178ca74386d'
+During task with name 'supervisor_subgraph' and id 'dbf8a7b0-5056-0ddf-3fd8-0a22c241bc47'
+2026-05-31 21:59:32 INFO [watchfiles.main] 5 changes detected
+2026-05-31 21:59:33 INFO [watchfiles.main] 1 change detected
+2026-05-31 21:59:35 INFO [watchfiles.main] 1 change detected
+2026-05-31 21:59:41 INFO [watchfiles.main] 5 changes detected
+2026-05-31 21:59:42 INFO [watchfiles.main] 1 change detected
+2026-05-31 21:59:43 INFO [watchfiles.main] 1 change detected
+2026-05-31 21:59:53 INFO [watchfiles.main] 1 change detected
+2026-05-31 22:00:37 INFO [watchfiles.main] 4 changes detected
+2026-05-31 22:00:58 INFO [watchfiles.main] 1 change detected
+2026-05-31 22:01:06 INFO [doc_generation.llm] Selected cognition backend 'deepseek' for role 'draft' with handle 'deepseek-v4-flash' (timeout=600)
+2026-05-31 22:01:09 INFO [doc_generation.llm] Selected cognition backend 'deepseek' for role 'evaluator' with handle 'deepseek-v4-flash' (timeout=600)
+2026-05-31 22:01:09 INFO [watchfiles.main] 5 changes detected
+2026-05-31 22:01:10 INFO [doc_generation.llm] Selected cognition backend 'deepseek' for role 'red_team' with handle 'deepseek-v4-flash' (timeout=600)
+2026-05-31 22:01:12 INFO [doc_generation.llm] Selected cognition backend 'deepseek' for role 'researcher_summarizer' with handle 'deepseek-v4-flash' (timeout=600)
+2026-05-31 22:01:13 INFO [doc_generation.llm] Selected cognition backend 'deepseek' for role 'writer' with handle 'deepseek-v4-flash' (timeout=600)
+2026-05-31 22:01:16 INFO [doc_generation.llm] Selected cognition backend 'deepseek' for role 'researcher_main' with handle 'deepseek-v4-flash' (timeout=600)
+2026-05-31 22:01:17 INFO [doc_generation.llm] Selected cognition backend 'deepseek' for role 'researcher_compressor' with handle 'deepseek-v4-flash' (timeout=600)
+2026-05-31 22:01:18 INFO [doc_generation.llm] Selected cognition backend 'deepseek' for role 'supervisor' with handle 'deepseek-v4-pro' (timeout=600)
+2026-05-31 22:01:20 INFO [doc_generation.llm] Selected cognition backend 'deepseek' for role 'writer' with handle 'deepseek-v4-flash' (timeout=600)
+2026-05-31 22:01:22 INFO [watchfiles.main] 3 changes detected
+2026-05-31 22:01:42 INFO [httpx] HTTP Request: POST https://api.zhizengzeng.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-31 22:01:42 INFO [doc_generation.agents.draft_agent] 结构化输出：research_brief='# 需求拆解简报：资源找回功能\n\n## 1. 需求摘要\n\n资源找回功能允许玩家在错过日常功能后，通过消耗绑钻或金币来买回错过的奖励。系统需记录玩家最近2天内未完成的日常功能数据，并在玩家登录时统计可找回的资源。找回方式分为绑钻找回和金币找回两种，绑钻找回可覆盖普通次数和额外付费次数，金币找回仅限普通次数。功能入口位于日常功能界面内的"资源找回"页签。\n\n---\n\n## 2. 需求分析\n\n### 已确认\n\n1. **功能入口**：日常功能界面内增加"资源找回"页签，点击后切换到资源找回功能界面。\n2. **找回内容展示**：显示可找回的功能项目，包括功能名、可找回次数、找回按钮、找回金额和奖励内容。\n3. **玩法提示**：点击按钮打开三级弹窗，玩法内容由策划配置。\n4. **追回类型选择**：分为"绑钻找回"和"金币找回"，默认选择绑钻找回。\n5. **离线记录规则**：玩家离线前，服务端记录当天尚未完成的日常功能。\n6. **2天存储周期**：若玩家2天内均有上线，则两天内未完成的日常功能均需存储记录；超过2天后清除2天前记录的未完成功能。\n7. **首次登录统计**：玩家每天第一次登录游戏时，服务端将目前可找回的所有资源统计完毕。\n8. **次数分类统计**：需分别记录"正常可找回的功能次数"和"可付费购买次数的功能次数"。\n9. **未开放功能限制**：玩家上次离线前未开放的功能不允许玩家找回。\n10. **绑钻找回规则**：消耗绑钻进行找回；若绑钻不足则弹窗询问是否消耗钻石找回。\n11. **绑钻找回范围**：可找回普通次数和额外次数的功能资源，额外次数单价更高。\n12. **金币找回规则**：只能找回普通次数的功能资源，不能找回额外次数。\n13. **次数互斥**：绑钻找回和金币找回共有次数，即绑钻找过的资源不能再用金币找回。\n14. **日常任务找回奖励**：包括经验和金币；经验根据玩家等级由数值公式计算。\n15. **装备副本找回奖励**：包括经验丹和装备；经验丹为配置道具；装备由策划配置宝箱，在多件装备中随机产出少量装备。\n\n### 待澄清\n\n1. **可找回的具体功能列表**：用户提到"具体可找回的功能内容由策划补充确定"，需策划明确哪些日常功能支持资源找回（如日常任务、装备副本之外是否还有其它功能）。\n2. **经验计算公式**：日常任务找回时经验的具体计算公式未给出，需数值提供。\n3. **额外次数定义与上限**：可付费购买次数的功能，其额外次数的购买上限、单价配置方式未说明。\n4. **绑钻不足时的钻石找回**：弹窗询问后，若玩家同意消耗钻石，钻石找回的规则（是否与绑钻找回等价、汇率等）未说明。\n5. **玩法提示内容**：三级弹窗的具体玩法内容由策划配置，未给出具体配置结构。\n6. **奖励预览与确认**：玩家选择找回后，是否需要二次确认？还是直接扣除货币发放奖励？\n7. **多货币混合找回**：同一功能项目中，是否允许部分次数用绑钻找回、部分用金币找回？还是只能选择一种货币类型统一找回？\n8. **清除时机**：超过2天后清除记录的触发时机（登录时清除？定时任务清除？）。\n9. **装备副本宝箱配置**：宝箱ID、随机产出规则、装备品质范围等需策划提供。\n\n### 合理推断\n\n1. **数据存储选型（推断）**：资源找回属于限时性功能（2天周期），数据可清理，适合使用 `#player_misc_extra{}` 存储，以 `key` 区分不同功能类型的找回记录。\n2. **离线记录时机（推断）**：玩家离线时（进程退出/断线）触发记录当天未完成功能，而非实时记录。\n3. **登录统计触发（推断）**：每天首次登录时触发统计，若当天已统计过则不再重复统计。\n\n---\n\n## 3. 功能模块\n\n### F-001：离线未完成功能记录\n\n- **描述**：玩家离线时，服务端记录当天尚未完成的日常功能列表，供后续资源找回使用。\n- **接口类型**：内部自用接口\n- **触发与交互**：玩家离线事件触发。输入：玩家ID、当天日期、未完成的日常功能列表（功能ID列表）。输出：存储记录到持久化层。\n- **依赖**：无（依赖日常功能系统的完成状态判定接口，但该接口属于外部系统，不在本功能范围内）\n\n### F-002：可找回数据存储与过期清理\n\n- **描述**：存储玩家最近2天内未完成的日常功能记录，超过2天后自动清除过期数据。\n- **接口类型**：内部自用接口\n- **触发与交互**：存储由F-001触发写入；清理由登录触发或定时任务触发。输入：玩家ID、功能ID、记录时间。输出：过期数据删除。\n- **依赖**：F-001（写入来源）\n\n### F-003：每日首次登录资源统计\n\n- **描述**：玩家每天第一次登录时，服务端统计当前所有可找回的资源，包括正常次数和可付费购买次数，两者分开记录。\n- **接口类型**：内部自用接口\n- **触发与交互**：玩家登录事件触发（仅每天首次）。输入：玩家ID。输出：生成可找回资源统计结果（按功能ID分类，含正常次数、可付费次数、对应奖励内容、找回费用）。\n- **依赖**：F-002（读取存储的未完成功能记录）；依赖外部系统获取功能配置、奖励配置、费用配置\n\n### F-004：资源找回界面数据查询\n\n- **描述**：玩家打开"资源找回"页签时，服务端返回可找回的功能项目列表，包括功能名、可找回次数、找回金额和奖励内容。\n- **接口类型**：与客户端交互的接口\n- **触发与交互**：客户端请求（切换到资源找回页签）。输入：玩家ID。输出：可找回功能项目列表（每个项目含功能ID、功能名、普通可找回次数、额外可找回次数、绑钻找回单价、金币找回单价、奖励预览列表）。\n- **依赖**：F-003（依赖统计结果）\n\n### F-005：玩法提示查询\n\n- **描述**：玩家点击玩法提示按钮时，返回由策划配置的玩法说明内容。\n- **接口类型**：与客户端交互的接口\n- **触发与交互**：客户端请求（点击玩法提示按钮）。输入：无（或功能ID）。输出：玩法提示内容（由策划配置，结构待定）。\n- **依赖**：无（依赖配置表）\n\n### F-006：绑钻找回执行\n\n- **描述**：玩家选择绑钻找回方式，消耗绑钻（或绑钻不足时消耗钻石）找回指定功能的奖励。可找回普通次数和额外次数，额外次数单价更高。\n- **接口类型**：与客户端交互的接口\n- **触发与交互**：客户端请求（选择绑钻找回并确认）。输入：玩家ID、功能ID、找回次数（含普通次数和额外次数）。输出：扣费结果、发放奖励结果。若绑钻不足，返回弹窗提示询问是否使用钻石。\n- **依赖**：F-003（依赖统计结果中的可找回次数和费用）；依赖外部货币系统（绑钻/钻石扣减）、奖励发放系统\n\n### F-007：金币找回执行\n\n- **描述**：玩家选择金币找回方式，消耗金币找回指定功能的奖励。只能找回普通次数，不能找回额外次数。\n- **接口类型**：与客户端交互的接口\n- **触发与交互**：客户端请求（选择金币找回并确认）。输入：玩家ID、功能ID、找回次数（仅普通次数）。输出：扣费结果、发放奖励结果。\n- **依赖**：F-003（依赖统计结果中的可找回次数和费用）；依赖外部货币系统（金币扣减）、奖励发放系统\n\n### F-008：找回次数互斥校验\n\n- **描述**：绑钻找回和金币找回共用次数，已通过绑钻找回的次数不可再通过金币找回，反之亦然。在执行找回前校验次数是否已被消耗。\n- **接口类型**：内部自用接口\n- **触发与交互**：由F-006和F-007内部调用。输入：玩家ID、功能ID、请求找回次数。输出：校验通过/失败。\n- **依赖**：F-006、F-007（被调用方）\n\n### F-009：日常任务奖励计算\n\n- **描述**：根据玩家等级和数值公式计算日常任务找回时获得的经验和金币奖励。\n- **接口类型**：内部自用接口\n- **触发与交互**：由F-006/F-007在发放日常任务奖励时调用。输入：玩家ID、玩家等级、找回次数。输出：经验值、金币数量。\n- **依赖**：F-006、F-007（被调用方）；依赖外部数值配置（经验公式）\n\n### F-010：装备副本奖励计算\n\n- **描述**：根据策划配置的宝箱规则，从多件装备中随机产出少量装备，并发放配置的经验丹。\n- **接口类型**：内部自用接口\n- **触发与交互**：由F-006/F-007在发放装备副本奖励时调用。输入：玩家ID、找回次数。输出：经验丹道具列表、随机装备列表。\n- **依赖**：F-006、F-007（被调用方）；依赖外部配置表（宝箱ID、随机规则、经验丹道具ID）\n\n---\n\n## 4. 功能点关系\n\n### 依赖顺序\n\n| 前置功能点 | 后置功能点 | 说明 |\n|-----------|-----------|------|\n| F-001（离线记录） | F-002（数据存储） | 先有记录才能存储 |\n| F-002（数据存储） | F-003（登录统计） | 统计需读取存储的数据 |\n| F-003（登录统计） | F-004（界面查询） | 查询需依赖统计结果 |\n| F-003（登录统计） | F-006（绑钻找回） | 找回需依赖统计结果 |\n| F-003（登录统计） | F-007（金币找回） | 找回需依赖统计结果 |\n| F-006（绑钻找回） | F-008（次数互斥） | 找回执行时需校验次数 |\n| F-007（金币找回） | F-008（次数互斥） | 找回执行时需校验次数 |\n| F-006/F-007 | F-009（日常任务奖励） | 发放奖励时调用 |\n| F-006/F-007 | F-010（装备副本奖励） | 发放奖励时调用 |\n\n### 可并行\n\n以下功能点之间无强依赖关系，可独立推进：\n\n- F-001（离线记录）与 F-005（玩法提示查询）可并行\n- F-004（界面查询）与 F-005（玩法提示查询）可并行\n- F-006（绑钻找回）与 F-007（金币找回）可并行开发（逻辑相似但独立）\n- F-009（日常任务奖励计算）与 F-010（装备副本奖励计算）可并行开发\n- F-005（玩法提示查询）与所有其他功能点均可并行'
+2026-05-31 22:01:49 INFO [httpx] HTTP Request: POST https://api.zhizengzeng.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-31 22:01:49 INFO [doc_generation.agents.draft_agent] 提问结果：items=[ClarificationItem(question='同一功能项目中，绑钻找回和金币找回是否允许混合使用（即部分次数用绑钻、部分用金币）？', options=['不允许混合，一次找回操作只能选择一种货币类型，所有找回次数统一用一种货币支付', '允许混合，玩家可以自由分配每种货币找回的次数，系统按比例扣费', '不允许混合，但玩家可以分多次操作，先绑钻找回部分次数，再金币找回剩余次数']), ClarificationItem(question='绑钻不足时弹窗询问是否使用钻石找回，钻石与绑钻的兑换比例或找回规则是怎样的？', options=['1钻石=1绑钻等价替换，钻石找回的单价与绑钻找回完全一致', '钻石找回的单价高于绑钻找回（如1.5倍），鼓励玩家使用绑钻', '钻石仅用于补足差额，即绑钻不足部分按比例用钻石补齐，单价不变']), ClarificationItem(question='超过2天的过期数据清除时机是什么时候？', options=['玩家每天首次登录时触发清除，登录时检查并删除过期记录', '由定时任务统一清理（如每日凌晨5点服务器定时执行）', '登录时和定时任务双重触发，登录时清理当前玩家数据，定时任务做全局兜底清理']), ClarificationItem(question='可付费购买次数的功能，其额外次数的购买上限和单价配置方式是什么？', options=['额外次数上限和单价由策划在功能配置表中按功能ID独立配置，每个功能可不同', '额外次数上限统一为固定值（如3次），单价按功能类型（日常任务/装备副本）区分', '额外次数上限由玩家VIP等级决定，单价由数值公式根据功能基础奖励价值计算']), ClarificationItem(question='玩家选择找回后是否需要二次确认弹窗，还是直接扣除货币发放奖励？', options=['需要二次确认弹窗，展示扣费明细和奖励预览，玩家确认后才执行', '不需要二次确认，客户端点击找回按钮后直接请求服务端执行扣费和发放', '仅在绑钻不足需用钻石时弹出二次确认，其他情况直接执行'])]
+2026-05-31 22:01:49 INFO [doc_generation.agents.draft_agent] question_to_user generated 5 questions, interrupting for user input
+2026-05-31 22:02:43 INFO [httpx] HTTP Request: POST https://api.zhizengzeng.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-31 22:02:43 INFO [doc_generation.agents.draft_agent] 提问结果：items=[ClarificationItem(question='同一功能项目中，绑钻找回和金币找回是否允许混合使用（即部分次数用绑钻找回、部分用金币找回）？', options=['不允许混合，同一功能只能选择一种货币类型统一找回所有次数', '允许混合，玩家可自由分配每种货币找回的次数，但总次数不超过可找回次数', '允许混合，但需先消耗完一种货币的可找回次数后才能使用另一种货币']), ClarificationItem(question='绑钻不足时弹窗询问是否使用钻石找回，钻石与绑钻的兑换比例或找回规则是怎样的？', options=['钻石与绑钻1:1等价替换，即消耗钻石时单价与绑钻找回相同', '钻石找回单价高于绑钻找回（如2倍），鼓励玩家使用绑钻', '钻石找回仅作为绑钻不足时的补充，按固定汇率（如1钻石=10绑钻）折算消耗']), ClarificationItem(question='超过2天的过期数据清除时机是什么时候触发？', options=['玩家每天首次登录时触发清除，清除当前日期2天前的所有记录', '由定时任务（如每日凌晨0点）统一批量清除所有玩家的过期数据', '登录时和定时任务双重触发，登录时清除该玩家过期数据，定时任务做兜底清理']), ClarificationItem(question='玩家执行找回操作时，是否需要二次确认弹窗？还是直接扣除货币发放奖励？', options=['需要二次确认弹窗，显示扣费明细和奖励预览，玩家确认后才执行', '不需要二次确认，客户端点击找回按钮后直接请求服务端执行扣费和发放', '仅在绑钻不足转为钻石找回时需要二次确认，其他情况直接执行']), ClarificationItem(question='可付费购买次数的功能，其额外次数的购买上限和单价配置方式是什么？', options=['额外次数上限和单价由策划在功能配置表中按功能ID独立配置，每个功能可不同', '额外次数上限统一为普通次数的2倍，单价统一为普通找回单价的1.5倍', '额外次数上限由玩家VIP等级决定，单价由数值公式根据功能类型计算'])]
+2026-05-31 22:02:43 INFO [doc_generation.agents.draft_agent] question_to_user generated 5 questions, interrupting for user input
+2026-05-31 22:04:00 INFO [httpx] HTTP Request: POST https://api.zhizengzeng.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-31 22:04:00 ERROR [doc_generation.agents.draft_agent] Error: 1 validation error for DraftReport
+draft_report
+  Field required [type=missing, input_value={}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.13/v/missing
+2026-05-31 22:04:54 INFO [httpx] HTTP Request: POST https://api.zhizengzeng.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-31 22:04:54 INFO [doc_generation.agents.draft_agent] 简报结果：None
+2026-05-31 22:04:54 ERROR [backend.service] Agent resume failed
+Traceback (most recent call last):
+  File "D:\project\doc_generation\backend\service.py", line 122, in resume_agent_stream
+    async for event in agent.astream_events(
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\base.py", line 1607, in _astream_events_v1_v2
+    async for event in event_stream:
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\tracers\event_stream.py", line 1100, in _astream_events_implementation_v2
+    await task
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\tracers\event_stream.py", line 1055, in consume_astream
+    async for _ in event_streamer.tap_output_aiter(run_id, stream):
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\tracers\event_stream.py", line 222, in tap_output_aiter
+    async for chunk in output:
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\pregel\main.py", line 3407, in astream
+    async for _ in runner.atick(
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\pregel\_runner.py", line 396, in atick
+    await arun_with_retry(
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\pregel\_retry.py", line 703, in arun_with_retry
+    async for _ in task.proc.astream(task.input, config):
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\_internal\_runnable.py", line 867, in astream
+    output = await asyncio.create_task(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\_internal\_runnable.py", line 932, in _consume_aiter
+    async for chunk in it:
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\tracers\event_stream.py", line 199, in tap_output_aiter
+    first = await anext(output, sentinel)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\base.py", line 1767, in atransform
+    async for ichunk in input:
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\base.py", line 1171, in astream
+    yield await self.ainvoke(input, config, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\_internal\_runnable.py", line 501, in ainvoke
+    ret = await self.afunc(*args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\config.py", line 667, in run_in_executor
+    return await asyncio.get_running_loop().run_in_executor(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\software\myConda\envs\rag-test\Lib\concurrent\futures\thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\config.py", line 658, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\doc_generation\agents\draft_agent.py", line 119, in write_draft_report
+    logger.debug("write_draft_report produced draft_report length=%d", len(response.draft_report))
+                                                                           ^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'draft_report'
+During task with name 'write_draft_report' and id '2204e159-7fac-647a-3527-7febb081438b'
+2026-05-31 22:05:47 INFO [httpx] HTTP Request: POST https://api.zhizengzeng.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-31 22:05:47 INFO [doc_generation.agents.draft_agent] 结构化输出：research_brief='## 1. 需求摘要\n\n资源找回功能允许玩家在错过日常功能后，通过消耗绑钻或金币来买回错过的奖励。系统需记录玩家最近2天内未完成的日常功能，并在玩家登录时统计可找回的资源。找回分为「绑钻找回」和「金币找回」两种方式，绑钻找回可覆盖普通次数和额外付费次数，金币找回仅限普通次数。后端需负责离线记录、登录统计、找回扣费与奖励发放等核心逻辑。\n\n## 2. 需求分析\n\n### 已确认\n\n1. 资源找回面向所有玩家，用于弥补错过的日常功能奖励。\n2. 可找回的内容为最近2天内（含当天）错过的日常功能。\n3. 玩家离线前，服务端需记录当天尚未完成的日常功能。\n4. 若玩家2天内均有上线，则两天内未完成的日常功能均需存储记录。\n5. 超过2天后，服务端清除2天前记录的未完成功能。\n6. 玩家每天第一次登录游戏时，服务端统计当前可找回的所有资源。\n7. 统计内容包括：正常可找回的功能次数 + 可付费购买次数的功能次数，两者分开记录。\n8. 玩家上次离线前未开放的功能，不允许玩家找回。\n9. 找回方式分为「绑钻找回」和「金币找回」两种，默认选择绑钻找回。\n10. 绑钻找回消耗绑钻，若绑钻不足则弹窗询问是否消耗钻石找回。\n11. 绑钻找回可找回普通次数 + 额外次数（额外次数单价更高）。\n12. 金币找回只能找回普通次数，不能找回额外次数。\n13. 绑钻找回和金币找回共有次数——即绑钻找过的资源不能再用金币找回。\n14. 日常任务找回奖励包括经验和金币；经验根据玩家等级由数值公式计算。\n15. 装备副本找回奖励包括经验丹和装备；经验丹为配置道具；装备由策划配置宝箱，在多件装备中随机产出。\n16. 功能界面包含：功能页签（日常功能内「资源找回」页签）、找回内容列表（功能名、可找回次数、找回按钮、找回金额、奖励内容）、玩法提示（三级弹窗，内容由策划配置）、追回类型选择（绑钻/金币，默认绑钻）。\n\n### 待澄清\n\n1. **可找回的具体功能列表**：用户提到「具体可找回的功能内容由策划补充确定」，需策划明确哪些日常功能支持资源找回（如日常任务、装备副本之外是否还有其它功能）。\n2. **额外次数的定义与来源**：哪些功能有额外付费次数？额外次数的上限、单价配置方式未说明。\n3. **绑钻不足时的钻石找回**：弹窗询问后，若玩家同意消耗钻石，钻石与绑钻的兑换比例或扣费规则未说明。\n4. **数值公式**：日常任务经验计算的具体公式未给出，需数值策划提供。\n5. **装备副本宝箱配置**：宝箱ID、随机产出规则（权重、数量范围）未说明。\n6. **玩法提示内容**：三级弹窗的具体内容由策划配置，未给出具体配置结构。\n7. **货币单位与精度**：绑钻、金币、钻石的最小单位及精度未说明。\n8. **清除时机**：超过2天后清除记录——是每天定时清理，还是登录时判断清理？未明确。\n9. **多角色/跨服场景**：是否涉及跨服角色数据？未提及。\n\n### 合理推断\n\n1. **「2天」的判定规则**：推断为自然日（以服务器日期为准），而非精确的48小时。依据：日常功能通常按自然日刷新。\n2. **离线记录存储载体**：推断使用 `#player_misc_extra{}` 存储离线未完成记录，因该数据有2天生命周期，符合运营活动/临时数据特征。\n3. **登录统计触发时机**：推断为玩家每日首次登录时触发一次，而非每次登录都触发。依据：用户明确说「每天第一次登录游戏时」。\n\n## 3. 功能模块\n\n### F-001：离线未完成功能记录\n\n- **描述**：玩家离线时，服务端记录当天尚未完成的日常功能列表，供后续资源找回使用。\n- **接口类型**：内部自用接口\n- **触发与交互**：玩家离线事件触发。输入：玩家ID、当天日期、未完成的日常功能列表（功能ID + 是否可购买额外次数等标记）。输出：存储记录到持久化层。\n- **依赖**：无（依赖玩家离线流程，属于游戏框架层）\n\n### F-002：过期记录清理\n\n- **描述**：清除超过2天前的未完成功能记录，避免无效数据累积。\n- **接口类型**：内部自用接口\n- **触发与交互**：玩家登录时或定时任务触发。输入：玩家ID、当前日期。输出：删除超过2天前的记录。\n- **依赖**：F-001（需先有记录才能清理）\n\n### F-003：每日首次登录可找回资源统计\n\n- **描述**：玩家每天第一次登录时，服务端统计当前所有可找回的资源，包括正常次数和可付费购买次数，两者分开记录。\n- **接口类型**：内部自用接口\n- **触发与交互**：玩家每日首次登录事件触发。输入：玩家ID、当前日期、离线未完成记录（F-001）。输出：生成可找回资源列表（功能ID、功能名、可找回普通次数、可找回额外次数、各次数的奖励内容、各次数的找回费用）。\n- **依赖**：F-001（需读取离线记录）、F-002（需先清理过期数据）\n\n### F-004：资源找回界面数据查询\n\n- **描述**：前端打开「资源找回」页签时，后端返回当前玩家可找回的资源列表及详情。\n- **接口类型**：外部交互接口（客户端请求）\n- **触发与交互**：玩家点击日常功能→「资源找回」页签。输入：玩家ID。输出：可找回资源列表（每个功能项包含：功能名、可找回普通次数、可找回额外次数、绑钻找回单价、金币找回单价、奖励内容预览、玩法提示信息）。\n- **依赖**：F-003（需先完成统计）\n\n### F-005：玩法提示查询\n\n- **描述**：玩家点击玩法提示按钮时，返回由策划配置的玩法说明内容。\n- **接口类型**：外部交互接口（客户端请求）\n- **触发与交互**：玩家点击玩法提示按钮。输入：玩家ID、功能ID。输出：玩法提示内容（文本/富文本，由策划配置）。\n- **依赖**：F-004（界面数据查询中包含玩法提示入口）\n\n### F-006：绑钻找回执行\n\n- **描述**：玩家选择绑钻找回方式，消耗绑钻（或绑钻不足时消耗钻石）找回指定功能的奖励。\n- **接口类型**：外部交互接口（客户端请求）\n- **触发与交互**：玩家选择「绑钻找回」→点击找回按钮。输入：玩家ID、功能ID、找回次数（普通/额外）。输出：扣费结果、发放奖励（经验、金币、道具等）。若绑钻不足，返回特殊状态码通知前端弹窗询问是否使用钻石。\n- **依赖**：F-003（需有已统计的可找回数据）、F-007（需校验次数是否已被金币找回占用）\n\n### F-007：金币找回执行\n\n- **描述**：玩家选择金币找回方式，消耗金币找回指定功能的普通次数奖励（不可找回额外次数）。\n- **接口类型**：外部交互接口（客户端请求）\n- **触发与交互**：玩家选择「金币找回」→点击找回按钮。输入：玩家ID、功能ID、找回次数（仅限普通次数）。输出：扣费结果、发放奖励。若该次数已被绑钻找回占用，返回错误。\n- **依赖**：F-003（需有已统计的可找回数据）、F-006（需校验次数是否已被绑钻找回占用）\n\n### F-008：绑钻不足转钻石扣费\n\n- **描述**：绑钻找回时若绑钻不足，服务端返回特殊状态，前端弹窗询问玩家是否使用钻石补足差额；玩家确认后，服务端扣除钻石并完成找回。\n- **接口类型**：外部交互接口（客户端请求）\n- **触发与交互**：玩家在绑钻不足弹窗中确认使用钻石。输入：玩家ID、功能ID、找回次数。输出：扣除钻石、发放奖励。\n- **依赖**：F-006（作为绑钻找回的补充流程）\n\n### F-009：日常任务找回奖励计算\n\n- **描述**：根据玩家等级和数值公式，计算日常任务找回时应发放的经验和金币数量。\n- **接口类型**：内部自用接口\n- **触发与交互**：F-006/F-007 执行日常任务找回时调用。输入：玩家ID、玩家等级、找回次数。输出：经验值、金币数量。\n- **依赖**：F-006、F-007（被找回执行流程调用）\n\n### F-010：装备副本找回奖励计算\n\n- **描述**：根据策划配置，计算装备副本找回时应发放的经验丹和随机装备奖励。\n- **接口类型**：内部自用接口\n- **触发与交互**：F-006/F-007 执行装备副本找回时调用。输入：玩家ID、功能ID、找回次数。输出：经验丹道具列表、随机装备列表（从配置宝箱中随机产出）。\n- **依赖**：F-006、F-007（被找回执行流程调用）\n\n### F-011：找回次数状态管理\n\n- **描述**：管理每个功能可找回次数的状态（已找回/未找回），确保绑钻找回和金币找回共用次数，已找回的次数不可再次找回。\n- **接口类型**：内部自用接口\n- **触发与交互**：F-006/F-007 执行成功后更新次数状态。输入：玩家ID、功能ID、找回次数、找回方式。输出：更新后的次数状态。\n- **依赖**：F-006、F-007（被找回执行流程调用）\n\n## 4. 功能点关系\n\n### 依赖顺序\n\n| 前置功能点 | 后置功能点 | 说明 |\n|-----------|-----------|------|\n| F-001（离线记录） | F-002（过期清理） | 需先有记录才能清理 |\n| F-001（离线记录） | F-003（登录统计） | 统计需读取离线记录 |\n| F-002（过期清理） | F-003（登录统计） | 统计前需先清理过期数据 |\n| F-003（登录统计） | F-004（界面查询） | 界面数据来源于统计结果 |\n| F-003（登录统计） | F-006（绑钻找回） | 找回需基于已统计的数据 |\n| F-003（登录统计） | F-007（金币找回） | 找回需基于已统计的数据 |\n| F-006（绑钻找回） | F-008（钻石补足） | 钻石补足是绑钻找回的补充流程 |\n| F-006（绑钻找回） | F-011（次数状态管理） | 找回后需更新次数状态 |\n| F-007（金币找回） | F-011（次数状态管理） | 找回后需更新次数状态 |\n| F-006/F-007 | F-009（日常任务奖励计算） | 被找回流程调用 |\n| F-006/F-007 | F-010（装备副本奖励计算） | 被找回流程调用 |\n\n### 可并行\n\n以下功能点之间无强依赖关系，可独立推进：\n\n- F-001（离线记录）与 F-003（登录统计）可并行设计（但运行时F-003依赖F-001的数据）\n- F-009（日常任务奖励计算）与 F-010（装备副本奖励计算）可并行设计\n- F-005（玩法提示查询）与其它功能点基本独立，可并行推进\n- F-004（界面查询）与 F-006/F-007（找回执行）可并行设计（但运行时F-004依赖F-003的数据）'
+2026-05-31 22:05:54 INFO [httpx] HTTP Request: POST https://api.zhizengzeng.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-31 22:05:54 INFO [doc_generation.agents.draft_agent] 提问结果：items=[ClarificationItem(question='「超过2天后清除记录」的清除时机具体是哪种方式？', options=['玩家每次登录时，判断并清除超过2天前的记录（按服务器自然日计算）', '服务器每天固定时间（如凌晨0点）启动定时任务，批量清理所有玩家超过2天前的记录', '玩家离线时触发清理，检查并清除超过2天前的记录']), ClarificationItem(question='绑钻不足时消耗钻石找回，钻石与绑钻的兑换比例或扣费规则是怎样的？', options=['1钻石=1绑钻，直接按绑钻单价等额扣除钻石', '钻石按固定折扣比例（如1钻石=0.8绑钻）换算，消耗更多钻石', '钻石与绑钻为独立货币体系，绑钻不足时按策划配置的固定差额价（如额外加收20%）扣除钻石']), ClarificationItem(question='额外付费次数的定义、上限及单价配置方式是什么？', options=['额外次数由策划在功能配置表中配置，每个功能独立配置上限次数和单价（绑钻单价），与普通次数单价不同', '额外次数上限统一为3次，单价为普通次数的2倍，所有功能共用同一套规则', '额外次数由运营活动动态发放，无固定上限，单价由活动配置决定']), ClarificationItem(question='多角色/跨服场景下，资源找回数据如何处理？', options=['不涉及跨服，每个角色独立记录和找回，数据按角色ID隔离', '支持跨服，玩家在主服的角色数据包含所有跨服角色的日常完成情况，统一汇总找回', '暂不支持跨服，但需在数据结构中预留跨服标识字段，便于后续扩展']), ClarificationItem(question='日常任务经验计算的数值公式由谁提供，公式的输入参数有哪些？', options=['由数值策划提供公式，输入参数为玩家等级和任务基础经验系数，输出为总经验值', '由系统固定公式：经验 = 玩家等级 × 固定系数 × 找回次数，系数由策划配置', '由策划提供分段函数表（等级区间→经验倍率），按玩家等级查表计算'])]
+2026-05-31 22:05:54 INFO [doc_generation.agents.draft_agent] question_to_user generated 5 questions, interrupting for user input
+2026-05-31 22:06:23 INFO [httpx] HTTP Request: POST https://api.zhizengzeng.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-31 22:06:23 ERROR [doc_generation.agents.draft_agent] Error: 1 validation error for ClarificationQuestions
+items
+  Field required [type=missing, input_value={}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.13/v/missing
+2026-05-31 22:06:33 INFO [httpx] HTTP Request: POST https://api.zhizengzeng.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-31 22:06:33 ERROR [doc_generation.agents.draft_agent] Error: 1 validation error for ClarificationQuestions
+items
+  Field required [type=missing, input_value={}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.13/v/missing
+2026-05-31 22:06:43 INFO [httpx] HTTP Request: POST https://api.zhizengzeng.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-31 22:06:43 INFO [doc_generation.agents.draft_agent] 提问结果：items=[ClarificationItem(question='「超过2天后清除记录」的清除时机和判定规则具体是什么？', options=['每天凌晨定时清理（服务器定时任务），清理所有玩家2天前的记录', '玩家每次登录时触发清理，仅清理该玩家2天前的记录', '玩家每日首次登录时触发清理，清理该玩家2天前的记录']), ClarificationItem(question='绑钻不足时，钻石与绑钻的兑换比例或扣费规则是怎样的？', options=['1钻石=1绑钻，直接按差额扣除等量钻石', '钻石按固定比例（如1:2）抵扣绑钻，即1钻石可抵2绑钻', '不设兑换比例，绑钻不足时直接提示玩家充值绑钻，不支持用钻石替代']), ClarificationItem(question='「2天」的判定规则是自然日还是精确的48小时？以服务器日期还是玩家本地日期为准？', options=['自然日，以服务器日期（0点重置）为准，当天未完成即算当天', '精确48小时，以玩家离线时刻开始计算，48小时内可找回', '自然日，但以玩家所在时区的日期为准，不同服务器按各自时区计算']), ClarificationItem(question='额外付费次数的来源、上限和单价配置方式是什么？哪些功能有额外次数？', options=['额外次数由策划在功能配置表中配置，每个功能独立配置上限和单价，仅部分付费功能（如装备副本）有额外次数', '额外次数统一由全局配置定义（如每个功能最多2次额外），单价按功能类型分档，所有日常功能均有额外次数', '额外次数由玩家VIP等级决定，VIP等级越高可购买的额外次数越多，单价随次数递增']), ClarificationItem(question='多角色/跨服场景下，资源找回数据是按角色独立存储还是按账号共享？是否涉及跨服角色？', options=['按角色独立存储，每个角色的未完成记录和找回状态互不影响，不涉及跨服', '按账号共享，同一账号下所有角色共用可找回次数，但奖励发放到当前角色', '按角色独立存储，但跨服角色需要将数据同步到目标服务器，涉及跨服数据迁移'])]
+2026-05-31 22:06:43 INFO [doc_generation.agents.draft_agent] question_to_user generated 5 questions, interrupting for user input
+2026-05-31 22:07:31 INFO [httpx] HTTP Request: POST https://api.zhizengzeng.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-31 22:07:31 INFO [doc_generation.agents.draft_agent] 简报结果：draft_report='# 资源找回系统 — 后端开发技术文档草稿\n\n## 1. 玩法概述\n\n### 1.1 玩法说明\n\n资源找回功能允许玩家在错过日常功能（如日常任务、装备副本等）后，通过消耗绑钻或金币来买回错过的奖励。系统记录玩家最近2天内未完成的日常功能，在玩家每日首次登录时统计可找回的资源，并提供找回执行接口。\n\n### 1.2 核心规则\n\n1. **可找回范围**：最近2个自然日（含当天）内错过的日常功能。\n2. **离线记录**：玩家离线前，服务端记录当天未完成的日常功能列表。\n3. **过期清理**：玩家每次登录时，清除超过2天前的记录（按服务器自然日计算）。\n4. **登录统计**：玩家每天第一次登录时，统计当前可找回的所有资源（普通次数 + 额外次数分开记录）。\n5. **找回方式**：绑钻找回（可找回普通+额外次数）和金币找回（仅限普通次数），两者共用次数。\n6. **绑钻不足**：绑钻不足时，1钻石=1绑钻等额扣除钻石，需前端弹窗确认。\n7. **额外次数**：统一上限3次，单价为普通次数的2倍。\n8. **数据隔离**：每个角色独立记录和找回，按角色ID隔离，不涉及跨服。\n\n## 2. 数据持久化（草稿级）\n\n### 2.1 存储选型分析\n\n资源找回数据具有以下特征：\n- 数据有2天生命周期，属于临时性数据\n- 活动结束后（超过2天）数据可清理\n- 同一玩家有多条记录（按日期区分）\n\n**结论**：采用 `#player_misc_extra{}` 存储。\n\n### 2.2 存储方案\n\n#### 离线未完成记录\n\n每条记录对应玩家某一天未完成的日常功能列表。\n\n| 逻辑字段 | 物理位置 | 类型 | 说明 |\n|----------|----------|------|------|\n| 日期标识 | key | integer | 服务器自然日时间戳（当天0点） |\n| 未完成功能列表 | value_text | list | `[{FunId, HasExtra}]`，FunId为功能ID，HasExtra为是否可购买额外次数（0/1） |\n| 记录创建时间 | time | integer | 记录创建时的Unix时间戳 |\n| 预留 | value / value1 / value2 / value3 | integer | 暂未使用，默认0 |\n| 预留 | value_text_1/2/3 | list | 暂未使用，默认[] |\n\n**key 取值规则**：`{resource_recovery, Date}`，其中 Date 为服务器自然日0点时间戳。\n\n**生命周期**：每次登录时检查，超过2天前的记录立即删除。\n\n#### 可找回资源统计结果\n\n玩家每日首次登录统计后，将结果缓存，供界面查询和找回执行使用。\n\n| 逻辑字段 | 物理位置 | 类型 | 说明 |\n|----------|----------|------|------|\n| 日期标识 | key | integer | 服务器自然日时间戳（当天0点） |\n| 可找回资源列表 | value_text | list | `[{FunId, NormalTimes, ExtraTimes, NormalCost, ExtraCost, RewardPreview}]` |\n| 已找回次数记录 | value_text_1 | list | `[{FunId, RecoveredNormal, RecoveredExtra}]`，记录已找回次数 |\n| 统计时间 | time | integer | 统计生成的Unix时间戳 |\n| 预留 | value / value1 / value2 / value3 | integer | 暂未使用，默认0 |\n| 预留 | value_text_2/3 | list | 暂未使用，默认[] |\n\n**key 取值规则**：`{resource_recovery_stat, Date}`。\n\n**生命周期**：当天有效，次日首次登录重新统计时覆盖。\n\n#### 找回次数状态\n\n与可找回资源统计共用 `value_text_1` 字段，记录已找回次数，确保绑钻找回和金币找回共用次数。\n\n## 3. 配置表设计（草稿）\n\n### 3.1 资源找回功能配置表（recovery_function_config）\n\n| 字段 | 类型(Erlang) | 说明 | 示例 |\n|------|-------------|------|------|\n| fun_id | integer() | 功能ID，唯一标识 | 1 |\n| fun_name | string() | 功能名称，前端展示 | "日常任务" |\n| fun_type | integer() | 功能类型：1=日常任务，2=装备副本 | 1 |\n| normal_cost_bind | integer() | 绑钻找回普通次数单价 | 50 |\n| extra_cost_bind | integer() | 绑钻找回额外次数单价（=normal_cost_bind×2） | 100 |\n| normal_cost_gold | integer() | 金币找回普通次数单价 | 5000 |\n| reward_type | integer() | 奖励类型：1=经验+金币，2=道具+随机装备 | 1 |\n| extra_max_times | integer() | 额外次数上限，统一为3 | 3 |\n| exp_coefficient | integer() | 经验系数（日常任务用） | 100 |\n| chest_id | integer() | 宝箱ID（装备副本用） | 1001 |\n| tip_content_id | integer() | 玩法提示内容ID，关联提示配置表 | 1 |\n\n### 3.2 玩法提示配置表（recovery_tip_config）\n\n| 字段 | 类型(Erlang) | 说明 | 示例 |\n|------|-------------|------|------|\n| tip_id | integer() | 提示ID | 1 |\n| content | string() | 提示内容（富文本/文本） | "资源找回可弥补错过的日常奖励…" |\n\n### 3.3 装备副本宝箱配置表（recovery_chest_config）\n\n| 字段 | 类型(Erlang) | 说明 | 示例 |\n|------|-------------|------|------|\n| chest_id | integer() | 宝箱ID | 1001 |\n| item_id | integer() | 道具ID | 2001 |\n| weight | integer() | 随机权重 | 50 |\n| min_count | integer() | 最小数量 | 1 |\n| max_count | integer() | 最大数量 | 1 |\n\n## 4. 功能点技术设计\n\n### 4.1 F-001：离线未完成功能记录\n\n#### 需求回顾\n\n玩家离线时，服务端记录当天尚未完成的日常功能列表，供后续资源找回使用。\n\n#### 功能逻辑\n\n1. 监听玩家离线事件（游戏框架层提供）。\n2. 获取当天服务器自然日0点时间戳 `Today`。\n3. 遍历所有支持资源找回的日常功能，检查玩家当天是否已完成。\n4. 对未完成的功能，记录 `{FunId, HasExtra}`（HasExtra=1表示该功能有额外付费次数可购买）。\n5. 以 `{resource_recovery, Today}` 为 key，写入 `#player_misc_extra{}` 的 `value_text` 字段。\n6. 若当天已有记录，覆盖更新。\n\n#### 接口设计（草稿）\n\n**类型**：内部自用接口（无Socket协议）\n\n**调用方式**：由玩家离线流程回调\n\n```erlang\n%% 伪代码\n-spec record_offline_unfinished(PlayerId :: integer(), Today :: integer()) -> ok.\n```\n\n**输入**：PlayerId, Today（服务器自然日0点时间戳）\n**输出**：ok\n\n#### 依赖与调用\n\n- 依赖：游戏框架层的玩家离线事件\n- 被调用：F-002（过期清理）、F-003（登录统计）\n\n---\n\n### 4.2 F-002：过期记录清理\n\n#### 需求回顾\n\n清除超过2天前的未完成功能记录，避免无效数据累积。清除时机为玩家每次登录时，按服务器自然日计算。\n\n#### 功能逻辑\n\n1. 玩家登录时触发。\n2. 获取当前服务器自然日0点时间戳 `Today`。\n3. 计算2天前的日期 `TwoDaysAgo = Today - 2 * 86400`。\n4. 查询玩家所有 `{resource_recovery, Date}` 记录。\n5. 删除 `Date < TwoDaysAgo` 的记录。\n6. 同时清理对应的可找回资源统计记录 `{resource_recovery_stat, Date}`（若存在）。\n\n#### 接口设计（草稿）\n\n**类型**：内部自用接口\n\n**调用方式**：由玩家登录流程回调\n\n```erlang\n-spec cleanup_expired_records(PlayerId :: integer(), Today :: integer()) -> ok.\n```\n\n**输入**：PlayerId, Today\n**输出**：ok\n\n#### 依赖与调用\n\n- 依赖：F-001（需先有记录才能清理）\n- 被调用：F-003（登录统计前调用）\n\n---\n\n### 4.3 F-003：每日首次登录可找回资源统计\n\n#### 需求回顾\n\n玩家每天第一次登录时，服务端统计当前所有可找回的资源，包括正常次数和可付费购买次数，两者分开记录。\n\n#### 功能逻辑\n\n1. 玩家每日首次登录时触发（由游戏框架层标记每日首次登录）。\n2. 先调用 F-002 清理过期记录。\n3. 读取 F-001 记录的离线未完成列表（当天及前1天）。\n4. 对每个未完成功能：\n   - 读取配置表 `recovery_function_config`，获取单价、奖励类型等信息。\n   - 普通次数：默认为1次（待确认：是否所有功能普通次数均为1？）。\n   - 额外次数：若 `HasExtra=1`，则额外次数上限为3（配置表 `extra_max_times`）。\n   - 计算绑钻找回单价（普通/额外）和金币找回单价（仅普通）。\n   - 生成奖励预览（调用 F-009/F-010 计算奖励内容）。\n5. 将统计结果写入 `{resource_recovery_stat, Today}` 的 `value_text`。\n6. 初始化已找回次数记录 `value_text_1` 为空列表。\n\n#### 接口设计（草稿）\n\n**类型**：内部自用接口\n\n```erlang\n-spec daily_first_login_stat(PlayerId :: integer(), Today :: integer()) -> ok.\n```\n\n**输入**：PlayerId, Today\n**输出**：ok\n\n#### 依赖与调用\n\n- 依赖：F-001（读取离线记录）、F-002（先清理过期数据）\n- 调用：F-009（日常任务奖励计算）、F-010（装备副本奖励计算）\n- 被调用：F-004（界面查询）、F-006/F-007（找回执行）\n\n---\n\n### 4.4 F-004：资源找回界面数据查询\n\n#### 需求回顾\n\n前端打开「资源找回」页签时，后端返回当前玩家可找回的资源列表及详情。\n\n#### 功能逻辑\n\n1. 客户端请求打开资源找回界面。\n2. 服务端读取当天 `{resource_recovery_stat, Today}` 的统计结果。\n3. 若统计结果不存在（当日未登录过），返回空列表。\n4. 组装返回数据：每个功能项包含功能名、可找回普通次数、可找回额外次数、绑钻找回单价、金币找回单价、奖励内容预览、玩法提示信息。\n5. 返回给客户端。\n\n#### 接口设计（草稿）— Socket\n\n**通信方式**：WebSocket/TCP\n\n**协议段**：待确认（建议分配新协议段，如 640）\n\n##### 消息一览\n\n| 方向 | 消息号 | 触发场景 | 处理模块（建议） |\n|------|--------|----------|------------------|\n| C2S | 64000 | 打开资源找回界面 | recovery_handler |\n| S2C | 64001 | 返回可找回资源列表 | recovery_handler |\n\n##### 64000 — 打开资源找回界面（C2S）\n\n| 字段 | 类型 | 说明 |\n|------|------|------|\n| （无请求参数） | - | 仅触发，服务端根据玩家ID查询 |\n\n**C2S 载荷**：空\n\n**业务说明**：客户端打开日常功能→「资源找回」页签时发送。\n\n##### 64001 — 返回可找回资源列表（S2C）\n\n| 字段 | 类型 | 说明 |\n|------|------|------|\n| Count | int32 | 可找回功能数量 |\n| List | 结构体数组 | 每个元素见下方子表 |\n\n**List 元素结构**：\n\n| 字段 | 类型 | 说明 |\n|------|------|------|\n| FunId | int32 | 功能ID |\n| FunName | string | 功能名称 |\n| NormalTimes | int32 | 可找回普通次数 |\n| ExtraTimes | int32 | 可找回额外次数 |\n| NormalCostBind | int32 | 绑钻找回普通次数单价 |\n| ExtraCostBind | int32 | 绑钻找回额外次数单价 |\n| NormalCostGold | int32 | 金币找回普通次数单价 |\n| RewardPreview | binary | 奖励预览（编码规则待确认） |\n| TipContentId | int32 | 玩法提示内容ID |\n\n**S2C 载荷**：`Count`, `[FunId, FunName, NormalTimes, ExtraTimes, NormalCostBind, ExtraCostBind, NormalCostGold, RewardPreview, TipContentId, ...]`\n\n**业务说明**：服务端返回当前玩家可找回的所有资源列表。\n\n#### 依赖与调用\n\n- 依赖：F-003（需先完成统计）\n- 调用：F-005（玩法提示查询入口）\n\n---\n\n### 4.5 F-005：玩法提示查询\n\n#### 需求回顾\n\n玩家点击玩法提示按钮时，返回由策划配置的玩法说明内容。\n\n#### 功能逻辑\n\n1. 客户端请求玩法提示内容，传入功能ID。\n2. 服务端根据功能ID查询 `recovery_function_config` 获取 `tip_content_id`。\n3. 根据 `tip_content_id` 查询 `recovery_tip_config` 获取提示内容。\n4. 返回提示内容给客户端。\n\n#### 接口设计（草稿）— Socket\n\n##### 消息一览\n\n| 方向 | 消息号 | 触发场景 | 处理模块（建议） |\n|------|--------|----------|------------------|\n| C2S | 64002 | 点击玩法提示按钮 | recovery_handler |\n| S2C | 64003 | 返回玩法提示内容 | recovery_handler |\n\n##### 64002 — 请求玩法提示（C2S）\n\n| 字段 | 类型 | 说明 |\n|------|------|------|\n| FunId | int32 | 功能ID |\n\n**C2S 载荷**：`FunId`\n\n##### 64003 — 返回玩法提示（S2C）\n\n| 字段 | 类型 | 说明 |\n|------|------|------|\n| FunId | int32 | 功能ID |\n| Content | string | 提示内容（文本/富文本） |\n\n**S2C 载荷**：`FunId`, `Content`\n\n#### 依赖与调用\n\n- 依赖：配置表 `recovery_function_config`、`recovery_tip_config`\n- 被调用：F-004（界面数据查询中包含玩法提示入口）\n\n---\n\n### 4.6 F-006：绑钻找回执行\n\n#### 需求回顾\n\n玩家选择绑钻找回方式，消耗绑钻（或绑钻不足时消耗钻石）找回指定功能的奖励。绑钻找回可找回普通次数+额外次数。\n\n#### 功能逻辑\n\n1. 客户端请求绑钻找回，传入功能ID、找回次数（普通/额外）。\n2. 服务端校验：\n   - 该功能当天是否有可找回次数（读取 `value_text_1` 已找回记录）。\n   - 请求的找回次数不超过剩余可找回次数。\n   - 若为额外次数，校验 `HasExtra=1` 且不超过上限3次。\n3. 计算总费用：\n   - 普通次数费用 = 普通次数 × `normal_cost_bind`\n   - 额外次数费用 = 额外次数 × `extra_cost_bind`\n   - 总费用 = 普通次数费用 + 额外次数费用\n4. 检查玩家绑钻余额：\n   - 绑钻充足：直接扣除绑钻。\n   - 绑钻不足：返回特殊状态码（如 `ERR_BIND_DIAMOND_NOT_ENOUGH`），通知前端弹窗询问是否使用钻石补足。\n5. 扣费成功后，根据功能类型调用 F-009（日常任务）或 F-010（装备副本）计算奖励并发放。\n6. 更新 `value_text_1` 中的已找回次数记录。\n7. 返回成功结果给客户端。\n\n#### 接口设计（草稿）— Socket\n\n##### 消息一览\n\n| 方向 | 消息号 | 触发场景 | 处理模块（建议） |\n|------|--------|----------|------------------|\n| C2S | 64004 | 点击绑钻找回按钮 | recovery_handler |\n| S2C | 64005 | 绑钻找回结果 | recovery_handler |\n\n##### 64004 — 绑钻找回请求（C2S）\n\n| 字段 | 类型 | 说明 |\n|------|------|------|\n| FunId | int32 | 功能ID |\n| NormalCount | int32 | 找回普通次数 |\n| ExtraCount | int32 | 找回额外次数 |\n\n**C2S 载荷**：`FunId`, `NormalCount`, `ExtraCount`\n\n##### 64005 — 绑钻找回响应（S2C）\n\n| 字段 | 类型 | 说明 |\n|------|------|------|\n| Result | int32 | 结果码：0=成功，1=绑钻不足需弹窗，其他=错误码 |\n| FunId | int32 | 功能ID |\n| NormalCount | int32 | 实际找回普通次数 |\n| ExtraCount | int32 | 实际找回额外次数 |\n| CostBind | int32 | 消耗绑钻数量（Result=0时有效） |\n| CostDiamond | int32 | 消耗钻石数量（Result=0且使用钻石时有效） |\n| Rewards | binary | 奖励列表（编码规则待确认） |\n\n**S2C 载荷**：`Result`, `FunId`, `NormalCount`, `ExtraCount`, `CostBind`, `CostDiamond`, `Rewards`\n\n**业务说明**：当 `Result=1` 时，前端应弹窗询问玩家是否使用钻石补足差额。玩家确认后走 F-008 流程。\n\n#### 依赖与调用\n\n- 依赖：F-003（需有已统计的可找回数据）、F-011（校验次数状态）\n- 调用：F-009（日常任务奖励计算）、F-010（装备副本奖励计算）、F-011（更新次数状态）\n- 被调用：F-008（绑钻不足转钻石扣费）\n\n---\n\n### 4.7 F-007：金币找回执行\n\n#### 需求回顾\n\n玩家选择金币找回方式，消耗金币找回指定功能的普通次数奖励（不可找回额外次数）。\n\n#### 功能逻辑\n\n1. 客户端请求金币找回，传入功能ID、找回次数（仅限普通次数）。\n2. 服务端校验：\n   - 该功能当天是否有可找回普通次数。\n   - 请求的普通次数不超过剩余可找回普通次数。\n   - 校验 `ExtraCount` 必须为0。\n3. 计算总费用 = 普通次数 × `normal_cost_gold`。\n4. 检查玩家金币余额，不足返回错误码。\n5. 扣费成功后，根据功能类型调用 F-009（日常任务）或 F-010（装备副本）计算奖励并发放。\n6. 更新 `value_text_1` 中的已找回次数记录。\n7. 返回成功结果给客户端。\n\n#### 接口设计（草稿）— Socket\n\n##### 消息一览\n\n| 方向 | 消息号 | 触发场景 | 处理模块（建议） |\n|------|--------|----------|------------------|\n| C2S | 64006 | 点击金币找回按钮 | recovery_handler |\n| S2C | 64007 | 金币找回结果 | recovery_handler |\n\n##### 64006 — 金币找回请求（C2S）\n\n| 字段 | 类型 | 说明 |\n|------|------|------|\n| FunId | int32 | 功能ID |\n| NormalCount | int32 | 找回普通次数（必须>0） |\n\n**C2S 载荷**：`FunId`, `NormalCount`\n\n##### 64007 — 金币找回响应（S2C）\n\n| 字段 | 类型 | 说明 |\n|------|------|------|\n| Result | int32 | 结果码：0=成功，其他=错误码 |\n| FunId | int32 | 功能ID |\n| NormalCount | int32 | 实际找回普通次数 |\n| CostGold | int32 | 消耗金币数量 |\n| Rewards | binary | 奖励列表（编码规则待确认） |\n\n**S2C 载荷**：`Result`, `FunId`, `NormalCount`, `CostGold`, `Rewards`\n\n#### 依赖与调用\n\n- 依赖：F-003（需有已统计的可找回数据）、F-011（校验次数状态）\n- 调用：F-009（日常任务奖励计算）、F-010（装备副本奖励计算）、F-011（更新次数状态）\n\n---\n\n### 4.8 F-008：绑钻不足转钻石扣费\n\n#### 需求回顾\n\n绑钻找回时若绑钻不足，服务端返回特殊状态，前端弹窗询问玩家是否使用钻石补足差额；玩家确认后，服务端扣除钻石并完成找回。\n\n#### 功能逻辑\n\n1. 前端收到 F-006 返回的 `Result=1`（绑钻不足），弹窗询问玩家。\n2. 玩家确认使用钻石后，客户端发送钻石找回请求。\n3. 服务端校验：\n   - 该功能当天是否有可找回次数（同 F-006 校验逻辑）。\n   - 计算总费用（同 F-006）。\n   - 检查玩家钻石余额是否充足（1钻石=1绑钻等额扣除）。\n4. 扣除钻石。\n5. 调用 F-009/F-010 计算奖励并发放。\n6. 更新 `value_text_1` 中的已找回次数记录。\n7. 返回成功结果。\n\n#### 接口设计（草稿）— Socket\n\n##### 消息一览\n\n| 方向 | 消息号 | 触发场景 | 处理模块（建议） |\n|------|--------|----------|------------------|\n| C2S | 64008 | 弹窗确认使用钻石 | recovery_handler |\n| S2C | 64009 | 钻石找回结果 | recovery_handler |\n\n##### 64008 — 钻石找回请求（C2S）\n\n| 字段 | 类型 | 说明 |\n|------|------|------|\n| FunId | int32 | 功能ID |\n| NormalCount | int32 | 找回普通次数 |\n| ExtraCount | int32 | 找回额外次数 |\n\n**C2S 载荷**：`FunId`, `NormalCount`, `ExtraCount`\n\n##### 64009 — 钻石找回响应（S2C）\n\n| 字段 | 类型 | 说明 |\n|------|------|------|\n| Result | int32 | 结果码：0=成功，其他=错误码 |\n| FunId | int32 | 功能ID |\n| NormalCount | int32 | 实际找回普通次数 |\n| ExtraCount | int32 | 实际找回额外次数 |\n| CostDiamond | int32 | 消耗钻石数量 |\n| Rewards | binary | 奖励列表（编码规则待确认） |\n\n**S2C 载荷**：`Result`, `FunId`, `NormalCount`, `ExtraCount`, `CostDiamond`, `Rewards`\n\n#### 依赖与调用\n\n- 依赖：F-006（作为绑钻找回的补充流程）\n- 调用：F-009（日常任务奖励计算）、F-010（装备副本奖励计算）、F-011（更新次数状态）\n\n---\n\n### 4.9 F-009：日常任务找回奖励计算\n\n#### 需求回顾\n\n根据玩家等级和数值公式，计算日常任务找回时应发放的经验和金币数量。公式：经验 = 玩家等级 × 固定系数 × 找回次数，系数由策划配置。\n\n#### 功能逻辑\n\n1. 被 F-006/F-007 调用，传入玩家ID、玩家等级、找回次数。\n2. 从配置表 `recovery_function_config` 读取日常任务对应的 `exp_coefficient`。\n3. 计算经验 = 玩家等级 × exp_coefficient × 找回次数。\n4. 计算金币 = 待确认（简报未明确金币计算公式，建议由策划补充）。\n5. 返回 `{Exp, Gold}`。\n\n#### 接口设计（草稿）\n\n**类型**：内部自用接口\n\n```erlang\n-spec calc_daily_task_reward(PlayerId :: integer(), Lv :: integer(), Times :: integer()) -> {Exp :: integer(), Gold :: integer()}.\n```\n\n#### 依赖与调用\n\n- 依赖：配置表 `recovery_function_config`\n- 被调用：F-006、F-007、F-008\n\n**待确认**：\n- 金币计算公式未在简报中说明，需策划补充。\n- 日常任务是否还有其他奖励类型（如活跃度等）？\n\n---\n\n### 4.10 F-010：装备副本找回奖励计算\n\n#### 需求回顾\n\n根据策划配置，计算装备副本找回时应发放的经验丹和随机装备奖励。\n\n#### 功能逻辑\n\n1. 被 F-006/F-007 调用，传入玩家ID、功能ID、找回次数。\n2. 从配置表 `recovery_function_config` 读取装备副本对应的 `chest_id`。\n3. 根据 `chest_id` 查询 `recovery_chest_config`，获取所有候选道具及其权重。\n4. 按权重随机产出指定数量的道具。\n5. 经验丹为固定配置道具，每次找回固定发放（数量待确认）。\n6. 返回 `{ExpDanList, RandomEquipList}`。\n\n#### 接口设计（草稿）\n\n**类型**：内部自用接口\n\n```erlang\n-spec calc_equip_dungeon_reward(PlayerId :: integer(), FunId :: integer(), Times :: integer()) -> {ExpDanList :: list(), RandomEquipList :: list()}.\n```\n\n#### 依赖与调用\n\n- 依赖：配置表 `recovery_function_config`、`recovery_chest_config`\n- 被调用：F-006、F-007、F-008\n\n**待确认**：\n- 经验丹每次找回的固定发放数量。\n- 宝箱随机产出的具体规则（权重算法、是否保底等）。\n\n---\n\n### 4.11 F-011：找回次数状态管理\n\n#### 需求回顾\n\n管理每个功能可找回次数的状态（已找回/未找回），确保绑钻找回和金币找回共用次数，已找回的次数不可再次找回。\n\n#### 功能逻辑\n\n1. 状态数据存储在 `{resource_recovery_stat, Today}` 的 `value_text_1` 字段中。\n2. 数据结构：`[{FunId, RecoveredNormal, RecoveredExtra}]`。\n3. 每次 F-006/F-007/F-008 执行成功后，更新对应功能的已找回次数。\n4. 校验逻辑：\n   - 请求的普通次数 ≤ 可找回普通次数 - 已找回普通次数。\n   - 请求的额外次数 ≤ 可找回额外次数 - 已找回额外次数。\n5. 绑钻找回和金币找回共用普通次数额度——金币找回消耗普通次数后，绑钻找回的普通次数相应减少，反之亦然。\n\n#### 接口设计（草稿）\n\n**类型**：内部自用接口\n\n```erlang\n%% 校验并更新次数状态\n-spec check_and_update_times(PlayerId :: integer(), Today :: integer(), FunId :: integer(), NormalCount :: integer(), ExtraCount :: integer()) -> ok | {error, Reason}.\n\n%% 查询剩余可找回次数\n-spec get_remaining_times(PlayerId :: integer(), Today :: integer(), FunId :: integer()) -> {RemainNormal :: integer(), RemainExtra :: integer()}.\n```\n\n#### 依赖与调用\n\n- 依赖：F-003（统计结果中包含初始可找回次数）\n- 被调用：F-006、F-007、F-008\n\n---\n\n## 5. 功能点依赖与实施顺序\n\n### 5.1 依赖关系图\n\n```\nF-001（离线记录）\n  ├── F-002（过期清理）[依赖F-001]\n  └── F-003（登录统计）[依赖F-001, F-002]\n        ├── F-004（界面查询）[依赖F-003]\n        ├── F-006（绑钻找回）[依赖F-003, F-011]\n        │     └── F-008（钻石补足）[依赖F-006]\n        ├── F-007（金币找回）[依赖F-003, F-011]\n        ├── F-009（日常任务奖励计算）[被F-006/F-007/F-008调用]\n        └── F-010（装备副本奖励计算）[被F-006/F-007/F-008调用]\nF-005（玩法提示查询）[独立]\nF-011（次数状态管理）[被F-006/F-007/F-008调用]\n```\n\n### 5.2 实施顺序建议\n\n| 阶段 | 功能点 | 说明 |\n|------|--------|------|\n| 第一阶段（基础） | F-001, F-002, F-003, F-011 | 离线记录、过期清理、登录统计、次数状态管理——核心数据链路 |\n| 第二阶段（查询） | F-004, F-005 | 界面数据查询、玩法提示查询——前端可联调界面展示 |\n| 第三阶段（找回执行） | F-006, F-007, F-008 | 绑钻找回、金币找回、钻石补足——核心玩法闭环 |\n| 第四阶段（奖励计算） | F-009, F-010 | 日常任务奖励计算、装备副本奖励计算——奖励发放逻辑 |\n\n### 5.3 可并行项\n\n- F-009（日常任务奖励计算）与 F-010（装备副本奖励计算）可并行开发。\n- F-005（玩法提示查询）与其它功能点基本独立，可随时推进。\n- 配置表设计（第3章）可提前完成，供各功能点开发时使用。\n\n---\n\n## 6. 风险、假设与开放问题\n\n### 6.1 待澄清项\n\n| 编号 | 功能点 | 待澄清内容 | 影响 |\n|------|--------|-----------|------|\n| Q1 | 全局 | 可找回的具体功能列表（除日常任务、装备副本外是否还有其它功能） | 影响配置表设计和F-001记录范围 |\n| Q2 | F-009 | 日常任务金币计算公式 | 影响奖励发放逻辑 |\n| Q3 | F-010 | 经验丹每次找回的固定发放数量 | 影响奖励计算 |\n| Q4 | F-010 | 宝箱随机产出规则（权重算法、是否保底） | 影响奖励计算 |\n| Q5 | F-005 | 玩法提示三级弹窗的具体配置结构 | 影响配置表设计和接口返回格式 |\n| Q6 | 全局 | 货币单位与精度（绑钻、金币、钻石的最小单位） | 影响扣费逻辑 |\n| Q7 | F-003 | 各功能普通次数是否统一为1次/天 | 影响统计逻辑 |\n\n### 6.2 文档假设\n\n| 假设编号 | 假设内容 | 若假设不成立的影响 |\n|----------|---------|-------------------|\n| A1 | 「2天」按服务器自然日计算（0点重置），而非精确48小时 | 清理和统计逻辑需调整 |\n| A2 | 每个日常功能每天普通次数默认为1次 | 统计逻辑和配置表需调整 |\n| A3 | 额外次数上限3次、单价为普通次数2倍，所有功能共用 | 配置表字段和扣费逻辑需调整 |\n| A4 | 1钻石=1绑钻等额扣除 | 扣费逻辑需调整 |\n| A5 | 数据按角色ID隔离，不涉及跨服 | 若涉及跨服需增加数据同步逻辑 |\n| A6 | 离线记录存储于 `#player_misc_extra{}` | 若改为 `#role{}` 字段需调整数据设计 |\n\n### 6.3 开放问题\n\n1. **性能考虑**：若支持资源找回的日常功能较多（如10+个），每次登录统计和界面查询的数据量是否在可接受范围内？建议上线前进行性能评估。\n2. **并发安全**：F-006/F-007/F-008 涉及扣费和奖励发放，需确保在并发场景下的数据一致性（建议使用 `gen_server` 串行化处理）。\n3. **日志与监控**：建议记录资源找回的操作日志（找回时间、功能、方式、消耗、奖励），便于问题排查和数据分析。'
+2026-05-31 22:07:31 INFO [doc_generation.agents.supervisor] [SUPERVISOR] supervisor invoked (iteration=0, messages=2)
+2026-05-31 22:07:40 INFO [httpx] HTTP Request: POST https://api.zhizengzeng.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-31 22:07:40 INFO [doc_generation.agents.supervisor] supervisor model produced tool_calls=True num_tool_calls=1
+2026-05-31 22:07:40 INFO [doc_generation.agents.supervisor] [SUPERVISOR] supervisor_tools executing think=1 conduct=0 refine=0
+2026-05-31 22:07:40 INFO [doc_generation.agents.supervisor] ========>[thinking tool] thinking process Reflection recorded: ## 文档分析
+
+这是一份资源找回系统的后端开发技术文档草稿，涉及以下关键技术模块：
+
+1. **数据持久化方案** - 使用 `#player_misc_extra{}` 存储，需要验证是否符合项目的数据持久化规范
+2. **Socket协议设计** - 协议段640，多个C2S/S2C消息，需要验证是否符合项目的协议开发规范
+3. **配置表设计** - 三张配置表，需要验证是否符合项目的配置表规范
+4. **接口设计** - 多个内部接口和外部接口，需要验证是否符合项目的接口规范
+5. **架构设计** - gen_server串行化等，需要验证是否符合项目的架构规范
+
+## 检索策略
+
+我需要从知识库中检索以下项目规范：
+1. **数据持久化规范** - `#player_misc_extra{}` 的使用规范、key命名规范、字段使用规范
+2. **协议开发规范** - Socket协议段分配、消息号命名、载荷编码规范
+3. **配置表规范** - 配置表命名、字段类型、存储方式
+4. **接口/编码规范** - Erlang编码规范、模块命名、函数命名
+5. **架构规范** - gen_server使用、模块组织方式
+
+这些检索可以并行进行，因为它们属于不同的规范文档。让我先并行检索这些核心规范。
+
+2026-05-31 22:07:40 INFO [doc_generation.agents.supervisor] [SUPERVISOR] supervisor invoked (iteration=1, messages=4)
+2026-05-31 22:07:48 INFO [httpx] HTTP Request: POST https://api.zhizengzeng.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-31 22:07:48 INFO [doc_generation.agents.supervisor] supervisor model produced tool_calls=True num_tool_calls=3
+2026-05-31 22:07:48 INFO [doc_generation.agents.supervisor] [SUPERVISOR] supervisor_tools executing think=0 conduct=3 refine=0
+2026-05-31 22:07:48 INFO [doc_generation.agents.supervisor] [DISPATCH] Sending 3 research tasks via Send (hand-off)
+2026-05-31 22:07:48 ERROR [backend.service] Agent resume failed
+Traceback (most recent call last):
+  File "D:\project\doc_generation\backend\service.py", line 122, in resume_agent_stream
+    async for event in agent.astream_events(
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\base.py", line 1607, in _astream_events_v1_v2
+    async for event in event_stream:
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\tracers\event_stream.py", line 1100, in _astream_events_implementation_v2
+    await task
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\tracers\event_stream.py", line 1055, in consume_astream
+    async for _ in event_streamer.tap_output_aiter(run_id, stream):
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\tracers\event_stream.py", line 222, in tap_output_aiter
+    async for chunk in output:
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\pregel\main.py", line 3407, in astream
+    async for _ in runner.atick(
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\pregel\_runner.py", line 396, in atick
+    await arun_with_retry(
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\pregel\_retry.py", line 703, in arun_with_retry
+    async for _ in task.proc.astream(task.input, config):
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\_internal\_runnable.py", line 867, in astream
+    output = await asyncio.create_task(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\_internal\_runnable.py", line 932, in _consume_aiter
+    async for chunk in it:
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\tracers\event_stream.py", line 199, in tap_output_aiter
+    first = await anext(output, sentinel)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\base.py", line 1767, in atransform
+    async for ichunk in input:
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\pregel\main.py", line 3407, in astream
+    async for _ in runner.atick(
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\pregel\_runner.py", line 396, in atick
+    await arun_with_retry(
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\pregel\_retry.py", line 703, in arun_with_retry
+    async for _ in task.proc.astream(task.input, config):
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\_internal\_runnable.py", line 867, in astream
+    output = await asyncio.create_task(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\_internal\_runnable.py", line 932, in _consume_aiter
+    async for chunk in it:
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\tracers\event_stream.py", line 199, in tap_output_aiter
+    first = await anext(output, sentinel)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\base.py", line 1785, in atransform
+    async for output in self.astream(final, config, **kwargs):
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\base.py", line 1171, in astream
+    yield await self.ainvoke(input, config, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\_internal\_runnable.py", line 501, in ainvoke
+    ret = await self.afunc(*args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\pregel\_write.py", line 99, in _awrite
+    self.do_write(
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\pregel\_write.py", line 126, in do_write
+    write(_assemble_writes(writes))
+          ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\pregel\_write.py", line 181, in _assemble_writes
+    if ww := w.mapper(w.value):
+             ^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\graph\state.py", line 1479, in _get_updates
+    raise InvalidUpdateError(msg)
+langgraph.errors.InvalidUpdateError: Expected dict, got [Send(node='research', arg={'researcher_messages': [HumanMessage(content='数据持久化规范 - 检索项目中关于 #player_misc_extra{} 记录的使用规范，包括：key命名规范、字段（value/value1/value2/value3/value_text/value_text_1/value_text_2/value_text_3/time）的使用方式、数据生命周期管理、记录创建/更新/删除的最佳实践、以及是否有其他更适合存储临时性角色数据（2天生命周期）的持久化方案', additional_kwargs={}, response_metadata={})], 'research_topic': '数据持久化规范 - 检索项目中关于 #player_misc_extra{} 记录的使用规范，包括：key命名规范、字段（value/value1/value2/value3/value_text/value_text_1/value_text_2/value_text_3/time）的使用方式、数据生命周期管理、记录创建/更新/删除的最佳实践、以及是否有其他更适合存储临时性角色数据（2天生命周期）的持久化方案', '_parent_thread_id': 'b7f42a48-eab9-4979-9ca3-a4dcd6f4f2b4'}), Send(node='research', arg={'researcher_messages': [HumanMessage(content='协议开发规范 - 检索项目中Socket协议开发的规范，包括：协议段分配规则（如何申请新协议段）、消息号命名规范（C2S/S2C编号规则）、载荷编码规范（binary编码格式、结构体序列化方式）、协议文档编写规范、以及是否有协议自动生成工具或框架', additional_kwargs={}, response_metadata={})], 'research_topic': '协议开发规范 - 检索项目中Socket协议开发的规范，包括：协议段分配规则（如何申请新协议段）、消息号命名规范（C2S/S2C编号规则）、载荷编码规范（binary编码格式、结构体序列化方式）、协议文档编写规范、以及是否有协议自动生成工具或框架', '_parent_thread_id': 'b7f42a48-eab9-4979-9ca3-a4dcd6f4f2b4'}), Send(node='research', arg={'researcher_messages': [HumanMessage(content='配置表开发规范 - 检索项目中配置表的设计规范，包括：配置表命名规范、字段类型定义（Erlang类型映射）、配置表存储格式（是否使用Excel/CSV/数据库）、配置表加载机制、以及配置表文档编写规范', additional_kwargs={}, response_metadata={})], 'research_topic': '配置表开发规范 - 检索项目中配置表的设计规范，包括：配置表命名规范、字段类型定义（Erlang类型映射）、配置表存储格式（是否使用Excel/CSV/数据库）、配置表加载机制、以及配置表文档编写规范', '_parent_thread_id': 'b7f42a48-eab9-4979-9ca3-a4dcd6f4f2b4'})]
+For troubleshooting, visit: https://docs.langchain.com/oss/python/langgraph/errors/INVALID_GRAPH_NODE_RETURN_VALUE
+During task with name 'dispatch_research' and id '124339a8-efd2-0166-dd21-b7ef487d97eb'
+During task with name 'supervisor_subgraph' and id 'f6c6d3e5-79b6-a5d9-3b41-c9b40ea92d26'
+2026-05-31 22:08:10 INFO [watchfiles.main] 4 changes detected
+2026-05-31 22:08:24 INFO [watchfiles.main] 1 change detected
+2026-05-31 22:08:43 INFO [watchfiles.main] 5 changes detected
+2026-05-31 22:08:44 INFO [watchfiles.main] 1 change detected
+2026-05-31 22:08:45 INFO [watchfiles.main] 1 change detected
+2026-05-31 22:09:01 INFO [watchfiles.main] 5 changes detected
+2026-05-31 22:09:02 INFO [watchfiles.main] 1 change detected
+2026-05-31 22:09:03 INFO [watchfiles.main] 1 change detected
+2026-05-31 22:09:10 INFO [watchfiles.main] 5 changes detected
+2026-05-31 22:09:10 INFO [watchfiles.main] 1 change detected
+2026-05-31 22:09:11 INFO [watchfiles.main] 1 change detected
+2026-05-31 22:09:17 INFO [watchfiles.main] 5 changes detected
+2026-05-31 22:09:18 INFO [watchfiles.main] 1 change detected
+2026-05-31 22:09:19 INFO [watchfiles.main] 1 change detected
+2026-05-31 22:10:11 INFO [watchfiles.main] 1 change detected
+2026-05-31 22:10:28 INFO [watchfiles.main] 1 change detected
+2026-05-31 22:10:29 INFO [watchfiles.main] 1 change detected
+2026-05-31 22:10:36 INFO [doc_generation.llm] Selected cognition backend 'deepseek' for role 'draft' with handle 'deepseek-v4-flash' (timeout=600)
+2026-05-31 22:10:39 INFO [doc_generation.llm] Selected cognition backend 'deepseek' for role 'evaluator' with handle 'deepseek-v4-flash' (timeout=600)
+2026-05-31 22:10:39 INFO [watchfiles.main] 5 changes detected
+2026-05-31 22:10:40 INFO [doc_generation.llm] Selected cognition backend 'deepseek' for role 'red_team' with handle 'deepseek-v4-flash' (timeout=600)
+2026-05-31 22:10:41 INFO [doc_generation.llm] Selected cognition backend 'deepseek' for role 'researcher_summarizer' with handle 'deepseek-v4-flash' (timeout=600)
+2026-05-31 22:10:43 INFO [doc_generation.llm] Selected cognition backend 'deepseek' for role 'writer' with handle 'deepseek-v4-flash' (timeout=600)
+2026-05-31 22:10:44 INFO [watchfiles.main] 1 change detected
+2026-05-31 22:10:45 INFO [doc_generation.llm] Selected cognition backend 'deepseek' for role 'researcher_main' with handle 'deepseek-v4-flash' (timeout=600)
+2026-05-31 22:10:47 INFO [doc_generation.llm] Selected cognition backend 'deepseek' for role 'researcher_compressor' with handle 'deepseek-v4-flash' (timeout=600)
+2026-05-31 22:10:48 INFO [doc_generation.llm] Selected cognition backend 'deepseek' for role 'supervisor' with handle 'deepseek-v4-pro' (timeout=600)
+2026-05-31 22:10:50 INFO [doc_generation.llm] Selected cognition backend 'deepseek' for role 'writer' with handle 'deepseek-v4-flash' (timeout=600)
+2026-05-31 22:10:51 INFO [watchfiles.main] 3 changes detected
+2026-05-31 22:10:59 INFO [watchfiles.main] 1 change detected
+2026-05-31 22:11:13 INFO [httpx] HTTP Request: POST https://api.zhizengzeng.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-31 22:11:13 INFO [doc_generation.agents.draft_agent] 结构化输出：research_brief='## 1. 需求摘要（简要）\n\n资源找回功能允许玩家在错过日常功能后，通过消耗绑钻或金币来买回错过的奖励。系统需记录玩家最近2天内未完成的日常功能，并在玩家登录时统计可找回资源。找回分为绑钻找回（可找回普通+额外次数）和金币找回（仅普通次数），两者共享次数。功能入口位于日常功能界面内的"资源找回"页签。\n\n---\n\n## 2. 需求分析\n\n### 已确认\n\n1. 资源找回入口位于日常功能界面，通过"资源找回"页签切换进入。\n2. 找回内容为最近2天内错过的日常功能。\n3. 玩家可选择"绑钻找回"或"金币找回"两种货币类型，默认选中绑钻找回。\n4. 绑钻找回消耗绑钻，若绑钻不足则弹窗询问是否消耗钻石找回。\n5. 绑钻找回可找回普通次数和额外次数的功能资源，额外次数单价更高。\n6. 金币找回只能找回普通次数的功能资源，不能找回额外次数。\n7. 绑钻找回和金币找回共有次数（即绑钻找过的资源不能再用金币找回）。\n8. 玩家离线前，服务端记录玩家当天尚未完成的日常功能。\n9. 2天内玩家若均有上线，则两天内未完成的日常功能需都存储记录。\n10. 超过2天后服务端清除2天前记录的未完成功能。\n11. 玩家每天第一次登录时，服务端统计目前可找回的所有资源。\n12. 统计内容包括：正常可找回的功能次数 + 可付费购买次数的功能次数，两者分开记录。\n13. 玩家上次离线前未开放的功能不允许玩家找回。\n14. 玩法提示：点击按钮打开三级弹窗，玩法内容由策划配置。\n15. 日常任务找回奖励包括经验和金币，经验根据玩家等级由数值公式计算。\n16. 装备副本找回奖励包括经验丹和装备，经验丹为配置道具，装备由策划配置宝箱随机产出。\n\n### 待澄清\n\n1. **可找回的具体功能列表**：用户提到"具体可找回的功能内容由策划补充确定"，需策划明确哪些日常功能支持资源找回（如日常任务、装备副本之外还有哪些）。\n2. **额外次数的定义与来源**：哪些功能有"可付费购买次数"？购买规则（价格、上限、购买入口）未说明。\n3. **绑钻不足时的弹窗逻辑**：弹窗后玩家选择"是/否"的后端处理流程（如是否直接扣钻石、是否记录本次操作）未详细说明。\n4. **找回费用的具体数值**：绑钻找回和金币找回的单价/费用由谁配置（策划配置表？），未给出具体数值或公式。\n5. **经验计算公式**：日常任务找回经验时，"根据玩家等级进行计算"的具体公式未给出，需数值提供。\n6. **装备副本宝箱配置**：宝箱ID、随机产出规则（权重、数量范围）未给出。\n7. **"玩法提示"三级弹窗内容**：由策划配置的具体内容格式未说明。\n8. **清除策略的具体时机**：超过2天后清除，是登录时检查清除还是定时任务清除？未明确。\n9. **找回奖励的发放方式**：找回后奖励是直接发放到背包还是通过邮件？未说明。\n\n### 合理推断\n\n1. **推断：资源找回功能面向所有玩家**，依据：功能描述中未限制等级或VIP条件，属于日常功能的补充机制。\n2. **推断：可付费购买次数的功能需有独立配置**，依据：需求明确要求"可付费购买次数的功能次数"需单独统计和记录。\n3. **推断：找回费用数据由策划配置表驱动**，依据：多处提到"由策划配置"、"由数值给出确认公式"。\n\n---\n\n## 3. 功能模块\n\n### F-001：离线未完成日常功能记录\n\n- **描述**：玩家离线时，服务端记录玩家当天尚未完成的日常功能列表（具体可找回的功能由策划补充确定）。该记录需区分不同日期，支持2天内数据的存储与查询。\n- **接口类型:**内部自用接口\n- **触发与交互**：触发时机为玩家离线（session断开/角色下线）。输入为玩家ID、当前时间、当天未完成的日常功能列表。输出为存储结果（成功/失败）。\n- **依赖**：无（依赖底层玩家数据存储能力）\n\n### F-002：过期未完成记录清除\n\n- **描述**：超过2天前记录的未完成日常功能数据，服务端需自动清除，避免数据无限堆积。\n- **接口类型:**内部自用接口\n- **触发与交互**：触发时机为玩家登录时或定时任务。输入为玩家ID、当前时间。输出为被清除的记录列表（或清除结果）。\n- **依赖**：F-001（需先有记录才能清除）\n\n### F-003：每日首次登录可找回资源统计\n\n- **描述**：玩家每天第一次登录游戏时，服务端统计当前所有可找回的资源。统计内容包括：正常可找回的功能次数 + 可付费购买次数的功能次数，两者分开记录。玩家上次离线前未开放的功能不允许计入可找回资源。\n- **接口类型:**内部自用接口\n- **触发与交互**：触发时机为玩家每日首次登录。输入为玩家ID、当前时间、玩家等级、功能开放状态。输出为可找回资源统计结果（按功能分组，含普通次数和额外次数）。\n- **依赖**：F-001（依赖离线记录数据）、F-002（依赖清除后的有效数据）\n\n### F-004：资源找回界面数据查询\n\n- **描述**：玩家打开"资源找回"页签时，前端请求可找回的资源列表数据。服务端返回各功能项目的名称、可找回次数（普通/额外）、找回费用（绑钻/金币）、奖励内容预览等信息。\n- **接口类型:**与客户端交互的接口\n- **触发与交互**：触发时机为玩家点击"资源找回"页签。输入为玩家ID。输出为可找回资源列表（每个项目包含：功能名、可找回普通次数、可找回额外次数、绑钻费用、金币费用、奖励内容列表）。\n- **依赖**：F-003（依赖已统计的可找回资源数据）\n\n### F-005：资源找回执行（绑钻找回）\n\n- **描述**：玩家选择"绑钻找回"并确认后，服务端扣除对应绑钻（若绑钻不足则弹窗询问是否消耗钻石），发放对应奖励。绑钻找回可同时找回普通次数和额外次数的资源，额外次数单价更高。找回后更新该功能的已找回次数，确保绑钻和金币共享次数。\n- **接口类型:**与客户端交互的接口\n- **触发与交互**：触发时机为玩家选择绑钻找回并确认。输入为玩家ID、功能项目ID、找回次数（普通/额外）。输出为找回结果（成功/失败/绑钻不足需弹窗），若成功则附带发放的奖励列表。\n- **依赖**：F-004（依赖界面数据中的费用和次数信息）、F-008（依赖奖励计算）\n\n### F-006：资源找回执行（金币找回）\n\n- **描述**：玩家选择"金币找回"并确认后，服务端扣除对应金币，发放对应奖励。金币找回只能找回普通次数的功能资源，不能找回额外次数。找回后更新该功能的已找回次数，确保绑钻和金币共享次数。\n- **接口类型:**与客户端交互的接口\n- **触发与交互**：触发时机为玩家选择金币找回并确认。输入为玩家ID、功能项目ID、找回次数（仅普通次数）。输出为找回结果（成功/失败），若成功则附带发放的奖励列表。\n- **依赖**：F-004（依赖界面数据中的费用和次数信息）、F-008（依赖奖励计算）\n\n### F-007：绑钻不足弹窗处理\n\n- **描述**：当玩家使用绑钻找回但绑钻不足时，服务端返回特殊状态码，前端弹窗询问是否消耗钻石找回。若玩家确认，服务端扣除钻石并发放奖励；若取消，操作终止。\n- **接口类型:**与客户端交互的接口\n- **触发与交互**：触发时机为F-005执行时绑钻不足。输入为玩家ID、功能项目ID、找回次数、所需钻石数量。输出为玩家确认结果（是/否），若确认则执行钻石扣除并发放奖励。\n- **依赖**：F-005（作为F-005的补充流程）\n\n### F-008：找回奖励计算\n\n- **描述**：根据功能类型和玩家数据，计算每次找回应发放的具体奖励内容。不同功能有不同的奖励规则：\n  - 日常任务：奖励经验和金币，经验根据玩家等级由数值公式计算。\n  - 装备副本：奖励经验丹（配置道具）和装备（由策划配置宝箱随机产出）。\n  - 其他功能：由策划补充配置。\n- **接口类型:**内部自用接口\n- **触发与交互**：触发时机为F-005/F-006执行时调用。输入为玩家ID、功能项目ID、找回次数、玩家等级。输出为奖励列表（道具ID+数量、经验值、金币值等）。\n- **依赖**：依赖策划配置表（经验公式、道具配置、宝箱配置）\n\n### F-009：玩法提示查询\n\n- **描述**：玩家点击"玩法提示"按钮时，服务端返回由策划配置的玩法说明内容（三级弹窗展示）。\n- **接口类型:**与客户端交互的接口\n- **触发与交互**：触发时机为玩家点击玩法提示按钮。输入为玩家ID（可选）、功能项目ID。输出为玩法提示内容（文本/富文本，由策划配置）。\n- **依赖**：依赖策划配置表\n\n---\n\n## 4. 功能点关系\n\n### 依赖顺序\n\n| 前置功能点 | 后置功能点 | 说明 |\n|-----------|-----------|------|\n| F-001（离线记录） | F-002（过期清除） | 需先有记录才能清除 |\n| F-001（离线记录） | F-003（登录统计） | 统计依赖离线记录数据 |\n| F-002（过期清除） | F-003（登录统计） | 统计前需先清除过期数据 |\n| F-003（登录统计） | F-004（界面数据查询） | 界面数据依赖已统计结果 |\n| F-004（界面数据查询） | F-005（绑钻找回） | 找回需先展示费用和次数 |\n| F-004（界面数据查询） | F-006（金币找回） | 找回需先展示费用和次数 |\n| F-008（奖励计算） | F-005（绑钻找回） | 找回执行时需计算奖励 |\n| F-008（奖励计算） | F-006（金币找回） | 找回执行时需计算奖励 |\n| F-005（绑钻找回） | F-007（绑钻不足弹窗） | 弹窗是绑钻找回的子流程 |\n\n### 可并行\n\n以下功能点无强依赖关系，可独立推进：\n\n- **F-001（离线记录）** 与 **F-008（奖励计算）**：离线记录不依赖奖励计算逻辑。\n- **F-009（玩法提示查询）** 与所有其他功能点：玩法提示为独立查询，无依赖。\n- **F-005（绑钻找回）** 与 **F-006（金币找回）**：两者为平行找回路径，可同时开发。\n- **F-008（奖励计算）** 可独立于界面相关功能（F-004）先行开发，因其为内部计算逻辑。'
+2026-05-31 22:11:14 INFO [watchfiles.main] 1 change detected
+2026-05-31 22:11:16 INFO [httpx] HTTP Request: POST https://api.zhizengzeng.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-31 22:11:16 ERROR [doc_generation.agents.draft_agent] Error: 1 validation error for ClarificationQuestions
+items
+  Field required [type=missing, input_value={}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.13/v/missing
+2026-05-31 22:11:24 INFO [httpx] HTTP Request: POST https://api.zhizengzeng.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-31 22:11:24 INFO [doc_generation.agents.draft_agent] 提问结果：items=[ClarificationItem(question='离线未完成记录的清除策略具体采用哪种触发方式？', options=['仅在玩家每日首次登录时检查并清除超过2天的旧记录', '服务端启动一个定时任务（如每分钟/每小时扫描一次），统一清除所有玩家超过2天的记录', '登录时清除 + 定时任务兜底双重机制，确保数据不会因玩家长期不上线而堆积']), ClarificationItem(question='绑钻不足时弹窗询问是否消耗钻石，若玩家确认消耗钻石，找回费用是按绑钻原价还是另有钻石专属定价？', options=['钻石与绑钻1:1等价，直接按绑钻费用扣除等量钻石', '钻石找回有独立定价（通常比绑钻更贵），由策划配置表中单独配置钻石费用', '先按绑钻费用扣钻石，但额外加收一定比例的手续费（如10%）']), ClarificationItem(question='找回奖励的发放方式如何确定？', options=['所有找回奖励直接发放到玩家背包/角色身上，不经过邮件', '所有找回奖励通过系统邮件发放，玩家需手动领取', '根据奖励类型区分：道具类直接进背包，经验/金币直接加到角色，特殊物品走邮件']), ClarificationItem(question='可付费购买额外次数的功能，其购买入口和次数上限由哪里控制？', options=['购买入口仅在资源找回界面内，次数上限由策划配置表统一配置，与日常功能本身的购买次数共享上限', '购买入口在资源找回界面和原日常功能界面均有，两者次数独立计算互不影响', '资源找回界面仅展示可购买次数，实际购买仍需跳转到原日常功能界面执行，资源找回只做记录和奖励补发']), ClarificationItem(question="玩家离线时记录的'当天未完成的日常功能'，如果玩家当天多次登录离线，是增量追加还是全量覆盖？", options=['每次离线时全量覆盖当天的记录，以最后一次离线时的状态为准', '每次离线时增量追加，保留当天所有未完成记录（去重合并）', '仅当玩家当天首次离线时记录，后续离线不再更新，以首次离线状态为准'])]
+2026-05-31 22:11:24 INFO [doc_generation.agents.draft_agent] question_to_user generated 5 questions, interrupting for user input
+2026-05-31 22:11:29 INFO [watchfiles.main] 1 change detected
+2026-05-31 22:11:44 INFO [watchfiles.main] 1 change detected
+2026-05-31 22:11:49 INFO [httpx] HTTP Request: POST https://api.zhizengzeng.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-31 22:11:49 ERROR [doc_generation.agents.draft_agent] Error: 1 validation error for ClarificationQuestions
+items
+  Field required [type=missing, input_value={}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.13/v/missing
+2026-05-31 22:11:59 INFO [httpx] HTTP Request: POST https://api.zhizengzeng.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-31 22:11:59 ERROR [doc_generation.agents.draft_agent] Error: 1 validation error for ClarificationQuestions
+items
+  Field required [type=missing, input_value={}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.13/v/missing
+2026-05-31 22:11:59 INFO [watchfiles.main] 1 change detected
+2026-05-31 22:12:09 INFO [httpx] HTTP Request: POST https://api.zhizengzeng.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-31 22:12:09 INFO [doc_generation.agents.draft_agent] 提问结果：items=[ClarificationItem(question='离线未完成记录的清除策略具体采用哪种触发方式？', options=['仅在玩家每日首次登录时检查并清除超过2天的旧记录', '服务端启动一个定时任务（如每天凌晨5点）批量清除所有玩家的过期记录', '登录时清除 + 定时任务双重保障，登录时清除当前玩家，定时任务兜底清理所有过期数据']), ClarificationItem(question='资源找回的奖励发放方式是什么？', options=['找回成功后奖励直接发放到玩家背包/账户余额中', '找回成功后奖励通过游戏内邮件发送给玩家', '根据奖励类型区分：道具直接进背包，经验/金币直接加属性，装备类通过邮件发放']), ClarificationItem(question='绑钻不足时弹窗询问是否消耗钻石，若玩家确认，消耗的是绑定钻石还是非绑定钻石？', options=['消耗非绑定钻石（即付费钻石），绑钻不足时用钻石补齐差额', '消耗非绑定钻石，但按1:1比例替代绑钻扣除', '优先消耗绑钻，不足部分自动用非绑定钻石补足，无需弹窗确认']), ClarificationItem(question='可找回的日常功能列表由谁最终确定，配置方式是什么？', options=['由策划在配置表中枚举所有支持找回的功能ID列表，服务端读取配置动态适配', '由开发在代码中硬编码支持找回的功能列表，后续通过热更新修改', "由策划配置功能类型标签，所有带'可找回'标签的日常功能自动纳入找回范围"]), ClarificationItem(question='资源找回功能是否需要考虑并发场景（如玩家同时多设备登录操作）？', options=['无需特殊处理，按单线程顺序处理玩家请求即可，游戏本身已有防并发机制', '需要加锁处理，同一玩家的找回操作需串行化，防止重复找回或扣款异常', '需要分布式锁，因服务可能多进程部署，需保证跨进程的玩家操作互斥'])]
+2026-05-31 22:12:09 INFO [doc_generation.agents.draft_agent] question_to_user generated 5 questions, interrupting for user input
+2026-05-31 22:12:14 INFO [watchfiles.main] 1 change detected
+2026-05-31 22:12:29 INFO [watchfiles.main] 1 change detected
+2026-05-31 22:12:44 INFO [watchfiles.main] 1 change detected
+2026-05-31 22:12:59 INFO [watchfiles.main] 1 change detected
+2026-05-31 22:13:00 INFO [httpx] HTTP Request: POST https://api.zhizengzeng.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-31 22:13:00 INFO [doc_generation.agents.draft_agent] 简报结果：draft_report='# 资源找回功能后端开发技术文档（草稿）\n\n## 1. 玩法概述\n\n### 1.1 玩法说明\n\n资源找回功能允许玩家在错过日常功能（如日常任务、装备副本等）后，通过消耗绑钻或金币来买回错过的奖励。系统记录玩家最近2天内未完成的日常功能，并在玩家每日首次登录时统计可找回资源。\n\n### 1.2 核心规则\n\n1. **记录范围**：玩家离线时记录当天尚未完成的日常功能，保留最近2天的数据。\n2. **找回货币**：绑钻找回（可找回普通+额外次数）和金币找回（仅普通次数），两者共享已找回次数。\n3. **绑钻不足**：绑钻不足时弹窗询问是否消耗钻石（1:1等价），确认后扣除等量钻石。\n4. **奖励发放**：所有找回奖励直接发放到玩家背包/角色身上，不经过邮件。\n5. **清除策略**：仅在玩家每日首次登录时检查并清除超过2天的旧记录。\n6. **离线记录策略**：每次离线时全量覆盖当天的记录，以最后一次离线时的状态为准。\n7. **额外次数**：购买入口仅在资源找回界面内，次数上限由策划配置表统一配置，与日常功能本身的购买次数共享上限。\n\n## 2. 数据持久化（草稿级）\n\n### 2.1 存储选型分析\n\n资源找回功能属于**运营活动/限时机制**（记录最近2天的未完成数据，数据有生命周期），因此选用 `#player_misc_extra{}` 作为存储载体。\n\n**选型理由**：\n- 数据有明确的过期时间（2天后清除），适合活动类存储\n- 同一玩家需按日期区分多条记录（不同 `key`）\n- 活动结束后数据可清理\n\n### 2.2 存储方案\n\n#### 2.2.1 离线未完成记录存储\n\n使用 `#player_misc_extra{}`，`key` 规则为 `{resource_recovery, Date}`，其中 `Date` 为当天的日期（如 `{2026, 5, 31}`）。\n\n| 逻辑字段 | 物理位置 | 类型 | 说明 |\n|----------|----------|------|------|\n| 日期标识 | key | tuple | `{resource_recovery, {Year, Month, Day}}` |\n| 未完成功能列表 | value_text | list | 元素为 `{FunctionId, CanBuyExtra}`，FunctionId 为功能配置ID，CanBuyExtra 为 boolean 表示该功能是否有可购买的额外次数 |\n| 预留 | value_text_1 | list | 备用 |\n| 记录时间戳 | time | integer | Unix 时间戳，记录创建/更新时间 |\n\n**key 取值规则**：`{resource_recovery, Date}`，Date 为 erlang date() 格式 `{Year, Month, Day}`。\n\n**生命周期**：每次离线全量覆盖当天的记录；超过2天在登录时清除。\n\n#### 2.2.2 可找回资源统计结果缓存\n\n玩家每日首次登录时统计的可找回资源结果，缓存到 `#player_misc_extra{}`，`key` 为 `{resource_recovery_cache, TodayDate}`。\n\n| 逻辑字段 | 物理位置 | 类型 | 说明 |\n|----------|----------|------|------|\n| 缓存日期 | key | tuple | `{resource_recovery_cache, {Year, Month, Day}}` |\n| 可找回资源列表 | value_text | list | 元素为 `{FunctionId, NormalTimes, ExtraTimes, BondCost, GoldCost, RewardPreview}`，详见统计逻辑 |\n| 统计时间戳 | time | integer | 统计生成时间 |\n\n**生命周期**：每日首次登录时生成，当天有效，次日登录时重新统计覆盖。\n\n#### 2.2.3 已找回次数记录\n\n使用 `#player_misc_extra{}`，`key` 为 `{resource_recovery_claimed, Date}`。\n\n| 逻辑字段 | 物理位置 | 类型 | 说明 |\n|----------|----------|------|------|\n| 日期标识 | key | tuple | `{resource_recovery_claimed, {Year, Month, Day}}` |\n| 已找回记录 | value_text | list | 元素为 `{FunctionId, ClaimedNormal, ClaimedExtra}`，记录该功能已找回的普通次数和额外次数 |\n| 更新时间 | time | integer | 最后找回时间戳 |\n\n**生命周期**：与离线记录同步清除（超过2天）。\n\n## 3. 配置表设计（草稿）\n\n### 3.1 资源找回功能配置表（resource_recovery_config）\n\n| 字段 | 类型(Erlang) | 说明 | 示例 |\n|------|-------------|------|------|\n| function_id | integer() | 功能ID，唯一标识一个日常功能 | 1 |\n| function_name | string() | 功能名称，前端展示 | "日常任务" |\n| function_type | integer() | 功能类型：1=日常任务，2=装备副本，3+=策划补充 | 1 |\n| has_extra | boolean() | 是否有可付费购买的额外次数 | true |\n| extra_max_times | integer() | 额外次数上限（与日常功能共享） | 2 |\n| bond_cost_normal | integer() | 每次普通次数的绑钻费用 | 10 |\n| bond_cost_extra | integer() | 每次额外次数的绑钻费用 | 20 |\n| gold_cost_normal | integer() | 每次普通次数的金币费用 | 5000 |\n| reward_rule | list() | 奖励规则，按功能类型不同格式 | 见下方说明 |\n| tip_content | string() | 玩法提示文本（三级弹窗内容） | "完成日常任务可获得..." |\n| unlock_condition | list() | 功能开放条件（玩家等级等） | [{level, 30}] |\n\n**reward_rule 格式说明**：\n- 日常任务（type=1）：`[{exp_formula, "level*100"}, {gold, 1000}]`，经验公式由数值配置\n- 装备副本（type=2）：`[{exp_potion_id, 1001}, {exp_potion_count, 1}, {chest_id, 2001}]`\n- 其他类型：由策划补充\n\n### 3.2 装备副本宝箱配置表（chest_config）\n\n| 字段 | 类型(Erlang) | 说明 | 示例 |\n|------|-------------|------|------|\n| chest_id | integer() | 宝箱ID | 2001 |\n| item_list | list() | 随机产出列表，元素为 `{ItemId, Weight, MinCount, MaxCount}` | [{1002, 50, 1, 1}, {1003, 30, 1, 2}] |\n\n## 4. 功能点技术设计\n\n### 4.1 F-001：离线未完成日常功能记录\n\n#### 需求回顾\n\n玩家离线时，服务端记录玩家当天尚未完成的日常功能列表。每次离线全量覆盖当天的记录，以最后一次离线时的状态为准。记录需区分不同日期，支持2天内数据的存储与查询。\n\n#### 功能逻辑\n\n1. 触发时机：玩家 session 断开/角色下线时。\n2. 获取当天日期 `Today = {Y, M, D}`。\n3. 遍历所有配置的日常功能（从配置表读取），检查玩家当天是否已完成。\n4. 对于未完成的功能，记录 `{FunctionId, CanBuyExtra}`（CanBuyExtra 表示该功能是否有可购买的额外次数，从配置表读取）。\n5. 以 `{resource_recovery, Today}` 为 key，全量覆盖写入 `#player_misc_extra{}` 的 `value_text` 字段。\n6. 更新 `time` 为当前时间戳。\n\n#### 接口设计（草稿）\n\n**类型**：内部自用接口（无 Socket 协议）\n\n**模块建议**：`mod_resource_recovery`\n\n**函数签名**：\n```erlang\n%% 玩家离线时调用\n-spec record_offline_unfinished(PlayerId :: integer(), Today :: calendar:date()) -> ok.\n```\n\n#### 配置表设计\n\n依赖 `resource_recovery_config` 配置表，读取所有功能ID及是否有额外次数。\n\n#### 依赖与调用\n\n- 依赖：玩家离线回调事件（`player_offline`）\n- 被依赖：F-002、F-003\n\n---\n\n### 4.2 F-002：过期未完成记录清除\n\n#### 需求回顾\n\n超过2天前记录的未完成日常功能数据，服务端需自动清除。触发时机为玩家每日首次登录时检查并清除超过2天的旧记录。\n\n#### 功能逻辑\n\n1. 触发时机：玩家每日首次登录时。\n2. 获取当前日期 `Today`。\n3. 遍历玩家所有 `#player_misc_extra{}` 中 key 为 `{resource_recovery, Date}` 的记录。\n4. 若 `Date` 早于 `Today - 2`（即超过2天前），则删除该记录。\n5. 同时删除对应的已找回记录 `{resource_recovery_claimed, Date}` 和缓存记录 `{resource_recovery_cache, Date}`。\n6. 返回被清除的记录列表（用于日志/统计）。\n\n#### 接口设计（草稿）\n\n**类型**：内部自用接口\n\n**模块建议**：`mod_resource_recovery`\n\n**函数签名**：\n```erlang\n%% 玩家每日首次登录时调用\n-spec cleanup_expired_records(PlayerId :: integer(), Today :: calendar:date()) -> [ExpiredDate :: calendar:date()].\n```\n\n#### 依赖与调用\n\n- 依赖：F-001（需先有记录才能清除）\n- 被依赖：F-003（统计前先清除）\n\n---\n\n### 4.3 F-003：每日首次登录可找回资源统计\n\n#### 需求回顾\n\n玩家每天第一次登录游戏时，服务端统计当前所有可找回的资源。统计内容包括：正常可找回的功能次数 + 可付费购买次数的功能次数，两者分开记录。玩家上次离线前未开放的功能不允许计入可找回资源。\n\n#### 功能逻辑\n\n1. 触发时机：玩家每日首次登录时（先执行 F-002 清除过期数据）。\n2. 获取当前日期 `Today` 和昨天日期 `Yesterday`。\n3. 读取 `{resource_recovery, Today}` 和 `{resource_recovery, Yesterday}` 两条记录（若存在）。\n4. 对于每条记录中的每个未完成功能：\n   a. 检查该功能当前是否已对玩家开放（根据配置表的 `unlock_condition` 和玩家等级/条件）。\n   b. 若未开放，跳过该功能。\n   c. 若已开放，计算可找回次数：\n      - **普通次数**：该功能每天的基础完成次数（从配置或日常功能模块获取） - 已找回的普通次数（从 `{resource_recovery_claimed, Date}` 读取）。\n      - **额外次数**：若 `CanBuyExtra = true`，则为 `extra_max_times` - 已找回的额外次数。\n5. 计算费用（从配置表读取单价 × 次数）：\n   - 绑钻费用（普通）：`bond_cost_normal × NormalTimes`\n   - 绑钻费用（额外）：`bond_cost_extra × ExtraTimes`\n   - 金币费用（普通）：`gold_cost_normal × NormalTimes`\n6. 生成奖励预览（调用 F-008 的预览模式，不实际发放）。\n7. 将统计结果缓存到 `{resource_recovery_cache, Today}`。\n8. 标记当日已统计（防止重复统计）。\n\n#### 接口设计（草稿）\n\n**类型**：内部自用接口\n\n**模块建议**：`mod_resource_recovery`\n\n**函数签名**：\n```erlang\n%% 玩家每日首次登录时调用\n-spec daily_statistics(PlayerId :: integer(), PlayerLv :: integer(), Today :: calendar:date()) -> ok.\n```\n\n#### 依赖与调用\n\n- 依赖：F-001（离线记录）、F-002（清除后数据）、F-008（奖励预览计算）\n- 被依赖：F-004（界面数据查询）\n\n---\n\n### 4.4 F-004：资源找回界面数据查询\n\n#### 需求回顾\n\n玩家打开"资源找回"页签时，前端请求可找回的资源列表数据。服务端返回各功能项目的名称、可找回次数（普通/额外）、找回费用（绑钻/金币）、奖励内容预览等信息。\n\n#### 功能逻辑\n\n1. 触发时机：玩家点击"资源找回"页签。\n2. 读取 `{resource_recovery_cache, Today}` 的缓存数据。\n3. 若缓存不存在（理论上不应发生，兜底处理），则重新执行 F-003 统计。\n4. 组装返回数据：每个功能项目包含功能名、可找回普通次数、可找回额外次数、绑钻总费用、金币总费用、奖励内容预览列表。\n5. 返回给前端。\n\n#### 接口设计（草稿）— Socket\n\n**通信方式**：WebSocket\n\n**协议段**：建议 `636`（资源找回功能域）\n\n##### 消息一览\n\n| 方向 | 消息号 | 触发场景 | 处理模块（建议） |\n|------|--------|----------|------------------|\n| C2S | 63600 | 打开资源找回页签 | mod_resource_recovery |\n| S2C | 63601 | 返回可找回资源列表 | mod_resource_recovery |\n\n##### 63600 — 打开资源找回界面（C2S）\n\n| 字段 | 类型 | 说明 |\n|------|------|------|\n| （无请求参数） | - | 仅触发查询，服务端根据玩家ID返回数据 |\n\n**C2S 载荷**：空\n\n**业务说明**：客户端进入资源找回页签时发送此消息。\n\n##### 63601 — 返回可找回资源列表（S2C）\n\n| 字段 | 类型 | 说明 |\n|------|------|------|\n| FunctionCount | int32 | 功能项目数量 |\n| FunctionList | binary | 功能列表（见下方结构） |\n\n**FunctionList 结构**（嵌套列表）：\n\n| 子字段 | 类型 | 说明 |\n|--------|------|------|\n| FunctionId | int32 | 功能ID |\n| FunctionName | string | 功能名称（或由前端根据ID本地化） |\n| NormalTimes | int32 | 可找回普通次数 |\n| ExtraTimes | int32 | 可找回额外次数 |\n| BondCost | int32 | 绑钻总费用（普通+额外） |\n| GoldCost | int32 | 金币总费用（仅普通） |\n| RewardCount | int32 | 奖励预览项数量 |\n| RewardList | binary | 奖励预览列表（见下方） |\n\n**RewardList 子结构**：\n\n| 子字段 | 类型 | 说明 |\n|--------|------|------|\n| RewardType | int32 | 奖励类型：1=道具，2=经验，3=金币 |\n| RewardId | int32 | 道具ID（经验/金币时为0） |\n| RewardCount | int32 | 数量 |\n\n**S2C 载荷**：`FunctionCount`, `FunctionList`（需按嵌套结构打包）\n\n**错误与边界**：\n- 若缓存不存在，服务端自动重新统计后返回\n- 若无可找回资源，返回 `FunctionCount = 0`\n\n#### 依赖与调用\n\n- 依赖：F-003（依赖已统计的可找回资源数据）\n- 被依赖：F-005、F-006\n\n---\n\n### 4.5 F-005：资源找回执行（绑钻找回）\n\n#### 需求回顾\n\n玩家选择"绑钻找回"并确认后，服务端扣除对应绑钻（若绑钻不足则弹窗询问是否消耗钻石），发放对应奖励。绑钻找回可同时找回普通次数和额外次数的资源，额外次数单价更高。找回后更新该功能的已找回次数，确保绑钻和金币共享次数。\n\n#### 功能逻辑\n\n1. 接收前端请求：功能ID、找回普通次数、找回额外次数。\n2. 校验：\n   a. 检查该功能是否在可找回缓存中。\n   b. 检查请求次数是否 ≤ 可找回次数（普通/额外分别校验）。\n   c. 计算总费用：`bond_cost_normal × NormalTimes + bond_cost_extra × ExtraTimes`。\n   d. 检查玩家绑钻是否充足。\n3. 若绑钻充足：\n   a. 扣除绑钻。\n   b. 调用 F-008 计算奖励。\n   c. 发放奖励到玩家背包/角色。\n   d. 更新 `{resource_recovery_claimed, Today}` 中的已找回次数。\n   e. 更新缓存中的可找回次数。\n   f. 返回成功结果。\n4. 若绑钻不足：\n   a. 返回特殊状态码（`BOND_NOT_ENOUGH`），前端弹窗询问是否消耗钻石。\n   b. 进入 F-007 流程。\n\n#### 接口设计（草稿）— Socket\n\n##### 消息一览\n\n| 方向 | 消息号 | 触发场景 | 处理模块（建议） |\n|------|--------|----------|------------------|\n| C2S | 63610 | 绑钻找回请求 | mod_resource_recovery |\n| S2C | 63611 | 绑钻找回结果 | mod_resource_recovery |\n\n##### 63610 — 绑钻找回请求（C2S）\n\n| 字段 | 类型 | 说明 |\n|------|------|------|\n| FunctionId | int32 | 功能ID |\n| NormalTimes | int32 | 找回普通次数 |\n| ExtraTimes | int32 | 找回额外次数 |\n\n**C2S 载荷**：`FunctionId`, `NormalTimes`, `ExtraTimes`\n\n##### 63611 — 绑钻找回结果（S2C）\n\n| 字段 | 类型 | 说明 |\n|------|------|------|\n| Result | int32 | 结果码：0=成功，1=绑钻不足需弹窗，2=参数错误，3=次数不足 |\n| FunctionId | int32 | 功能ID |\n| NormalTimes | int32 | 实际找回普通次数 |\n| ExtraTimes | int32 | 实际找回额外次数 |\n| RewardCount | int32 | 奖励项数量（成功时有效） |\n| RewardList | binary | 奖励列表（同F-004格式） |\n| NeedDiamond | int32 | 绑钻不足时所需钻石数量（Result=1时有效） |\n\n**S2C 载荷**：`Result`, `FunctionId`, `NormalTimes`, `ExtraTimes`, `RewardCount`, `RewardList`, `NeedDiamond`\n\n#### 依赖与调用\n\n- 依赖：F-004（界面数据）、F-008（奖励计算）\n- 调用：F-007（绑钻不足时）\n\n---\n\n### 4.6 F-006：资源找回执行（金币找回）\n\n#### 需求回顾\n\n玩家选择"金币找回"并确认后，服务端扣除对应金币，发放对应奖励。金币找回只能找回普通次数的功能资源，不能找回额外次数。找回后更新该功能的已找回次数，确保绑钻和金币共享次数。\n\n#### 功能逻辑\n\n1. 接收前端请求：功能ID、找回普通次数。\n2. 校验：\n   a. 检查该功能是否在可找回缓存中。\n   b. 检查请求的普通次数是否 ≤ 可找回普通次数。\n   c. 计算总费用：`gold_cost_normal × NormalTimes`。\n   d. 检查玩家金币是否充足。\n3. 若金币充足：\n   a. 扣除金币。\n   b. 调用 F-008 计算奖励（仅普通次数部分）。\n   c. 发放奖励到玩家背包/角色。\n   d. 更新 `{resource_recovery_claimed, Today}` 中的已找回次数。\n   e. 更新缓存中的可找回次数。\n   f. 返回成功结果。\n4. 若金币不足，返回失败状态码。\n\n#### 接口设计（草稿）— Socket\n\n##### 消息一览\n\n| 方向 | 消息号 | 触发场景 | 处理模块（建议） |\n|------|--------|----------|------------------|\n| C2S | 63620 | 金币找回请求 | mod_resource_recovery |\n| S2C | 63621 | 金币找回结果 | mod_resource_recovery |\n\n##### 63620 — 金币找回请求（C2S）\n\n| 字段 | 类型 | 说明 |\n|------|------|------|\n| FunctionId | int32 | 功能ID |\n| NormalTimes | int32 | 找回普通次数 |\n\n**C2S 载荷**：`FunctionId`, `NormalTimes`\n\n##### 63621 — 金币找回结果（S2C）\n\n| 字段 | 类型 | 说明 |\n|------|------|------|\n| Result | int32 | 结果码：0=成功，1=金币不足，2=参数错误，3=次数不足 |\n| FunctionId | int32 | 功能ID |\n| NormalTimes | int32 | 实际找回普通次数 |\n| RewardCount | int32 | 奖励项数量（成功时有效） |\n| RewardList | binary | 奖励列表（同F-004格式） |\n\n**S2C 载荷**：`Result`, `FunctionId`, `NormalTimes`, `RewardCount`, `RewardList`\n\n#### 依赖与调用\n\n- 依赖：F-004（界面数据）、F-008（奖励计算）\n\n---\n\n### 4.7 F-007：绑钻不足弹窗处理\n\n#### 需求回顾\n\n当玩家使用绑钻找回但绑钻不足时，服务端返回特殊状态码，前端弹窗询问是否消耗钻石找回。若玩家确认，服务端扣除钻石并发放奖励；若取消，操作终止。钻石与绑钻1:1等价，直接按绑钻费用扣除等量钻石。\n\n#### 功能逻辑\n\n1. F-005 返回 `Result=1`（绑钻不足）及 `NeedDiamond` 数量。\n2. 前端弹窗显示"绑钻不足，是否消耗 `NeedDiamond` 钻石找回？"。\n3. 玩家选择：\n   - **确认**：前端发送确认消息，服务端扣除等量钻石，发放奖励，更新已找回次数。\n   - **取消**：前端发送取消消息，服务端不做任何操作。\n4. 钻石扣除后，更新玩家钻石数量。\n\n#### 接口设计（草稿）— Socket\n\n##### 消息一览\n\n| 方向 | 消息号 | 触发场景 | 处理模块（建议） |\n|------|--------|----------|------------------|\n| C2S | 63630 | 弹窗确认/取消 | mod_resource_recovery |\n| S2C | 63631 | 弹窗处理结果 | mod_resource_recovery |\n\n##### 63630 — 弹窗确认/取消（C2S）\n\n| 字段 | 类型 | 说明 |\n|------|------|------|\n| FunctionId | int32 | 功能ID |\n| NormalTimes | int32 | 找回普通次数 |\n| ExtraTimes | int32 | 找回额外次数 |\n| Confirm | int8 | 1=确认消耗钻石，0=取消 |\n\n**C2S 载荷**：`FunctionId`, `NormalTimes`, `ExtraTimes`, `Confirm`\n\n##### 63631 — 弹窗处理结果（S2C）\n\n| 字段 | 类型 | 说明 |\n|------|------|------|\n| Result | int32 | 结果码：0=成功，1=取消操作，2=钻石不足（并发问题），3=参数错误 |\n| FunctionId | int32 | 功能ID |\n| RewardCount | int32 | 奖励项数量（成功时有效） |\n| RewardList | binary | 奖励列表 |\n\n**S2C 载荷**：`Result`, `FunctionId`, `RewardCount`, `RewardList`\n\n#### 依赖与调用\n\n- 依赖：F-005（作为F-005的补充流程）\n\n---\n\n### 4.8 F-008：找回奖励计算\n\n#### 需求回顾\n\n根据功能类型和玩家数据，计算每次找回应发放的具体奖励内容。不同功能有不同的奖励规则：\n- 日常任务：奖励经验和金币，经验根据玩家等级由数值公式计算。\n- 装备副本：奖励经验丹（配置道具）和装备（由策划配置宝箱随机产出）。\n- 其他功能：由策划补充配置。\n\n#### 功能逻辑\n\n1. 输入：玩家ID、功能ID、找回次数（普通/额外）、玩家等级。\n2. 根据功能ID从配置表读取 `function_type` 和 `reward_rule`。\n3. 按功能类型计算奖励：\n   - **日常任务（type=1）**：\n     - 经验 = `floor(level_formula(PlayerLv)) × 次数`（公式由数值配置，如 `level * 100`）\n     - 金币 = `reward_rule.gold × 次数`\n   - **装备副本（type=2）**：\n     - 经验丹 = `{exp_potion_id, exp_potion_count × 次数}`\n     - 装备 = 从 `chest_config` 读取宝箱ID，按权重随机产出 `次数` 次\n   - **其他类型**：按配置表 `reward_rule` 解析执行（待策划补充）\n4. 返回奖励列表：`[{Type, Id, Count}]`。\n5. 提供两种模式：\n   - **预览模式**（F-003/F-004调用）：仅计算奖励内容，不实际发放。\n   - **执行模式**（F-005/F-006调用）：计算并发放奖励到玩家背包/角色。\n\n#### 接口设计（草稿）\n\n**类型**：内部自用接口\n\n**模块建议**：`mod_resource_reward`\n\n**函数签名**：\n```erlang\n%% 预览模式\n-spec preview_reward(FunctionId :: integer(), NormalTimes :: integer(), ExtraTimes :: integer(), PlayerLv :: integer()) -> [RewardItem].\n\n%% 执行模式\n-spec claim_reward(PlayerId :: integer(), FunctionId :: integer(), NormalTimes :: integer(), ExtraTimes :: integer(), PlayerLv :: integer()) -> {ok, [RewardItem]} | {error, Reason}.\n```\n\n#### 配置表设计\n\n依赖 `resource_recovery_config` 配置表的 `reward_rule` 字段和 `chest_config` 宝箱配置表。\n\n#### 依赖与调用\n\n- 被依赖：F-003（预览）、F-005（执行）、F-006（执行）\n\n---\n\n### 4.9 F-009：玩法提示查询\n\n#### 需求回顾\n\n玩家点击"玩法提示"按钮时，服务端返回由策划配置的玩法说明内容（三级弹窗展示）。\n\n#### 功能逻辑\n\n1. 接收前端请求：功能ID。\n2. 从 `resource_recovery_config` 配置表读取该功能的 `tip_content` 字段。\n3. 返回玩法提示内容给前端。\n\n#### 接口设计（草稿）— Socket\n\n##### 消息一览\n\n| 方向 | 消息号 | 触发场景 | 处理模块（建议） |\n|------|--------|----------|------------------|\n| C2S | 63640 | 查询玩法提示 | mod_resource_recovery |\n| S2C | 63641 | 返回玩法提示内容 | mod_resource_recovery |\n\n##### 63640 — 查询玩法提示（C2S）\n\n| 字段 | 类型 | 说明 |\n|------|------|------|\n| FunctionId | int32 | 功能ID |\n\n**C2S 载荷**：`FunctionId`\n\n##### 63641 — 返回玩法提示内容（S2C）\n\n| 字段 | 类型 | 说明 |\n|------|------|------|\n| FunctionId | int32 | 功能ID |\n| TipContent | string | 玩法提示文本（由策划配置） |\n\n**S2C 载荷**：`FunctionId`, `TipContent`\n\n**业务说明**：前端收到后以三级弹窗展示 `TipContent` 内容。\n\n#### 依赖与调用\n\n- 依赖：`resource_recovery_config` 配置表\n- 无其他功能点依赖\n\n---\n\n## 5. 功能点依赖与实施顺序\n\n### 5.1 依赖关系图\n\n```\nF-001 (离线记录) ──→ F-002 (过期清除) ──→ F-003 (登录统计) ──→ F-004 (界面查询)\n                                                                    ├──→ F-005 (绑钻找回) ──→ F-007 (弹窗处理)\n                                                                    └──→ F-006 (金币找回)\nF-008 (奖励计算) ←───────────────────────────────────────────────────┘\nF-009 (玩法提示) 独立，无依赖\n```\n\n### 5.2 开发顺序建议\n\n| 阶段 | 功能点 | 说明 |\n|------|--------|------|\n| 第一阶段（基础） | F-001、F-008 | 离线记录和奖励计算是基础能力，无外部依赖 |\n| 第二阶段（数据管理） | F-002、F-003 | 清除和统计逻辑，依赖第一阶段 |\n| 第三阶段（界面交互） | F-004、F-009 | 界面数据查询和玩法提示，依赖第二阶段 |\n| 第四阶段（找回执行） | F-005、F-006、F-007 | 找回执行逻辑，依赖第三阶段和F-008 |\n\n### 5.3 可并行项\n\n- F-001 与 F-008 可并行开发\n- F-005 与 F-006 可并行开发\n- F-009 可独立于其他功能开发\n\n### 5.4 关键路径\n\nF-001 → F-002 → F-003 → F-004 → F-005/F-006（含F-007）\n\n---\n\n## 6. 风险、假设与开放问题\n\n### 6.1 待澄清项（需策划/数值确认）\n\n| 编号 | 功能点 | 待澄清内容 | 影响 |\n|------|--------|-----------|------|\n| 1 | 全局 | 具体可找回的功能列表（日常任务、装备副本之外还有哪些） | 影响配置表设计和F-001记录范围 |\n| 2 | F-003/F-008 | 额外次数的定义与来源、购买规则（价格、上限、购买入口） | 影响额外次数统计逻辑 |\n| 3 | F-008 | 经验计算公式（"根据玩家等级进行计算"的具体公式） | 影响日常任务奖励计算 |\n| 4 | F-008 | 装备副本宝箱ID、随机产出规则（权重、数量范围） | 影响装备副本奖励计算 |\n| 5 | F-009 | "玩法提示"三级弹窗内容的格式（纯文本/富文本/支持图片？） | 影响S2C协议字段类型 |\n| 6 | 全局 | 各功能找回费用的具体数值（绑钻/金币单价） | 影响配置表 |\n\n### 6.2 文档假设\n\n| 假设编号 | 假设内容 | 若假设不成立的影响 |\n|----------|---------|-------------------|\n| A1 | 资源找回功能面向所有玩家，无等级/VIP限制 | 需增加条件判断逻辑 |\n| A2 | 可付费购买次数的功能需有独立配置（`has_extra` 字段） | 需调整配置表结构 |\n| A3 | 找回费用数据由策划配置表驱动 | 若为硬编码需修改实现 |\n| A4 | 日常功能的基础完成次数由日常功能模块提供接口查询 | 需确认日常功能模块接口 |\n| A5 | 协议段 `636` 未被其他功能占用 | 若冲突需调整协议段号 |\n\n### 6.3 开放问题\n\n1. **并发安全**：玩家同时发起多个找回请求时，需确保次数扣减的原子性（建议在 gen_server 中串行处理）。\n2. **缓存一致性**：`{resource_recovery_cache, Today}` 在找回操作后需同步更新，避免界面数据与后端状态不一致。\n3. **跨天处理**：若玩家在23:59登录统计，00:01时数据是否仍有效？建议以服务器日期为准，跨天后重新统计。\n4. **数据清理兜底**：若玩家长期不上线，离线记录是否仍保留？按当前设计，登录时清除超过2天的数据，长期不上线则不清除（待确认是否需要定时任务兜底）。'
+2026-05-31 22:13:00 INFO [doc_generation.agents.supervisor] [SUPERVISOR] supervisor invoked (iteration=0, messages=2)
+2026-05-31 22:13:07 INFO [httpx] HTTP Request: POST https://api.zhizengzeng.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-31 22:13:07 INFO [doc_generation.agents.supervisor] supervisor model produced tool_calls=True num_tool_calls=1
+2026-05-31 22:13:07 INFO [doc_generation.agents.supervisor] [SUPERVISOR] supervisor_tools executing think=1 conduct=0 refine=0
+2026-05-31 22:13:07 INFO [doc_generation.agents.supervisor] ========>[thinking tool] thinking process Reflection recorded: 分析技术文档草稿，识别需要检索的关键技术规范：
+
+1. **数据持久化规范** - 文档使用了 `#player_misc_extra{}` 作为存储方案，需要确认是否符合项目的持久化规范
+2. **协议开发规范** - 文档定义了多个 Socket 协议（63600-63641），需要确认协议号分配、消息格式等是否符合项目规范
+3. **接口设计规范** - 文档中的函数签名、模块命名等需要对照项目规范
+4. **配置表设计规范** - 文档设计了 `resource_recovery_config` 和 `chest_config` 配置表，需要确认格式是否符合项目规范
+5. **架构规范** - 模块划分、gen_server 使用等
+
+这些是独立的技术领域，可以并行检索。先检索最关键的几个：数据持久化规范、协议开发规范、配置表规范。
+2026-05-31 22:13:07 INFO [doc_generation.agents.supervisor] [SUPERVISOR] supervisor invoked (iteration=1, messages=4)
+2026-05-31 22:13:14 INFO [httpx] HTTP Request: POST https://api.zhizengzeng.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-31 22:13:14 INFO [doc_generation.agents.supervisor] supervisor model produced tool_calls=True num_tool_calls=3
+2026-05-31 22:13:14 INFO [doc_generation.agents.supervisor] [SUPERVISOR] supervisor_tools executing think=0 conduct=3 refine=0
+2026-05-31 22:13:14 INFO [doc_generation.agents.supervisor] [DISPATCH] Sending 3 research tasks via Send (hand-off)
+2026-05-31 22:13:14 INFO [watchfiles.main] 1 change detected
+2026-05-31 22:13:16 INFO [httpx] HTTP Request: POST https://api.zhizengzeng.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-31 22:13:16 INFO [doc_generation.agents.research_agent] llm_call produced response tool_calls=True num_tool_calls=2 iteration=0
+2026-05-31 22:13:16 INFO [doc_generation.agents.research_agent] should_continue decision=tool_node (has_tool_calls=True, iteration=1)
+2026-05-31 22:13:16 INFO [doc_generation.agents.research_agent] tool_node executing 2 tool calls
+2026-05-31 22:13:16 INFO [doc_generation.agents.research_agent] Invoking tool rag_search with args={'query': 'player_misc_extra record定义 key命名规则 value字段使用规范'}
+2026-05-31 22:13:16 INFO [doc_generation.tools.rag_tool] rag_search query='player_misc_extra record定义 key命名规则 value字段使用规范' top_k=5
+2026-05-31 22:13:16 INFO [doc_generation.rag.factory] Building Chroma RAG store stage='prod' collection='doc_generation'
+2026-05-31 22:13:16 INFO [httpx] HTTP Request: POST https://api.zhizengzeng.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-31 22:13:16 INFO [doc_generation.agents.research_agent] llm_call produced response tool_calls=True num_tool_calls=3 iteration=0
+2026-05-31 22:13:16 INFO [doc_generation.agents.research_agent] should_continue decision=tool_node (has_tool_calls=True, iteration=1)
+2026-05-31 22:13:16 INFO [doc_generation.agents.research_agent] tool_node executing 3 tool calls
+2026-05-31 22:13:16 INFO [doc_generation.agents.research_agent] Invoking tool rag_search with args={'query': 'Socket协议开发规范 协议号分配规则 消息号命名规范'}
+2026-05-31 22:13:16 INFO [doc_generation.tools.rag_tool] rag_search query='Socket协议开发规范 协议号分配规则 消息号命名规范' top_k=5
+2026-05-31 22:13:16 INFO [doc_generation.rag.factory] Building Chroma RAG store stage='prod' collection='doc_generation'
+2026-05-31 22:13:16 INFO [httpx] HTTP Request: POST https://api.zhizengzeng.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-31 22:13:16 INFO [doc_generation.agents.research_agent] llm_call produced response tool_calls=True num_tool_calls=3 iteration=0
+2026-05-31 22:13:16 INFO [doc_generation.agents.research_agent] should_continue decision=tool_node (has_tool_calls=True, iteration=1)
+2026-05-31 22:13:16 INFO [doc_generation.agents.research_agent] tool_node executing 3 tool calls
+2026-05-31 22:13:16 INFO [doc_generation.agents.research_agent] Invoking tool rag_search with args={'query': '配置表设计规范 命名规范 字段类型定义 Erlang类型映射'}
+2026-05-31 22:13:16 INFO [doc_generation.tools.rag_tool] rag_search query='配置表设计规范 命名规范 字段类型定义 Erlang类型映射' top_k=5
+2026-05-31 22:13:16 INFO [doc_generation.rag.factory] Building Chroma RAG store stage='prod' collection='doc_generation'
+2026-05-31 22:13:18 INFO [watchfiles.main] 4 changes detected
+2026-05-31 22:13:26 INFO [httpx] HTTP Request: POST http://127.0.0.1:11434/v1/embeddings "HTTP/1.1 200 OK"
+2026-05-31 22:13:27 INFO [doc_generation.agents.research_agent] Invoking tool rag_search with args={'query': 'C2S S2C 消息格式定义规范 嵌套结构打包规范'}
+2026-05-31 22:13:27 INFO [doc_generation.tools.rag_tool] rag_search query='C2S S2C 消息格式定义规范 嵌套结构打包规范' top_k=5
+2026-05-31 22:13:27 INFO [watchfiles.main] 4 changes detected
+2026-05-31 22:13:27 INFO [httpx] HTTP Request: POST http://127.0.0.1:11434/v1/embeddings "HTTP/1.1 200 OK"
+2026-05-31 22:13:27 INFO [doc_generation.agents.research_agent] Invoking tool rag_search with args={'query': '配置表加载方式 配置表结构 奖励配置 reward_rule 格式'}
+2026-05-31 22:13:27 INFO [doc_generation.tools.rag_tool] rag_search query='配置表加载方式 配置表结构 奖励配置 reward_rule 格式' top_k=5
+2026-05-31 22:13:27 INFO [httpx] HTTP Request: POST http://127.0.0.1:11434/v1/embeddings "HTTP/1.1 200 OK"
+2026-05-31 22:13:27 INFO [doc_generation.agents.research_agent] Invoking tool rag_search with args={'query': 'player_misc_extra 生命周期管理 数据清理策略 限时机制'}
+2026-05-31 22:13:27 INFO [doc_generation.tools.rag_tool] rag_search query='player_misc_extra 生命周期管理 数据清理策略 限时机制' top_k=5
+2026-05-31 22:13:27 INFO [httpx] HTTP Request: POST http://127.0.0.1:11434/v1/embeddings "HTTP/1.1 200 OK"
+2026-05-31 22:13:27 INFO [doc_generation.agents.research_agent] Invoking tool rag_search with args={'query': '错误码定义规范 WebSocket通信规范'}
+2026-05-31 22:13:27 INFO [doc_generation.tools.rag_tool] rag_search query='错误码定义规范 WebSocket通信规范' top_k=5
+2026-05-31 22:13:27 INFO [httpx] HTTP Request: POST http://127.0.0.1:11434/v1/embeddings "HTTP/1.1 200 OK"
+2026-05-31 22:13:27 INFO [doc_generation.agents.research_agent] Invoking tool rag_search with args={'query': 'unlock_condition 条件配置 标准格式 配置表'}
+2026-05-31 22:13:27 INFO [doc_generation.tools.rag_tool] rag_search query='unlock_condition 条件配置 标准格式 配置表' top_k=5
+2026-05-31 22:13:27 INFO [httpx] HTTP Request: POST http://127.0.0.1:11434/v1/embeddings "HTTP/1.1 200 OK"
+2026-05-31 22:13:27 INFO [httpx] HTTP Request: POST http://127.0.0.1:11434/v1/embeddings "HTTP/1.1 200 OK"
+2026-05-31 22:13:27 INFO [httpx] HTTP Request: POST http://127.0.0.1:11434/v1/embeddings "HTTP/1.1 200 OK"
+2026-05-31 22:13:29 INFO [watchfiles.main] 1 change detected
+2026-05-31 22:13:30 INFO [httpx] HTTP Request: POST https://api.zhizengzeng.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-31 22:13:30 INFO [doc_generation.agents.research_agent] llm_call produced response tool_calls=True num_tool_calls=1 iteration=1
+2026-05-31 22:13:30 INFO [doc_generation.agents.research_agent] should_continue decision=tool_node (has_tool_calls=True, iteration=2)
+2026-05-31 22:13:30 INFO [doc_generation.agents.research_agent] tool_node executing 1 tool calls
+2026-05-31 22:13:30 INFO [doc_generation.agents.research_agent] Invoking tool think_tool with args={'reflection': '已获取到 #player_misc_extra{} 的核心规范信息，包括：\n1. record 定义（所有字段及类型）\n2. key 命名规则（一般为活动id）\n3. value/value_text/time 字段使用规范\n4. 生命周期管理（活动结束后保留/删除/归档）\n5. 禁止事项（5条）\n6. 文档输出格式模板\n\n但还需要补充：\n- 具体的数据清理策略细节（如何清理、清理时机）\n- 其他类似的运营活动/限时机制的数据持久化方案作为参考（如赛季战令、节日玩法等具体案例）\n- 生命周期管理的具体实现方式\n\n让我继续检索这些信息。'}
+2026-05-31 22:13:30 INFO [httpx] HTTP Request: POST https://api.zhizengzeng.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-31 22:13:30 INFO [doc_generation.agents.research_agent] llm_call produced response tool_calls=True num_tool_calls=1 iteration=1
+2026-05-31 22:13:30 INFO [doc_generation.agents.research_agent] should_continue decision=tool_node (has_tool_calls=True, iteration=2)
+2026-05-31 22:13:30 INFO [doc_generation.agents.research_agent] tool_node executing 1 tool calls
+2026-05-31 22:13:30 INFO [doc_generation.agents.research_agent] Invoking tool think_tool with args={'reflection': '第一次检索结果分析：\n1. 已获取的信息：\n   - 通信方式：WebSocket/TCP\n   - 协议编号约定：协议段（功能域）、消息号（具体消息）、线上包号（pt:pack首参）\n   - 协议配对原则：C2S和S2C必须成对，同一消息号\n   - 文档输出格式：包含消息一览表、C2S载荷、S2C载荷、业务说明、错误与边界\n   - 禁止事项：5条明确禁止规则\n   - pack/read的代码示例\n\n2. 信息缺口：\n   - 协议段划分规则（具体段号范围分配）—— 未检索到\n   - 消息号命名规范细节 —— 未检索到\n   - 嵌套结构打包规范 —— 未检索到\n   - 错误码定义规范 —— 未检索到\n   - WebSocket通信规范细节 —— 未检索到\n\n需要进一步检索补充这些缺失的信息。'}
+2026-05-31 22:13:31 INFO [httpx] HTTP Request: POST https://api.zhizengzeng.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-31 22:13:31 INFO [doc_generation.agents.research_agent] llm_call produced response tool_calls=True num_tool_calls=1 iteration=1
+2026-05-31 22:13:31 INFO [doc_generation.agents.research_agent] should_continue decision=tool_node (has_tool_calls=True, iteration=2)
+2026-05-31 22:13:31 INFO [doc_generation.agents.research_agent] tool_node executing 1 tool calls
+2026-05-31 22:13:31 INFO [doc_generation.agents.research_agent] Invoking tool think_tool with args={'reflection': '我已经检索到了配置表开发规范的核心内容，包括：\n1. 两种数据构建方式（列表+元组 和 Record）\n2. 数据类型说明（基本类型和复合类型）\n3. 常用数据结构示例（物品奖励、范围区间、任务条件）\n4. 选择指南\n\n但还有一些信息需要补充：\n- 配置表命名规范（函数命名规则）\n- 更详细的Erlang类型映射（基本类型如integer, float, boolean, string等）\n- reward_rule奖励配置的标准格式\n- unlock_condition条件配置的标准格式\n- 配置表加载方式\n\n让我继续检索这些缺失的信息。'}
+2026-05-31 22:13:32 INFO [httpx] HTTP Request: POST https://api.zhizengzeng.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-31 22:13:32 INFO [doc_generation.agents.research_agent] llm_call produced response tool_calls=True num_tool_calls=2 iteration=2
+2026-05-31 22:13:32 INFO [doc_generation.agents.research_agent] should_continue decision=tool_node (has_tool_calls=True, iteration=3)
+2026-05-31 22:13:32 INFO [doc_generation.agents.research_agent] tool_node executing 2 tool calls
+2026-05-31 22:13:32 INFO [doc_generation.agents.research_agent] Invoking tool rag_search with args={'query': '运营活动 限时活动 赛季战令 节日玩法 数据清理 生命周期 持久化方案 案例'}
+2026-05-31 22:13:32 INFO [doc_generation.tools.rag_tool] rag_search query='运营活动 限时活动 赛季战令 节日玩法 数据清理 生命周期 持久化方案 案例' top_k=5
+2026-05-31 22:13:33 INFO [httpx] HTTP Request: POST http://127.0.0.1:11434/v1/embeddings "HTTP/1.1 200 OK"
+2026-05-31 22:13:33 INFO [doc_generation.agents.research_agent] Invoking tool rag_search with args={'query': 'player_misc_extra 数据清理 清理策略 活动结束 归档 删除时机'}
+2026-05-31 22:13:33 INFO [doc_generation.tools.rag_tool] rag_search query='player_misc_extra 数据清理 清理策略 活动结束 归档 删除时机' top_k=5
+2026-05-31 22:13:33 INFO [httpx] HTTP Request: POST https://api.zhizengzeng.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-31 22:13:33 INFO [doc_generation.agents.research_agent] llm_call produced response tool_calls=True num_tool_calls=3 iteration=2
+2026-05-31 22:13:33 INFO [doc_generation.agents.research_agent] should_continue decision=tool_node (has_tool_calls=True, iteration=3)
+2026-05-31 22:13:33 INFO [doc_generation.agents.research_agent] tool_node executing 3 tool calls
+2026-05-31 22:13:33 INFO [doc_generation.agents.research_agent] Invoking tool rag_search with args={'query': '协议段划分 协议段分配规则 段号范围 模块分组'}
+2026-05-31 22:13:33 INFO [doc_generation.tools.rag_tool] rag_search query='协议段划分 协议段分配规则 段号范围 模块分组' top_k=5
+2026-05-31 22:13:33 INFO [httpx] HTTP Request: POST http://127.0.0.1:11434/v1/embeddings "HTTP/1.1 200 OK"
+2026-05-31 22:13:33 INFO [httpx] HTTP Request: POST http://127.0.0.1:11434/v1/embeddings "HTTP/1.1 200 OK"
+2026-05-31 22:13:33 INFO [doc_generation.agents.research_agent] Invoking tool rag_search with args={'query': '嵌套结构打包规范 二进制打包 嵌套协议 Erlang pack read'}
+2026-05-31 22:13:33 INFO [doc_generation.tools.rag_tool] rag_search query='嵌套结构打包规范 二进制打包 嵌套协议 Erlang pack read' top_k=5
+2026-05-31 22:13:33 INFO [httpx] HTTP Request: POST https://api.zhizengzeng.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-31 22:13:33 INFO [doc_generation.agents.research_agent] llm_call produced response tool_calls=True num_tool_calls=3 iteration=2
+2026-05-31 22:13:33 INFO [doc_generation.agents.research_agent] should_continue decision=tool_node (has_tool_calls=True, iteration=3)
+2026-05-31 22:13:33 INFO [doc_generation.agents.research_agent] tool_node executing 3 tool calls
+2026-05-31 22:13:33 INFO [doc_generation.agents.research_agent] Invoking tool rag_search with args={'query': '配置表命名规范 函数命名 get_ 前缀 配置表加载方式 启动加载'}
+2026-05-31 22:13:33 INFO [doc_generation.tools.rag_tool] rag_search query='配置表命名规范 函数命名 get_ 前缀 配置表加载方式 启动加载' top_k=5
+2026-05-31 22:13:34 INFO [httpx] HTTP Request: POST http://127.0.0.1:11434/v1/embeddings "HTTP/1.1 200 OK"
+2026-05-31 22:13:34 INFO [doc_generation.agents.research_agent] Invoking tool rag_search with args={'query': '错误码定义规范 错误码分配 错误码范围 错误码约定'}
+2026-05-31 22:13:34 INFO [doc_generation.tools.rag_tool] rag_search query='错误码定义规范 错误码分配 错误码范围 错误码约定' top_k=5
+2026-05-31 22:13:34 INFO [httpx] HTTP Request: POST http://127.0.0.1:11434/v1/embeddings "HTTP/1.1 200 OK"
+2026-05-31 22:13:34 INFO [doc_generation.agents.research_agent] Invoking tool rag_search with args={'query': 'reward_rule 奖励规则 标准格式 配置 unlock_condition 解锁条件'}
+2026-05-31 22:13:34 INFO [doc_generation.tools.rag_tool] rag_search query='reward_rule 奖励规则 标准格式 配置 unlock_condition 解锁条件' top_k=5
+2026-05-31 22:13:34 INFO [httpx] HTTP Request: POST http://127.0.0.1:11434/v1/embeddings "HTTP/1.1 200 OK"
+2026-05-31 22:13:34 INFO [httpx] HTTP Request: POST http://127.0.0.1:11434/v1/embeddings "HTTP/1.1 200 OK"
+2026-05-31 22:13:34 INFO [doc_generation.agents.research_agent] Invoking tool rag_search with args={'query': '配置表数据类型 Erlang类型映射 integer float boolean string binary 基本类型'}
+2026-05-31 22:13:34 INFO [doc_generation.tools.rag_tool] rag_search query='配置表数据类型 Erlang类型映射 integer float boolean string binary 基本类型' top_k=5
+2026-05-31 22:13:34 INFO [httpx] HTTP Request: POST http://127.0.0.1:11434/v1/embeddings "HTTP/1.1 200 OK"
+2026-05-31 22:13:36 INFO [httpx] HTTP Request: POST https://api.zhizengzeng.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-31 22:13:36 INFO [doc_generation.agents.research_agent] llm_call produced response tool_calls=True num_tool_calls=1 iteration=3
+2026-05-31 22:13:36 INFO [doc_generation.agents.research_agent] should_continue decision=tool_node (has_tool_calls=True, iteration=4)
+2026-05-31 22:13:36 INFO [doc_generation.agents.research_agent] tool_node executing 1 tool calls
+2026-05-31 22:13:36 INFO [doc_generation.agents.research_agent] Invoking tool think_tool with args={'reflection': '目前已经收集到足够的信息。让我总结一下：\n\n已获取的核心信息：\n1. **record定义** - 完整的 #player_misc_extra{} 字段列表（player_id, key, value/value1-3, value_text/value_text_1-3, time/time1-2, server_id）\n2. **key命名规则** - 一般为活动id，用于区分不同活动的数据\n3. **value字段使用规范** - value/value1-3只支持数字，value_text/value_text_1-3支持所有Erlang数据类型（list），time/time1-2为时间戳\n4. **生命周期管理** - 活动结束后三种策略：保留/删除/归档\n5. **数据清理策略** - 活动结束后可清理或归档；邮件补发后清理\n6. **禁止事项** - 5条明确禁止规则\n7. **文档输出格式模板** - 标准化的markdown表格格式\n8. **存储选型决策** - 运营活动 vs 常驻功能的判定依据\n9. **类似方案参考** - 限时活动、赛季战令、节日玩法等都属于运营活动场景，统一使用 #player_misc_extra{}\n\n信息已经足够全面，可以整理输出完整的规范文档了。不需要再继续检索。'}
+2026-05-31 22:13:37 INFO [httpx] HTTP Request: POST https://api.zhizengzeng.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-31 22:13:37 INFO [doc_generation.agents.research_agent] llm_call produced response tool_calls=True num_tool_calls=1 iteration=3
+2026-05-31 22:13:37 INFO [doc_generation.agents.research_agent] should_continue decision=tool_node (has_tool_calls=True, iteration=4)
+2026-05-31 22:13:37 INFO [doc_generation.agents.research_agent] tool_node executing 1 tool calls
+2026-05-31 22:13:37 INFO [doc_generation.agents.research_agent] Invoking tool think_tool with args={'reflection': '第二次检索结果分析：\n\n已获取的新信息：\n1. **位宽与类型对照表** - 代码写法与文档类型的映射（int32、int16、byte、binary、嵌套结构体）\n2. **read解包示例** - C2S方向，read(63500, <<ActivityId:32>>) -> {ok, [ActivityId]}\n3. **pack组包示例** - S2C方向，pack(63500, {ActivityId, PlayerLv}) -> Data = <<ActivityId:32, PlayerLv:32>>\n4. **协议提取规则** - 在Erlang工程中查找pack/read\n\n仍然缺失的信息：\n- **协议段划分规则**（具体段号范围分配，如哪些段号分配给哪些模块）—— 文档中未明确给出具体段号分配表\n- **消息号命名规范**（如消息号与协议段的关系，63500中635是段号，00是消息序号）—— 从示例可推断但无明确规范说明\n- **嵌套结构打包规范**（嵌套record、列表、map等复杂类型的打包方式）—— 位宽表提到"嵌套<<...>>"但未详细说明\n- **错误码定义规范**（错误码范围、分配规则）—— 未检索到相关文档\n- **WebSocket通信规范细节**（连接建立、心跳、重连等）—— 未检索到\n\n从现有信息来看，协议段划分规则可以从"协议段=635，消息号=63500"的示例中推断：消息号 = 协议段号 * 100 + 序号。但具体段号分配表未找到。\n\n错误码规范和WebSocket通信规范可能在其他文档中，让我再尝试检索。'}
+2026-05-31 22:13:38 INFO [httpx] HTTP Request: POST https://api.zhizengzeng.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-31 22:13:38 INFO [doc_generation.agents.research_agent] llm_call produced response tool_calls=True num_tool_calls=1 iteration=3
+2026-05-31 22:13:38 INFO [doc_generation.agents.research_agent] should_continue decision=tool_node (has_tool_calls=True, iteration=4)
+2026-05-31 22:13:38 INFO [doc_generation.agents.research_agent] tool_node executing 1 tool calls
+2026-05-31 22:13:38 INFO [doc_generation.agents.research_agent] Invoking tool think_tool with args={'reflection': '现在我已经收集到了比较全面的信息。让我评估一下：\n\n**已获取的信息：**\n1. ✅ **配置表命名规范** - 函数命名以 `get_` 开头（如 `get_draw_list()`, `get_shop_list()`, `get_attr()`, `get_config()`）\n2. ✅ **字段类型定义规范（Erlang类型映射）** - 基础类型（整数、浮点数、布尔值、原子）和复合类型（数据区间、物品、物品列表、条件列表）都有详细说明\n3. ✅ **配置表加载方式** - 两种方式：列表+元组（运营活动）和 Record（功能类配置）\n4. ✅ **奖励配置格式** - 物品奖励 `{112735,1,0,0,0}` 5元素元组格式，物品列表 `[{112735,1,0,0,0}]`\n5. ✅ **条件配置格式** - 条件列表 `[{charge_diamond,999}]` 元组列表格式\n6. ✅ **注意事项** - UTF8编码、默认返回值、禁止手动修改等\n\n**还缺少的信息：**\n- 关于 `reward_rule` 和 `unlock_condition` 作为特定字段名的标准格式，文档中没有直接提到这两个术语。但从已有信息可以推断：\n  - 奖励规则（reward_rule）通常使用物品列表格式 `[{物品ID, 数量, 绑定, 类型, 保留字段}]`\n  - 解锁条件（unlock_condition）通常使用条件列表格式 `[{条件原子, 参数}]`\n\n让我再检索一次看看是否有更具体的关于 reward_rule 和 unlock_condition 的文档。'}
+2026-05-31 22:13:40 INFO [httpx] HTTP Request: POST https://api.zhizengzeng.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-31 22:13:40 INFO [doc_generation.agents.research_agent] llm_call produced response tool_calls=True num_tool_calls=3 iteration=4
+2026-05-31 22:13:40 INFO [doc_generation.agents.research_agent] should_continue: max iterations reached (5), forcing compress_research
+2026-05-31 22:13:40 INFO [doc_generation.agents.research_agent] compress_research invoked with 16 messages
+2026-05-31 22:13:41 INFO [httpx] HTTP Request: POST https://api.zhizengzeng.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-31 22:13:41 INFO [doc_generation.agents.research_agent] llm_call produced response tool_calls=True num_tool_calls=1 iteration=4
+2026-05-31 22:13:41 INFO [doc_generation.agents.research_agent] should_continue: max iterations reached (5), forcing compress_research
+2026-05-31 22:13:41 INFO [doc_generation.agents.research_agent] compress_research invoked with 16 messages
+2026-05-31 22:13:44 INFO [watchfiles.main] 1 change detected
+2026-05-31 22:13:46 INFO [httpx] HTTP Request: POST https://api.zhizengzeng.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-31 22:13:46 INFO [doc_generation.agents.research_agent] llm_call produced response tool_calls=False num_tool_calls=0 iteration=4
+2026-05-31 22:13:46 INFO [doc_generation.agents.research_agent] should_continue: max iterations reached (5), forcing compress_research
+2026-05-31 22:13:46 INFO [doc_generation.agents.research_agent] compress_research invoked with 14 messages
+2026-05-31 22:14:03 INFO [httpx] HTTP Request: POST https://api.zhizengzeng.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-31 22:14:03 INFO [httpx] HTTP Request: POST https://api.zhizengzeng.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-31 22:14:03 INFO [httpx] HTTP Request: POST https://api.zhizengzeng.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-31 22:14:04 ERROR [backend.service] Agent resume failed
+Traceback (most recent call last):
+  File "D:\project\doc_generation\backend\service.py", line 122, in resume_agent_stream
+    async for event in agent.astream_events(
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\base.py", line 1607, in _astream_events_v1_v2
+    async for event in event_stream:
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\tracers\event_stream.py", line 1100, in _astream_events_implementation_v2
+    await task
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\tracers\event_stream.py", line 1055, in consume_astream
+    async for _ in event_streamer.tap_output_aiter(run_id, stream):
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\tracers\event_stream.py", line 222, in tap_output_aiter
+    async for chunk in output:
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\pregel\main.py", line 3407, in astream
+    async for _ in runner.atick(
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\pregel\_runner.py", line 396, in atick
+    await arun_with_retry(
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\pregel\_retry.py", line 703, in arun_with_retry
+    async for _ in task.proc.astream(task.input, config):
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\_internal\_runnable.py", line 867, in astream
+    output = await asyncio.create_task(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\_internal\_runnable.py", line 932, in _consume_aiter
+    async for chunk in it:
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\tracers\event_stream.py", line 199, in tap_output_aiter
+    first = await anext(output, sentinel)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\base.py", line 1767, in atransform
+    async for ichunk in input:
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\pregel\main.py", line 3425, in astream
+    loop.after_tick()
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\pregel\_loop.py", line 671, in after_tick
+    self.updated_channels = apply_writes(
+                            ^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\pregel\_algo.py", line 319, in apply_writes
+    if channels[chan].update(vals) and next_version is not None:
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\channels\last_value.py", line 64, in update
+    raise InvalidUpdateError(msg)
+langgraph.errors.InvalidUpdateError: At key '_parent_thread_id': Can receive only one value per step. Use an Annotated key to handle multiple values.
+For troubleshooting, visit: https://docs.langchain.com/oss/python/langgraph/errors/INVALID_CONCURRENT_GRAPH_UPDATE
+During task with name 'supervisor_subgraph' and id '3310f107-41b9-d449-979a-48992bb9b81e'
+2026-05-31 22:14:44 INFO [watchfiles.main] 5 changes detected
+2026-05-31 22:14:46 INFO [watchfiles.main] 1 change detected
+2026-05-31 22:14:48 INFO [watchfiles.main] 5 changes detected
+2026-05-31 22:14:48 INFO [watchfiles.main] 1 change detected
+2026-05-31 22:15:10 INFO [watchfiles.main] 5 changes detected
+2026-05-31 22:15:10 INFO [watchfiles.main] 1 change detected
+2026-05-31 22:15:11 INFO [watchfiles.main] 1 change detected
+2026-05-31 22:15:18 INFO [watchfiles.main] 5 changes detected
+2026-05-31 22:15:19 INFO [watchfiles.main] 1 change detected
+2026-05-31 22:15:20 INFO [watchfiles.main] 1 change detected
+2026-05-31 22:15:33 INFO [watchfiles.main] 5 changes detected
+2026-05-31 22:15:33 INFO [watchfiles.main] 1 change detected
+2026-05-31 22:15:35 INFO [watchfiles.main] 1 change detected
+2026-05-31 22:16:37 INFO [watchfiles.main] 4 changes detected
+2026-05-31 22:16:38 INFO [watchfiles.main] 1 change detected
+2026-05-31 22:16:40 INFO [doc_generation.llm] Selected cognition backend 'deepseek' for role 'draft' with handle 'deepseek-v4-flash' (timeout=600)
+2026-05-31 22:16:43 INFO [doc_generation.llm] Selected cognition backend 'deepseek' for role 'evaluator' with handle 'deepseek-v4-flash' (timeout=600)
+2026-05-31 22:16:43 INFO [watchfiles.main] 5 changes detected
+2026-05-31 22:16:45 INFO [doc_generation.llm] Selected cognition backend 'deepseek' for role 'red_team' with handle 'deepseek-v4-flash' (timeout=600)
+2026-05-31 22:16:46 INFO [doc_generation.llm] Selected cognition backend 'deepseek' for role 'researcher_summarizer' with handle 'deepseek-v4-flash' (timeout=600)
+2026-05-31 22:16:48 INFO [doc_generation.llm] Selected cognition backend 'deepseek' for role 'writer' with handle 'deepseek-v4-flash' (timeout=600)
+2026-05-31 22:16:50 INFO [doc_generation.llm] Selected cognition backend 'deepseek' for role 'researcher_main' with handle 'deepseek-v4-flash' (timeout=600)
+2026-05-31 22:16:52 INFO [doc_generation.llm] Selected cognition backend 'deepseek' for role 'researcher_compressor' with handle 'deepseek-v4-flash' (timeout=600)
+2026-05-31 22:16:53 INFO [doc_generation.llm] Selected cognition backend 'deepseek' for role 'supervisor' with handle 'deepseek-v4-pro' (timeout=600)
+2026-05-31 22:16:55 INFO [doc_generation.llm] Selected cognition backend 'deepseek' for role 'writer' with handle 'deepseek-v4-flash' (timeout=600)
+2026-05-31 22:16:56 INFO [watchfiles.main] 3 changes detected
+2026-05-31 22:17:20 INFO [httpx] HTTP Request: POST https://api.zhizengzeng.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-31 22:17:20 INFO [doc_generation.agents.draft_agent] 结构化输出：research_brief='## 1. 需求摘要（简要）\n\n资源找回功能允许玩家在错过日常功能后，通过消耗绑钻或金币来买回错过的奖励。系统需记录玩家最近2天内未完成的日常功能数据，并在玩家登录时统计可找回资源。找回分为「绑钻找回」和「金币找回」两种方式，绑钻找回可覆盖普通次数和额外付费次数，金币找回仅限普通次数。本功能作为日常功能的一个子页签存在，后端需承载离线记录、登录统计、找回扣费与奖励发放等核心逻辑。\n\n---\n\n## 2. 需求分析\n\n### 已确认\n\n1. **功能入口**：资源找回是日常功能下的一个页签，玩家点击「资源找回」页签即可切换进入。\n2. **找回内容展示**：界面显示可找回的功能项目，包括功能名、可找回次数、找回按钮、找回金额和奖励内容。\n3. **玩法提示**：点击按钮打开三级弹窗，玩法内容由策划配置。\n4. **追回类型**：分为「绑钻找回」和「金币找回」，默认选中「绑钻找回」。\n5. **离线记录规则**：玩家离线前，服务端记录当天尚未完成的日常功能。\n6. **记录保留期限**：2天内玩家若均有上线，则两天内未完成的日常功能均需存储记录；超过2天后清除2天前记录的未完成功能。\n7. **登录统计**：玩家每天第一次登录时，服务端统计目前可找回的所有资源。\n8. **统计范围**：不仅统计正常可找回的功能次数，也要统计可付费购买次数的功能次数，两者分开记录。\n9. **找回限制**：玩家上次离线前未开放的功能不允许找回。\n10. **绑钻找回消耗**：消耗绑钻进行找回；若绑钻不足，弹窗询问是否消耗钻石找回。\n11. **绑钻找回范围**：可找回普通次数和额外次数的功能资源，额外次数单价更高。\n12. **金币找回范围**：只能找回普通次数的功能资源，不能找回额外次数。\n13. **次数互斥**：绑钻找回和金币找回共有次数，即绑钻找过的资源不能再用金币找回。\n14. **日常任务找回奖励**：包括经验和金币；经验根据玩家等级由数值公式计算。\n15. **装备副本找回奖励**：包括经验丹和装备；经验丹为配置道具；装备由策划配置宝箱，在多件装备中随机产出少量装备。\n\n### 待澄清\n\n1. **可找回的功能列表**：具体哪些日常功能可被资源找回覆盖（用户提到「由策划补充确定」），需策划提供配置表或功能白名单。\n2. **额外次数的定义与来源**：哪些功能有「可付费购买次数」？购买次数上限、单价配置由何处定义？是否与商城或VIP系统联动？\n3. **绑钻不足时的钻石找回**：绑钻不足时弹窗询问是否消耗钻石，钻石找回的规则是否与绑钻找回一致（是否也支持额外次数）？钻石消耗比例如何？\n4. **金币找回的货币类型**：金币是游戏内免费货币还是绑定货币？是否有每日/总量限制？\n5. **经验计算公式**：日常任务找回经验的具体公式需数值策划提供。\n6. **装备副本宝箱配置**：宝箱ID、随机产出规则、装备品质/等级范围需策划配置。\n7. **玩法提示内容**：三级弹窗的具体内容由策划配置，后端是否需要提供配置读取接口？\n8. **清除时机**：超过2天后清除记录，是定时任务清除还是登录时判断清除？清除的精确时间规则（如按自然日还是按48小时）？\n9. **多角色/跨服场景**：是否涉及跨服角色数据同步？暂按单服处理。\n10. **找回费用定价**：绑钻找回和金币找回的具体费用数值由策划配置还是由公式计算？\n\n### 合理推断\n\n1. **推断：资源找回记录以玩家维度存储**——依据：离线记录和登录统计均以玩家为单位，需按player_id存储未完成功能列表。\n2. **推断：存在配置表定义可找回功能**——依据：可找回功能内容由策划补充确定，说明功能列表是配置驱动的。\n3. **推断：额外次数与VIP/特权系统关联**——依据：提到「可付费购买次数的功能次数」，常见于VIP每日额外购买次数机制。\n\n---\n\n## 3. 功能模块\n\n### F-001：离线未完成功能记录\n\n- **描述**：玩家离线时，服务端记录玩家当天尚未完成的日常功能列表（具体可找回的功能由策划配置白名单）。记录需区分不同日期，保留最近2天的数据。\n- **接口类型:** 内部自用接口\n- **触发与交互**：玩家离线事件触发。输入：玩家ID、当前日期、未完成的日常功能ID列表。输出：存储到玩家离线记录中。\n- **依赖**：无（依赖玩家离线流程，属于基础框架事件）\n\n### F-002：过期记录清除\n\n- **描述**：超过2天的未完成功能记录需被清除。清除时机可为玩家登录时判断或定时任务执行。\n- **接口类型:** 内部自用接口\n- **触发与交互**：玩家登录时触发 或 定时任务触发。输入：玩家ID。输出：删除过期记录。\n- **依赖**：F-001（需先有记录才能清除）\n\n### F-003：每日首次登录资源统计\n\n- **描述**：玩家每天第一次登录时，服务端统计当前可找回的所有资源。统计内容包括：正常可找回的功能次数（来自F-001记录）和可付费购买次数的功能次数（来自配置），两者分开记录。\n- **接口类型:** 内部自用接口\n- **触发与交互**：玩家每日首次登录事件触发。输入：玩家ID、当前日期。输出：可找回资源统计结果（含普通次数和额外次数）。\n- **依赖**：F-001（需读取离线记录）、F-002（需先清除过期记录再统计）\n\n### F-004：资源找回界面数据查询\n\n- **描述**：玩家打开资源找回页签时，前端请求可找回的功能项目列表。返回内容包括：功能名、可找回次数（普通/额外）、找回费用（绑钻/金币）、奖励内容预览。\n- **接口类型:** 与客户端交互的接口\n- **触发与交互**：玩家点击「资源找回」页签，前端发起请求。输入：玩家ID。输出：可找回功能项目列表（每个项目含功能ID、名称、可找回次数、费用、奖励预览）。\n- **依赖**：F-003（需先完成统计，才能提供查询数据）\n\n### F-005：玩法提示查询\n\n- **描述**：玩家点击玩法提示按钮时，返回由策划配置的玩法说明内容（三级弹窗展示）。\n- **接口类型:** 与客户端交互的接口\n- **触发与交互**：玩家点击玩法提示按钮，前端发起请求。输入：玩家ID（可选）。输出：玩法提示文本/配置内容。\n- **依赖**：无（纯配置读取）\n\n### F-006：绑钻找回\n\n- **描述**：玩家选择「绑钻找回」并确认后，服务端扣除对应绑钻（若绑钻不足则弹窗询问是否消耗钻石），发放对应奖励。绑钻找回可覆盖普通次数和额外次数，额外次数单价更高。找回后对应次数消耗，不可再用金币找回同一资源。\n- **接口类型:** 与客户端交互的接口\n- **触发与交互**：玩家选择绑钻找回并点击确认，前端发起找回请求。输入：玩家ID、功能ID、找回类型（绑钻）、找回次数（普通/额外）。输出：扣费结果、奖励发放结果。\n- **依赖**：F-003（需有统计结果）、F-004（需展示费用信息）、F-007（需读取奖励配置）\n\n### F-007：金币找回\n\n- **描述**：玩家选择「金币找回」并确认后，服务端扣除对应金币，发放对应奖励。金币找回只能找回普通次数的功能资源，不能找回额外次数。找回后对应次数消耗，不可再用绑钻找回同一资源。\n- **接口类型:** 与客户端交互的接口\n- **触发与交互**：玩家选择金币找回并点击确认，前端发起找回请求。输入：玩家ID、功能ID、找回类型（金币）、找回次数（仅普通）。输出：扣费结果、奖励发放结果。\n- **依赖**：F-003（需有统计结果）、F-004（需展示费用信息）、F-007（需读取奖励配置）\n\n### F-008：奖励配置与发放\n\n- **描述**：根据功能类型（日常任务、装备副本等）和玩家数据，计算并发放找回奖励。\n  - 日常任务：奖励经验和金币，经验根据玩家等级由数值公式计算。\n  - 装备副本：奖励经验丹（配置道具）和装备（策划配置宝箱，随机产出）。\n- **接口类型:** 内部自用接口\n- **触发与交互**：由F-006/F-007在扣费成功后调用。输入：玩家ID、功能ID、找回类型、找回次数。输出：奖励发放结果。\n- **依赖**：F-006、F-007（被调用方）\n\n### F-009：找回费用配置\n\n- **描述**：定义各功能项目在绑钻找回和金币找回下的费用规则。绑钻找回普通次数和额外次数单价不同，金币找回仅普通次数有定价。\n- **接口类型:** 内部自用接口\n- **触发与交互**：由F-004（查询费用）、F-006/F-007（扣费校验）读取配置数据。输入：功能ID、找回类型、次数类型。输出：费用数值。\n- **依赖**：无（纯配置读取）\n\n---\n\n## 4. 功能点关系\n\n### 依赖顺序\n\n| 前置功能点 | 后置功能点 | 说明 |\n|-----------|-----------|------|\n| F-001（离线记录） | F-002（过期清除） | 需先有记录才能清除 |\n| F-001（离线记录）、F-002（过期清除） | F-003（登录统计） | 统计需基于有效记录 |\n| F-003（登录统计） | F-004（界面查询） | 查询需基于统计结果 |\n| F-003（登录统计）、F-009（费用配置） | F-006（绑钻找回）、F-007（金币找回） | 找回需基于统计结果和费用配置 |\n| F-008（奖励配置与发放） | F-006（绑钻找回）、F-007（金币找回） | 找回成功后需发放奖励 |\n| F-009（费用配置） | F-004（界面查询） | 界面需展示费用信息 |\n\n### 可并行\n\n以下功能点无强依赖关系，可独立推进：\n\n- **F-001（离线记录）** 与 **F-009（费用配置）**：离线记录不依赖费用配置。\n- **F-005（玩法提示查询）** 与所有其他功能点：纯配置读取，无依赖。\n- **F-008（奖励配置与发放）** 与 **F-009（费用配置）**：奖励逻辑和费用逻辑可独立设计。\n- **F-006（绑钻找回）** 与 **F-007（金币找回）**：两者逻辑相似但独立，可并行开发，共用F-008和F-009。'
+2026-05-31 22:17:27 INFO [httpx] HTTP Request: POST https://api.zhizengzeng.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-31 22:17:27 INFO [doc_generation.agents.draft_agent] 提问结果：items=[ClarificationItem(question='过期记录的清除时机和精确时间规则是什么？', options=['玩家每次登录时判断并清除超过2自然日的记录（按日期比较，如5月31日登录时清除5月29日及更早的记录）', '服务器定时任务每天凌晨00:00:00统一清除所有超过2自然日的记录', '按48小时精确计算，记录创建时间戳超过48小时即清除（登录时判断或定时任务均可）']), ClarificationItem(question='资源找回功能是否支持跨服角色？若支持，离线记录和登录统计的数据如何同步？', options=['暂不支持跨服，仅单服处理，所有数据存储在本服数据库', '支持跨服，离线记录和统计结果需同步到跨服中心数据库，由跨服中心统一处理找回逻辑', '支持跨服，但离线记录在各服本地存储，玩家登录时由所在服拉取所有分服的离线记录进行合并统计']), ClarificationItem(question='绑钻不足时消耗钻石找回，其规则是否与绑钻找回完全一致（包括支持额外次数、单价规则）？钻石与绑钻的消耗比例是多少？', options=['钻石找回规则与绑钻找回完全一致（支持额外次数），钻石与绑钻按1:1比例消耗', '钻石找回规则与绑钻找回完全一致（支持额外次数），但钻石消耗比例为1绑钻=2钻石（即钻石单价翻倍）', '钻石找回仅支持普通次数（不支持额外次数），规则与金币找回类似但消耗钻石，钻石与绑钻按1:1比例消耗']), ClarificationItem(question='可找回的日常功能白名单和找回费用定价是由策划配置表驱动还是由代码硬编码？配置表的结构大致是怎样的？', options=['由策划配置表驱动，配置表包含：功能ID、功能名称、绑钻找回单价（普通/额外）、金币找回单价、奖励配置ID等字段', '由策划配置表驱动，但费用由公式计算（如根据玩家等级或功能基础价值动态计算），配置表只定义功能白名单和基础参数', '部分硬编码：功能白名单由策划配置，但找回费用由数值公式统一计算，不单独配置单价']), ClarificationItem(question='多角色场景下，资源找回记录是按账号维度还是按角色维度存储？同一账号下不同角色是否共享找回次数？', options=['按角色维度存储，每个角色独立记录和统计，角色间不共享找回次数', '按账号维度存储，同一账号下所有角色共享可找回次数和找回记录', '按角色维度存储，但部分功能（如日常任务）按账号维度共享次数，其他功能按角色独立'])]
+2026-05-31 22:17:27 INFO [doc_generation.agents.draft_agent] question_to_user generated 5 questions, interrupting for user input
+2026-05-31 22:19:17 INFO [httpx] HTTP Request: POST https://api.zhizengzeng.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-31 22:19:17 INFO [doc_generation.agents.draft_agent] 提问结果：items=[ClarificationItem(question='离线记录的清除时机与精确规则是什么？', options=['玩家每次登录时判断并清除超过2自然日的记录（按日期比较，如5月30日的记录在6月1日登录时清除）', '服务端定时任务每天凌晨执行一次，清除所有超过48小时的记录', '玩家登录时判断并清除超过48小时的记录（精确到小时，如5月29日14:00的记录在5月31日14:01登录时清除）']), ClarificationItem(question='资源找回功能覆盖的日常功能范围如何确定？额外付费次数的来源与上限如何定义？', options=['由策划提供配置表（功能ID白名单），额外次数上限和单价也在同一配置表中定义，不与VIP/商城系统联动', '由策划提供配置表定义可找回功能，额外次数上限与VIP等级挂钩，单价由数值公式计算', '所有日常功能默认均可找回，额外次数由商城/特权系统统一管理，资源找回仅读取其剩余可购买次数']), ClarificationItem(question='绑钻不足时消耗钻石找回的规则是否与绑钻找回完全一致？钻石与绑钻的消耗比例是多少？', options=['钻石找回规则与绑钻找回完全一致（含额外次数），钻石与绑钻按1:1比例消耗', '钻石找回规则与绑钻找回完全一致（含额外次数），但钻石消耗比例为1绑钻=2钻石（即钻石更贵）', '钻石找回仅能找回普通次数（不能找回额外次数），钻石与绑钻按1:1消耗']), ClarificationItem(question='找回费用的定价机制是什么？是固定配置值还是公式计算？', options=['每个功能ID分别配置绑钻找回和金币找回的固定单价，额外次数单独配置更高单价', '费用由公式计算：基础值 × 玩家等级系数 × 次数，基础值由策划配置', '普通次数费用固定配置，额外次数费用由公式（基础费用 × 额外倍率）计算']), ClarificationItem(question='装备副本宝箱的随机产出规则需要后端实现抽奖逻辑，还是仅读取策划配置的固定奖励？', options=['后端实现随机抽奖逻辑：从宝箱配置的装备列表中按权重随机抽取指定数量', '后端仅读取策划配置的固定奖励列表，随机逻辑由前端展示，后端直接发放配置中的全部奖励', '后端实现随机抽奖，但宝箱配置中需指定保底规则（如至少产出1件紫色品质装备）'])]
+2026-05-31 22:19:17 INFO [doc_generation.agents.draft_agent] question_to_user generated 5 questions, interrupting for user input
+2026-05-31 22:20:07 INFO [httpx] HTTP Request: POST https://api.zhizengzeng.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-31 22:20:07 INFO [doc_generation.agents.draft_agent] 简报结果：draft_report='# 资源找回功能 — 后端开发技术文档（草稿）\n\n## 1. 玩法概述\n\n### 1.1 玩法说明\n\n资源找回是日常功能下的一个子页签，允许玩家在错过日常功能后，通过消耗绑钻（或钻石）或金币来买回错过的奖励。系统记录玩家最近 2 个自然日内未完成的日常功能数据，在玩家登录时统计可找回资源，并提供找回操作入口。\n\n### 1.2 核心规则\n\n- **记录范围**：玩家离线时记录当天未完成的日常功能（由策划配置白名单决定哪些功能可找回）。\n- **保留期限**：最多保留最近 2 个自然日的记录；玩家每次登录时清除超过 2 自然日的旧记录。\n- **找回方式**：绑钻找回（可找回普通次数 + 额外付费次数）和金币找回（仅可找回普通次数）。\n- **次数互斥**：绑钻找回和金币找回共用次数，同一资源只能被找回一次。\n- **绑钻不足**：若绑钻不足，弹窗询问是否消耗钻石（钻石与绑钻 1:1 比例），规则与绑钻找回完全一致。\n- **角色维度**：按角色维度存储，同一账号下不同角色独立记录，不共享找回次数。\n- **跨服**：暂不支持跨服，仅单服处理。\n\n## 2. 数据持久化（草稿级）\n\n### 2.1 存储选型分析\n\n资源找回属于**运营活动/限时功能**范畴（记录最近 2 天的离线未完成数据，数据有生命周期，过期可清理），因此选用 `#player_misc_extra{}` 作为存储载体。\n\n**选型理由**：\n- 数据按 `(player_id, key)` 定位，key 可区分不同日期的记录。\n- 数据有明确的过期清除策略（超过 2 自然日清除），适合活动类存储。\n- 同一玩家可有多条记录（不同日期的未完成功能列表）。\n\n### 2.2 存储方案\n\n#### 2.2.1 离线未完成功能记录\n\n每条记录对应玩家某一天未完成的日常功能列表。\n\n**key 取值规则**：`{resource_recovery, Date}`，其中 `Date` 为日期整数（如 `20260530`）。\n\n| 逻辑字段 | 物理位置 | 类型 | 说明 |\n|----------|----------|------|------|\n| 日期 | key | 整数 | 格式 `YYYYMMDD`，作为 key 的一部分 |\n| 未完成功能列表 | value_text | list | 元素为 `{FunctionId, NormalCount, ExtraCount}`，分别表示功能ID、未完成的普通次数、未完成的额外次数 |\n| 记录创建时间 | time | 整数 | Unix 时间戳，记录创建时间 |\n| 预留 | time1 | 整数 | 0（预留） |\n\n**生命周期**：\n- 创建：玩家离线时写入。\n- 读取：玩家登录时统计可找回资源时读取。\n- 清除：玩家每次登录时，清除 `Date < (Today - 1)` 的记录（即超过 2 自然日）。\n\n#### 2.2.2 每日首次登录统计结果\n\n玩家每天第一次登录时，统计结果也暂存到 `#player_misc_extra{}`，用于界面查询和找回操作校验。\n\n**key 取值规则**：`{resource_recovery_stat, Today}`，其中 `Today` 为当天日期整数。\n\n| 逻辑字段 | 物理位置 | 类型 | 说明 |\n|----------|----------|------|------|\n| 日期 | key | 整数 | 格式 `YYYYMMDD` |\n| 可找回功能列表（含统计结果） | value_text | list | 元素为 `{FunctionId, NormalCanRecover, ExtraCanRecover, NormalCost, ExtraCost, RewardPreview}`，详见下文 |\n| 统计时间 | time | 整数 | Unix 时间戳 |\n| 预留 | time1 | 整数 | 0 |\n\n**生命周期**：\n- 创建：玩家每日首次登录时生成。\n- 更新：当天首次登录后不再更新。\n- 清除：次日首次登录时覆盖。\n\n#### 2.2.3 已找回记录（次数互斥）\n\n记录玩家当天已通过绑钻/金币找回的资源，用于次数互斥校验。\n\n**key 取值规则**：`{resource_recovery_claimed, Today}`\n\n| 逻辑字段 | 物理位置 | 类型 | 说明 |\n|----------|----------|------|------|\n| 日期 | key | 整数 | 格式 `YYYYMMDD` |\n| 已找回列表 | value_text | list | 元素为 `{FunctionId, NormalClaimed, ExtraClaimed}`，已找回的普通次数和额外次数 |\n| 预留 | time | 整数 | 0 |\n\n**生命周期**：\n- 创建/更新：每次找回成功后更新。\n- 清除：次日首次登录时重置。\n\n## 3. 配置表设计（草稿）\n\n### 3.1 可找回功能配置表（`resource_recovery_config`）\n\n由策划配置，定义哪些日常功能可被资源找回覆盖，以及各功能的找回费用和奖励。\n\n| 字段 | 类型（Erlang） | 说明 | 示例 |\n|------|---------------|------|------|\n| function_id | integer() | 功能ID，唯一标识一个日常功能 | 1001 |\n| function_name | string() | 功能名称，用于前端展示 | "日常任务" |\n| bind_coin_normal_cost | integer() | 绑钻找回普通次数单价 | 50 |\n| bind_coin_extra_cost | integer() | 绑钻找回额外次数单价 | 100 |\n| gold_normal_cost | integer() | 金币找回普通次数单价 | 5000 |\n| reward_config_id | integer() | 奖励配置ID，关联奖励配置表 | 2001 |\n| max_normal_times | integer() | 每日普通次数上限 | 1 |\n| max_extra_times | integer() | 每日额外次数上限（可付费购买次数） | 2 |\n| extra_source | string() | 额外次数来源说明（如VIP等级） | "vip_level" |\n\n### 3.2 奖励配置表（`resource_reward_config`）\n\n定义各功能找回时的奖励内容。\n\n| 字段 | 类型（Erlang） | 说明 | 示例 |\n|------|---------------|------|------|\n| reward_config_id | integer() | 奖励配置ID | 2001 |\n| function_type | integer() | 功能类型：1=日常任务，2=装备副本 | 1 |\n| exp_formula | string() | 经验计算公式（表达式字符串，由数值策划定义） | "lv * 100 + 500" |\n| gold_reward | integer() | 金币奖励数值 | 10000 |\n| item_rewards | list() | 道具奖励列表，元素为 `{ItemId, Count}` | [{3001, 1}] |\n| chest_id | integer() | 宝箱ID（装备副本用），0表示无 | 5001 |\n| chest_random_count | integer() | 宝箱随机产出数量 | 1 |\n\n### 3.3 玩法提示配置表（`resource_tip_config`）\n\n| 字段 | 类型（Erlang） | 说明 | 示例 |\n|------|---------------|------|------|\n| tip_id | integer() | 提示ID | 1 |\n| title | string() | 弹窗标题 | "资源找回说明" |\n| content | string() | 弹窗内容文本 | "资源找回功能允许您..." |\n\n## 4. 功能点技术设计\n\n### 4.1 F-001：离线未完成功能记录\n\n#### 需求回顾\n\n玩家离线时，服务端记录玩家当天尚未完成的日常功能列表（由策划配置白名单决定）。记录需区分不同日期，保留最近 2 天的数据。\n\n#### 功能逻辑\n\n1. 监听玩家离线事件（`player_offline`）。\n2. 获取当前日期 `Today`（格式 `YYYYMMDD`）。\n3. 遍历配置表 `resource_recovery_config` 中的功能ID列表。\n4. 对每个功能，检查玩家当天是否已完成：\n   - 若未完成，记录 `{FunctionId, 未完成普通次数, 未完成额外次数}`。\n   - 未完成次数 = 配置上限 - 已完成的次数（需从对应功能模块查询）。\n5. 将未完成功能列表写入 `#player_misc_extra{}`，key = `{resource_recovery, Today}`。\n\n#### 接口设计（草稿）\n\n**类型**：内部自用接口（无 Socket 协议）\n\n**调用方式**：由玩家离线流程回调触发。\n\n**输入**：`PlayerId`、`Today`（日期整数）、`UnfinishedList`（未完成功能列表）\n\n**输出**：`ok | {error, Reason}`\n\n**核心函数签名（建议）**：\n```erlang\n%% 在 resource_recovery_server.erl 中\nhandle_offline(PlayerId, Today) ->\n    UnfinishedList = collect_unfinished_functions(PlayerId, Today),\n    save_unfinished_record(PlayerId, Today, UnfinishedList).\n```\n\n#### 配置表设计\n\n依赖 `resource_recovery_config` 配置表（见第 3 节），读取可找回功能白名单。\n\n#### 依赖与调用\n\n- 依赖：玩家离线事件、`resource_recovery_config` 配置表。\n- 被调用方：玩家离线流程。\n\n---\n\n### 4.2 F-002：过期记录清除\n\n#### 需求回顾\n\n超过 2 自然日的未完成功能记录需被清除。清除时机为玩家每次登录时判断。\n\n#### 功能逻辑\n\n1. 玩家登录时触发。\n2. 获取当前日期 `Today`。\n3. 计算过期日期 `ExpireDate = Today - 2`（如 5 月 31 日登录，清除 5 月 29 日及更早的记录）。\n4. 遍历玩家所有 key 为 `{resource_recovery, Date}` 的记录。\n5. 若 `Date =< ExpireDate`，删除该记录。\n6. 同时清理对应的统计记录和已找回记录（key 为 `{resource_recovery_stat, Date}` 和 `{resource_recovery_claimed, Date}`）。\n\n#### 接口设计（草稿）\n\n**类型**：内部自用接口\n\n**调用方式**：由玩家登录流程回调触发。\n\n**输入**：`PlayerId`、`Today`\n\n**输出**：`ok`\n\n**核心函数签名（建议）**：\n```erlang\nhandle_login_cleanup(PlayerId, Today) ->\n    ExpireDate = Today - 2,\n    delete_expired_records(PlayerId, ExpireDate).\n```\n\n#### 依赖与调用\n\n- 依赖：F-001（需先有记录才能清除）。\n- 被调用方：玩家登录流程。\n\n---\n\n### 4.3 F-003：每日首次登录资源统计\n\n#### 需求回顾\n\n玩家每天第一次登录时，服务端统计当前可找回的所有资源。统计内容包括正常可找回的功能次数（来自 F-001 记录）和可付费购买次数的功能次数（来自配置），两者分开记录。\n\n#### 功能逻辑\n\n1. 玩家登录时，先执行 F-002 清除过期记录。\n2. 判断当天是否已统计（检查 key = `{resource_recovery_stat, Today}` 是否存在）。\n3. 若已统计，跳过；若未统计，执行统计流程。\n4. 读取所有 key = `{resource_recovery, Date}` 的记录（Date 为 Today 和 Today-1）。\n5. 对每个功能：\n   - **普通次数**：汇总所有记录中该功能的 `NormalCount`。\n   - **额外次数**：汇总所有记录中该功能的 `ExtraCount`。\n   - 从配置表读取费用和奖励预览信息。\n6. 将统计结果写入 `#player_misc_extra{}`，key = `{resource_recovery_stat, Today}`。\n7. 初始化已找回记录，key = `{resource_recovery_claimed, Today}`，空列表。\n\n#### 接口设计（草稿）\n\n**类型**：内部自用接口\n\n**调用方式**：由玩家登录流程回调触发（在 F-002 之后）。\n\n**输入**：`PlayerId`、`Today`\n\n**输出**：`ok | {error, Reason}`\n\n**核心函数签名（建议）**：\n```erlang\nhandle_daily_stat(PlayerId, Today) ->\n    case is_stat_exists(PlayerId, Today) of\n        true -> ok;\n        false ->\n            Records = read_unfinished_records(PlayerId, Today),\n            StatResult = calculate_stat(Records),\n            save_stat(PlayerId, Today, StatResult),\n            init_claimed_record(PlayerId, Today)\n    end.\n```\n\n#### 依赖与调用\n\n- 依赖：F-001（读取离线记录）、F-002（先清除过期记录）。\n- 被调用方：玩家登录流程。\n\n---\n\n### 4.4 F-004：资源找回界面数据查询\n\n#### 需求回顾\n\n玩家打开资源找回页签时，前端请求可找回的功能项目列表。返回内容包括：功能名、可找回次数（普通/额外）、找回费用（绑钻/金币）、奖励内容预览。\n\n#### 功能逻辑\n\n1. 前端打开资源找回页签时发送 C2S 请求。\n2. 服务端读取 key = `{resource_recovery_stat, Today}` 的统计结果。\n3. 若统计结果不存在（非首次登录但数据异常），则重新执行 F-003 统计。\n4. 从统计结果中组装返回数据，包括：\n   - 功能ID、功能名称（从配置表读取）。\n   - 可找回普通次数、可找回额外次数。\n   - 绑钻找回单价（普通/额外）、金币找回单价（普通）。\n   - 奖励内容预览（经验、金币、道具列表）。\n5. 返回 S2C 响应。\n\n#### 接口设计（草稿）— Socket\n\n**通信方式**：WebSocket / TCP\n\n**协议段**：待确认（建议分配新协议段，如 `636`）\n\n##### 消息一览\n\n| 方向 | 消息号 | 触发场景 | 处理模块（建议） |\n|------|--------|----------|------------------|\n| C2S | 63600 | 打开资源找回页签 | `resource_recovery_handler` |\n| S2C | 63601 | 返回可找回功能列表 | `resource_recovery_handler` |\n\n##### 63600 — 打开资源找回页签（C2S）\n\n| 字段 | 类型 | 说明 |\n|------|------|------|\n| （无字段） | - | 仅触发请求，无需额外参数 |\n\n**C2S 载荷（read）**：无字段\n\n**业务说明**：客户端进入资源找回页签时发送此消息。\n\n##### 63601 — 返回可找回功能列表（S2C）\n\n| 字段 | 类型 | 说明 |\n|------|------|------|\n| FunctionCount | int32 | 可找回功能数量 |\n| FunctionList | binary（嵌套结构） | 可找回功能列表，每个元素包含以下字段 |\n\n**FunctionList 每个元素结构**：\n\n| 字段 | 类型 | 说明 |\n|------|------|------|\n| FunctionId | int32 | 功能ID |\n| FunctionName | string（长度+内容） | 功能名称 |\n| NormalCanRecover | int32 | 可找回普通次数 |\n| ExtraCanRecover | int32 | 可找回额外次数 |\n| BindCoinNormalCost | int32 | 绑钻找回普通次数单价 |\n| BindCoinExtraCost | int32 | 绑钻找回额外次数单价 |\n| GoldNormalCost | int32 | 金币找回普通次数单价 |\n| ExpReward | int32 | 经验奖励预览 |\n| GoldReward | int32 | 金币奖励预览 |\n| ItemCount | int32 | 道具奖励种类数 |\n| ItemList | binary（嵌套结构） | 道具奖励列表，每个元素 `{ItemId, Count}` |\n\n**S2C 载荷（pack）**：`FunctionCount`, `FunctionList`\n\n**错误与边界**：\n- 若统计结果不存在，返回空列表。\n- 若玩家等级/数据异常导致经验计算失败，返回错误码（待确认）。\n\n#### 依赖与调用\n\n- 依赖：F-003（需先完成统计）。\n- 调用：读取 `resource_recovery_config` 和 `resource_reward_config` 配置表。\n\n---\n\n### 4.5 F-005：玩法提示查询\n\n#### 需求回顾\n\n玩家点击玩法提示按钮时，返回由策划配置的玩法说明内容（三级弹窗展示）。\n\n#### 功能逻辑\n\n1. 前端点击玩法提示按钮时发送 C2S 请求。\n2. 服务端从 `resource_tip_config` 配置表读取玩法提示内容。\n3. 返回 S2C 响应。\n\n#### 接口设计（草稿）— Socket\n\n**协议段**：636（与资源找回共用协议段）\n\n##### 消息一览\n\n| 方向 | 消息号 | 触发场景 | 处理模块（建议） |\n|------|--------|----------|------------------|\n| C2S | 63610 | 点击玩法提示按钮 | `resource_recovery_handler` |\n| S2C | 63611 | 返回玩法提示内容 | `resource_recovery_handler` |\n\n##### 63610 — 查询玩法提示（C2S）\n\n| 字段 | 类型 | 说明 |\n|------|------|------|\n| （无字段） | - | 仅触发请求 |\n\n**C2S 载荷（read）**：无字段\n\n##### 63611 — 返回玩法提示内容（S2C）\n\n| 字段 | 类型 | 说明 |\n|------|------|------|\n| Title | string | 弹窗标题 |\n| Content | string | 弹窗内容文本 |\n\n**S2C 载荷（pack）**：`Title`, `Content`\n\n#### 依赖与调用\n\n- 依赖：无（纯配置读取）。\n- 调用：读取 `resource_tip_config` 配置表。\n\n---\n\n### 4.6 F-006：绑钻找回\n\n#### 需求回顾\n\n玩家选择「绑钻找回」并确认后，服务端扣除对应绑钻（若绑钻不足则弹窗询问是否消耗钻石），发放对应奖励。绑钻找回可覆盖普通次数和额外次数，额外次数单价更高。找回后对应次数消耗，不可再用金币找回同一资源。\n\n#### 功能逻辑\n\n1. 前端发送绑钻找回请求（含功能ID、找回类型、找回次数类型和数量）。\n2. 服务端校验：\n   - 统计结果中该功能的可找回次数是否充足。\n   - 已找回记录中该功能是否已被找回（次数互斥）。\n   - 玩家绑钻是否足够（若不足，返回特殊错误码触发前端弹窗询问是否消耗钻石）。\n3. 若绑钻不足且玩家选择消耗钻石，前端重新发送请求（或服务端直接扣钻石，**待确认**交互流程）。\n4. 扣费：扣除 `次数 × 单价` 的绑钻（或钻石）。\n5. 调用 F-008 发放奖励。\n6. 更新已找回记录（`resource_recovery_claimed`），标记已找回次数。\n7. 返回 S2C 响应。\n\n#### 接口设计（草稿）— Socket\n\n**协议段**：636\n\n##### 消息一览\n\n| 方向 | 消息号 | 触发场景 | 处理模块（建议） |\n|------|--------|----------|------------------|\n| C2S | 63620 | 发起绑钻找回请求 | `resource_recovery_handler` |\n| S2C | 63621 | 绑钻找回结果 | `resource_recovery_handler` |\n\n##### 63620 — 绑钻找回请求（C2S）\n\n| 字段 | 类型 | 说明 |\n|------|------|------|\n| FunctionId | int32 | 功能ID |\n| RecoverType | byte | 找回类型：1=普通次数，2=额外次数 |\n| RecoverCount | int32 | 找回次数 |\n| UseDiamond | byte | 0=使用绑钻，1=绑钻不足时同意使用钻石（前端弹窗后传入） |\n\n**C2S 载荷（read）**：`FunctionId`, `RecoverType`, `RecoverCount`, `UseDiamond`\n\n##### 63621 — 绑钻找回结果（S2C）\n\n| 字段 | 类型 | 说明 |\n|------|------|------|\n| Result | byte | 0=成功，1=绑钻不足（需弹窗），2=钻石不足，3=其他错误 |\n| FunctionId | int32 | 功能ID |\n| RecoverType | byte | 找回类型 |\n| RecoverCount | int32 | 实际找回次数 |\n| RewardList | binary（嵌套结构） | 发放的奖励列表（每个元素 `{ItemId, Count}`） |\n\n**S2C 载荷（pack）**：`Result`, `FunctionId`, `RecoverType`, `RecoverCount`, `RewardList`\n\n**错误码说明**：\n- `Result = 1`：绑钻不足，前端弹窗询问是否消耗钻石。\n- `Result = 2`：钻石也不足，提示玩家。\n- `Result = 3`：其他错误（如次数不足、功能不存在等）。\n\n#### 依赖与调用\n\n- 依赖：F-003（统计结果）、F-008（奖励发放）、F-009（费用配置）。\n- 调用：玩家资产模块（扣绑钻/钻石）、奖励发放模块。\n\n---\n\n### 4.7 F-007：金币找回\n\n#### 需求回顾\n\n玩家选择「金币找回」并确认后，服务端扣除对应金币，发放对应奖励。金币找回只能找回普通次数的功能资源，不能找回额外次数。找回后对应次数消耗，不可再用绑钻找回同一资源。\n\n#### 功能逻辑\n\n1. 前端发送金币找回请求（含功能ID、找回次数）。\n2. 服务端校验：\n   - 找回类型只能为普通次数（不允许额外次数）。\n   - 统计结果中该功能的普通可找回次数是否充足。\n   - 已找回记录中该功能的普通次数是否已被找回。\n   - 玩家金币是否足够。\n3. 扣费：扣除 `次数 × 金币找回单价` 的金币。\n4. 调用 F-008 发放奖励。\n5. 更新已找回记录。\n6. 返回 S2C 响应。\n\n#### 接口设计（草稿）— Socket\n\n**协议段**：636\n\n##### 消息一览\n\n| 方向 | 消息号 | 触发场景 | 处理模块（建议） |\n|------|--------|----------|------------------|\n| C2S | 63630 | 发起金币找回请求 | `resource_recovery_handler` |\n| S2C | 63631 | 金币找回结果 | `resource_recovery_handler` |\n\n##### 63630 — 金币找回请求（C2S）\n\n| 字段 | 类型 | 说明 |\n|------|------|------|\n| FunctionId | int32 | 功能ID |\n| RecoverCount | int32 | 找回次数（仅普通次数） |\n\n**C2S 载荷（read）**：`FunctionId`, `RecoverCount`\n\n##### 63631 — 金币找回结果（S2C）\n\n| 字段 | 类型 | 说明 |\n|------|------|------|\n| Result | byte | 0=成功，1=金币不足，2=其他错误 |\n| FunctionId | int32 | 功能ID |\n| RecoverCount | int32 | 实际找回次数 |\n| RewardList | binary（嵌套结构） | 发放的奖励列表 |\n\n**S2C 载荷（pack）**：`Result`, `FunctionId`, `RecoverCount`, `RewardList`\n\n#### 依赖与调用\n\n- 依赖：F-003（统计结果）、F-008（奖励发放）、F-009（费用配置）。\n- 调用：玩家资产模块（扣金币）、奖励发放模块。\n\n---\n\n### 4.8 F-008：奖励配置与发放\n\n#### 需求回顾\n\n根据功能类型（日常任务、装备副本等）和玩家数据，计算并发放找回奖励。\n- 日常任务：奖励经验和金币，经验根据玩家等级由数值公式计算。\n- 装备副本：奖励经验丹（配置道具）和装备（策划配置宝箱，随机产出）。\n\n#### 功能逻辑\n\n1. 由 F-006 / F-007 在扣费成功后调用。\n2. 根据功能ID读取 `resource_reward_config` 配置表。\n3. 根据 `function_type` 分支处理：\n   - **日常任务（type=1）**：\n     - 经验 = 根据 `exp_formula` 公式计算（公式中代入玩家等级等参数）。\n     - 金币 = `gold_reward × 找回次数`。\n     - 道具 = `item_rewards` 列表 × 找回次数。\n   - **装备副本（type=2）**：\n     - 经验丹 = `item_rewards` 列表 × 找回次数。\n     - 装备 = 从 `chest_id` 宝箱中随机产出 `chest_random_count` 件装备 × 找回次数。\n4. 发放奖励到玩家背包/属性。\n5. 返回发放结果。\n\n#### 接口设计（草稿）\n\n**类型**：内部自用接口\n\n**调用方式**：由 F-006 / F-007 调用。\n\n**输入**：`PlayerId`、`FunctionId`、`RecoverType`、`RecoverCount`\n\n**输出**：`{ok, RewardList}` | `{error, Reason}`\n\n**核心函数签名（建议）**：\n```erlang\ncalculate_and_grant_reward(PlayerId, FunctionId, RecoverCount) ->\n    Config = get_reward_config(FunctionId),\n    RewardList = calculate_reward(PlayerId, Config, RecoverCount),\n    grant_reward(PlayerId, RewardList).\n```\n\n#### 依赖与调用\n\n- 依赖：`resource_reward_config` 配置表、玩家等级/属性模块、背包模块、宝箱随机模块。\n- 被调用方：F-006、F-007。\n\n---\n\n### 4.9 F-009：找回费用配置\n\n#### 需求回顾\n\n定义各功能项目在绑钻找回和金币找回下的费用规则。绑钻找回普通次数和额外次数单价不同，金币找回仅普通次数有定价。\n\n#### 功能逻辑\n\n1. 费用数据由 `resource_recovery_config` 配置表定义。\n2. 提供内部查询接口，供 F-004（界面查询）、F-006（绑钻找回扣费校验）、F-007（金币找回扣费校验）调用。\n3. 查询参数：`FunctionId`、`RecoverType`（绑钻/金币）、`TimesType`（普通/额外）。\n4. 返回：单价费用数值。\n\n#### 接口设计（草稿）\n\n**类型**：内部自用接口（纯配置读取）\n\n**核心函数签名（建议）**：\n```erlang\nget_recover_cost(FunctionId, bind_coin, normal) -> BindCoinNormalCost;\nget_recover_cost(FunctionId, bind_coin, extra) -> BindCoinExtraCost;\nget_recover_cost(FunctionId, gold, normal) -> GoldNormalCost;\nget_recover_cost(FunctionId, gold, extra) -> {error, not_supported}.\n```\n\n#### 依赖与调用\n\n- 依赖：`resource_recovery_config` 配置表。\n- 被调用方：F-004、F-006、F-007。\n\n---\n\n## 5. 功能点依赖与实施顺序\n\n### 5.1 依赖关系图\n\n```\nF-001 (离线记录) ──→ F-002 (过期清除) ──→ F-003 (登录统计) ──→ F-004 (界面查询)\n                                                              ├──→ F-006 (绑钻找回) ──→ F-008 (奖励发放)\n                                                              ├──→ F-007 (金币找回) ──→ F-008 (奖励发放)\nF-009 (费用配置) ──────────────────────────────────────────────┴──→ F-004/F-006/F-007\nF-005 (玩法提示)  (无依赖，可独立开发)\n```\n\n### 5.2 实施顺序建议\n\n| 阶段 | 功能点 | 说明 |\n|------|--------|------|\n| 第一阶段（基础） | F-001、F-009、配置表设计 | 离线记录和费用配置是基础能力 |\n| 第二阶段（统计） | F-002、F-003 | 过期清除和登录统计 |\n| 第三阶段（查询） | F-004、F-005 | 界面查询和玩法提示 |\n| 第四阶段（找回） | F-006、F-007、F-008 | 找回逻辑和奖励发放 |\n\n### 5.3 可并行项\n\n- F-001 与 F-009：可独立推进。\n- F-005 与所有其他功能点：纯配置读取，无依赖。\n- F-008 与 F-009：奖励逻辑和费用逻辑可独立设计。\n- F-006 与 F-007：逻辑相似但独立，可并行开发。\n\n### 5.4 关键路径\n\n```\nF-001 → F-002 → F-003 → F-004 → F-006/F-007 → F-008\n```\n\n## 6. 风险、假设与开放问题\n\n### 6.1 待澄清项（需策划/产品确认）\n\n| 编号 | 问题 | 涉及功能点 |\n|------|------|-----------|\n| Q1 | 可找回的功能白名单具体包含哪些日常功能？ | F-001、F-009 |\n| Q2 | 额外次数的定义与来源？哪些功能有「可付费购买次数」？购买次数上限、单价配置由何处定义？是否与VIP系统联动？ | F-001、F-009 |\n| Q3 | 绑钻不足时消耗钻石找回，前端交互流程是服务端返回特殊错误码后前端弹窗，还是前端预判？ | F-006 |\n| Q4 | 经验计算公式的具体表达式？ | F-008 |\n| Q5 | 装备副本宝箱ID、随机产出规则、装备品质/等级范围？ | F-008 |\n| Q6 | 玩法提示三级弹窗的具体内容？ | F-005 |\n| Q7 | 金币是否有每日/总量限制？ | F-007 |\n| Q8 | 协议段和消息号的具体分配？ | F-004 ~ F-007 |\n\n### 6.2 文档撰写假设\n\n| 假设 | 说明 | 可替换方案 |\n|------|------|-----------|\n| 存储载体为 `#player_misc_extra{}` | 基于运营活动类数据生命周期特征选择 | 若确认为常驻功能，可改为 `#role{}` 字段 |\n| 协议段分配为 636 | 新功能建议分配新协议段 | 可并入日常功能已有协议段 |\n| 钻石与绑钻 1:1 比例 | 用户补充说明确认 | 可配置化 |\n| 按自然日比较清除（非48小时） | 用户补充说明确认 | 可改为48小时精确计算 |\n| 按角色维度存储 | 用户补充说明确认 | 若需改为账号维度，需重构 key 设计 |\n\n### 6.3 开放技术问题\n\n1. **额外次数来源**：需与VIP/特权系统对接，获取玩家当日可购买的额外次数上限和已购买次数。建议在 `resource_recovery_config` 中增加 `extra_source` 字段，指向对应的特权ID或VIP等级。\n2. **日常功能完成状态查询**：F-001 需要从各日常功能模块查询玩家当天是否已完成，需定义统一的回调接口或事件机制。\n3. **并发安全**：找回操作涉及扣费和发奖，需确保在并发场景下的原子性（建议使用 `gen_server` 串行化处理）。\n'
+2026-05-31 22:20:07 INFO [doc_generation.agents.supervisor] [SUPERVISOR] supervisor invoked (iteration=0, messages=2)
+2026-05-31 22:20:15 INFO [httpx] HTTP Request: POST https://api.zhizengzeng.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-31 22:20:15 INFO [doc_generation.agents.supervisor] supervisor model produced tool_calls=True num_tool_calls=1
+2026-05-31 22:20:15 INFO [doc_generation.agents.supervisor] [SUPERVISOR] supervisor_tools executing think=1 conduct=0 refine=0
+2026-05-31 22:20:15 INFO [doc_generation.agents.supervisor] ========>[thinking tool] thinking process Reflection recorded: ## 文档分析
+
+这是一份资源找回功能的后端开发技术文档草稿。我需要从知识库中检索项目的开发规范，验证文档是否符合项目标准。主要需要检索以下方面：
+
+### 需要检索的技术规范：
+
+1. **数据持久化规范** - 文档使用了 `#player_misc_extra{}` 作为存储载体，需要确认这个选择是否符合项目的数据持久化规范。需要了解：
+   - `#player_misc_extra{}` 的定义和使用规范
+   - key/value 的命名规范
+   - 生命周期管理规范
+
+2. **协议/接口开发规范** - 文档定义了多个Socket协议（63600-63631），需要确认：
+   - 协议段分配规范
+   - 消息号命名规范
+   - C2S/S2C 消息格式规范
+   - 错误码规范
+
+3. **配置表设计规范** - 文档设计了多个配置表，需要确认：
+   - 配置表命名规范
+   - 字段类型规范
+   - 配置表结构规范
+
+4. **编码规范** - Erlang代码规范，函数命名、模块组织等
+
+### 检索策略：
+这些是独立的技术规范领域，可以并行检索。我将同时检索：
+- 数据持久化规范
+- 协议开发规范
+- 配置表设计规范
+- 编码规范
+
+先进行第一轮并行检索。
+2026-05-31 22:20:15 INFO [doc_generation.agents.supervisor] [SUPERVISOR] supervisor invoked (iteration=1, messages=4)
+2026-05-31 22:20:21 INFO [httpx] HTTP Request: POST https://api.zhizengzeng.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-31 22:20:21 INFO [doc_generation.agents.supervisor] supervisor model produced tool_calls=True num_tool_calls=3
+2026-05-31 22:20:21 INFO [doc_generation.agents.supervisor] [SUPERVISOR] supervisor_tools executing think=0 conduct=3 refine=0
+2026-05-31 22:20:21 INFO [doc_generation.agents.supervisor] [DISPATCH] Sending 3 research tasks via Send (hand-off)
+2026-05-31 22:20:23 INFO [httpx] HTTP Request: POST https://api.zhizengzeng.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-31 22:20:23 INFO [doc_generation.agents.research_agent] llm_call produced response tool_calls=True num_tool_calls=2 iteration=0
+2026-05-31 22:20:23 INFO [doc_generation.agents.research_agent] should_continue decision=tool_node (has_tool_calls=True, iteration=1)
+2026-05-31 22:20:23 INFO [doc_generation.agents.research_agent] tool_node executing 2 tool calls
+2026-05-31 22:20:23 INFO [doc_generation.agents.research_agent] Invoking tool rag_search with args={'query': '配置表设计规范 命名规范 字段类型 Erlang类型 配置表结构'}
+2026-05-31 22:20:23 INFO [doc_generation.tools.rag_tool] rag_search query='配置表设计规范 命名规范 字段类型 Erlang类型 配置表结构' top_k=5
+2026-05-31 22:20:23 INFO [doc_generation.rag.factory] Building Chroma RAG store stage='prod' collection='doc_generation'
+2026-05-31 22:20:23 INFO [httpx] HTTP Request: POST https://api.zhizengzeng.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-31 22:20:23 INFO [doc_generation.agents.research_agent] llm_call produced response tool_calls=True num_tool_calls=2 iteration=0
+2026-05-31 22:20:23 INFO [doc_generation.agents.research_agent] should_continue decision=tool_node (has_tool_calls=True, iteration=1)
+2026-05-31 22:20:23 INFO [doc_generation.agents.research_agent] tool_node executing 2 tool calls
+2026-05-31 22:20:23 INFO [doc_generation.agents.research_agent] Invoking tool rag_search with args={'query': '数据持久化规范 player_misc_extra 定义 使用规范 key value 命名规范 生命周期管理'}
+2026-05-31 22:20:23 INFO [doc_generation.tools.rag_tool] rag_search query='数据持久化规范 player_misc_extra 定义 使用规范 key value 命名规范 生命周期管理' top_k=5
+2026-05-31 22:20:23 INFO [doc_generation.rag.factory] Building Chroma RAG store stage='prod' collection='doc_generation'
+2026-05-31 22:20:23 INFO [httpx] HTTP Request: POST https://api.zhizengzeng.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-31 22:20:23 INFO [doc_generation.agents.research_agent] llm_call produced response tool_calls=True num_tool_calls=2 iteration=0
+2026-05-31 22:20:23 INFO [doc_generation.agents.research_agent] should_continue decision=tool_node (has_tool_calls=True, iteration=1)
+2026-05-31 22:20:23 INFO [doc_generation.agents.research_agent] tool_node executing 2 tool calls
+2026-05-31 22:20:23 INFO [doc_generation.agents.research_agent] Invoking tool rag_search with args={'query': 'Socket协议段分配规范 消息号命名规范 C2S S2C消息格式定义规范'}
+2026-05-31 22:20:23 INFO [doc_generation.tools.rag_tool] rag_search query='Socket协议段分配规范 消息号命名规范 C2S S2C消息格式定义规范' top_k=5
+2026-05-31 22:20:23 INFO [doc_generation.rag.factory] Building Chroma RAG store stage='prod' collection='doc_generation'
+2026-05-31 22:20:25 INFO [watchfiles.main] 4 changes detected
+2026-05-31 22:20:25 INFO [watchfiles.main] 1 change detected
+2026-05-31 22:20:32 INFO [httpx] HTTP Request: POST http://127.0.0.1:11434/v1/embeddings "HTTP/1.1 200 OK"
+2026-05-31 22:20:32 INFO [doc_generation.agents.research_agent] Invoking tool rag_search with args={'query': '策划配置表 格式要求 配置表文档编写规范'}
+2026-05-31 22:20:32 INFO [doc_generation.tools.rag_tool] rag_search query='策划配置表 格式要求 配置表文档编写规范' top_k=5
+2026-05-31 22:20:32 INFO [watchfiles.main] 4 changes detected
+2026-05-31 22:20:32 INFO [httpx] HTTP Request: POST http://127.0.0.1:11434/v1/embeddings "HTTP/1.1 200 OK"
+2026-05-31 22:20:32 INFO [doc_generation.agents.research_agent] Invoking tool rag_search with args={'query': '运营活动 限时功能 数据存储方案 选型指南'}
+2026-05-31 22:20:32 INFO [doc_generation.tools.rag_tool] rag_search query='运营活动 限时功能 数据存储方案 选型指南' top_k=5
+2026-05-31 22:20:32 INFO [httpx] HTTP Request: POST http://127.0.0.1:11434/v1/embeddings "HTTP/1.1 200 OK"
+2026-05-31 22:20:32 INFO [doc_generation.agents.research_agent] Invoking tool rag_search with args={'query': '错误码规范 协议文档编写规范 新功能协议段分配规则'}
+2026-05-31 22:20:32 INFO [doc_generation.tools.rag_tool] rag_search query='错误码规范 协议文档编写规范 新功能协议段分配规则' top_k=5
+2026-05-31 22:20:32 INFO [httpx] HTTP Request: POST http://127.0.0.1:11434/v1/embeddings "HTTP/1.1 200 OK"
+2026-05-31 22:20:32 INFO [httpx] HTTP Request: POST http://127.0.0.1:11434/v1/embeddings "HTTP/1.1 200 OK"
+2026-05-31 22:20:32 INFO [httpx] HTTP Request: POST http://127.0.0.1:11434/v1/embeddings "HTTP/1.1 200 OK"
+2026-05-31 22:20:34 INFO [httpx] HTTP Request: POST https://api.zhizengzeng.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-31 22:20:34 INFO [doc_generation.agents.research_agent] llm_call produced response tool_calls=True num_tool_calls=1 iteration=1
+2026-05-31 22:20:34 INFO [doc_generation.agents.research_agent] should_continue decision=tool_node (has_tool_calls=True, iteration=2)
+2026-05-31 22:20:34 INFO [doc_generation.agents.research_agent] tool_node executing 1 tool calls
+2026-05-31 22:20:34 INFO [doc_generation.agents.research_agent] Invoking tool think_tool with args={'reflection': '我已经检索到了配置表开发规范的核心内容，包括：\n1. 两种数据构建方式（运营活动→列表+元组，功能类→Record）\n2. 数据类型说明\n3. 注意事项（禁止手动修改、UTF8编码、默认返回值等）\n4. 数据持久化规范\n\n但还需要补充以下信息：\n- 配置表命名规范的具体要求\n- 字段类型规范（Erlang类型）的详细说明\n- 配置表结构设计规范\n- 配置表文档编写规范\n- 策划配置表的格式要求\n\n让我继续检索这些缺失的信息。'}
+2026-05-31 22:20:35 INFO [httpx] HTTP Request: POST https://api.zhizengzeng.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-31 22:20:35 INFO [doc_generation.agents.research_agent] llm_call produced response tool_calls=True num_tool_calls=1 iteration=1
+2026-05-31 22:20:35 INFO [doc_generation.agents.research_agent] should_continue decision=tool_node (has_tool_calls=True, iteration=2)
+2026-05-31 22:20:35 INFO [doc_generation.agents.research_agent] tool_node executing 1 tool calls
+2026-05-31 22:20:35 INFO [doc_generation.agents.research_agent] Invoking tool think_tool with args={'reflection': '已获取到Socket协议规范的核心内容，包括：\n1. 协议编号约定（协议段、消息号、线上包号）\n2. 协议配对原则（C2S和S2C必须成对）\n3. 文档输出格式模板\n4. 禁止事项\n\n但还需要补充检索：\n- 新功能协议段的分配规则（如何分配新的协议段编号）\n- 消息号命名规范的具体规则\n- 错误码规范\n- 协议段编号的范围/区间划分规则'}
+2026-05-31 22:20:35 INFO [httpx] HTTP Request: POST https://api.zhizengzeng.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-31 22:20:35 INFO [doc_generation.agents.research_agent] llm_call produced response tool_calls=True num_tool_calls=1 iteration=1
+2026-05-31 22:20:35 INFO [doc_generation.agents.research_agent] should_continue decision=tool_node (has_tool_calls=True, iteration=2)
+2026-05-31 22:20:35 INFO [doc_generation.agents.research_agent] tool_node executing 1 tool calls
+2026-05-31 22:20:35 INFO [doc_generation.agents.research_agent] Invoking tool think_tool with args={'reflection': '我已经检索到了非常全面的数据持久化规范文档内容，涵盖了：\n\n1. **存储选型决策** - 运营活动用 `#player_misc_extra{}`，常驻功能用 `#role{}` 字段\n2. **`#player_misc_extra{}` 的完整定义** - 所有字段、类型、默认值\n3. **使用规则** - 数据类型支持、文档要求、活动共用逻辑\n4. **禁止事项** - 5条明确的禁止规则\n5. **文档输出格式** - 标准化的markdown模板\n6. **生命周期管理** - 活动结束后保留/删除/归档\n\n信息已经非常充分，涵盖了用户问题的所有方面。不需要再继续检索了。现在我可以整理一份完整的回答。'}
+2026-05-31 22:20:36 INFO [httpx] HTTP Request: POST https://api.zhizengzeng.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-31 22:20:36 INFO [doc_generation.agents.research_agent] llm_call produced response tool_calls=True num_tool_calls=2 iteration=2
+2026-05-31 22:20:36 INFO [doc_generation.agents.research_agent] should_continue decision=tool_node (has_tool_calls=True, iteration=3)
+2026-05-31 22:20:36 INFO [doc_generation.agents.research_agent] tool_node executing 2 tool calls
+2026-05-31 22:20:36 INFO [doc_generation.agents.research_agent] Invoking tool rag_search with args={'query': '新功能协议段分配规则 协议段编号范围 区间划分 如何申请新协议段'}
+2026-05-31 22:20:36 INFO [doc_generation.tools.rag_tool] rag_search query='新功能协议段分配规则 协议段编号范围 区间划分 如何申请新协议段' top_k=5
+2026-05-31 22:20:37 INFO [httpx] HTTP Request: POST https://api.zhizengzeng.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-31 22:20:37 INFO [doc_generation.agents.research_agent] llm_call produced response tool_calls=True num_tool_calls=2 iteration=2
+2026-05-31 22:20:37 INFO [doc_generation.agents.research_agent] should_continue decision=tool_node (has_tool_calls=True, iteration=3)
+2026-05-31 22:20:37 INFO [doc_generation.agents.research_agent] tool_node executing 2 tool calls
+2026-05-31 22:20:37 INFO [doc_generation.agents.research_agent] Invoking tool rag_search with args={'query': '配置表命名规范 文件命名 函数命名 策划配置表 Excel格式'}
+2026-05-31 22:20:37 INFO [doc_generation.tools.rag_tool] rag_search query='配置表命名规范 文件命名 函数命名 策划配置表 Excel格式' top_k=5
+2026-05-31 22:20:37 INFO [httpx] HTTP Request: POST http://127.0.0.1:11434/v1/embeddings "HTTP/1.1 200 OK"
+2026-05-31 22:20:37 INFO [doc_generation.agents.research_agent] Invoking tool rag_search with args={'query': '错误码规范 错误码定义 错误码分配 错误码范围'}
+2026-05-31 22:20:37 INFO [doc_generation.tools.rag_tool] rag_search query='错误码规范 错误码定义 错误码分配 错误码范围' top_k=5
+2026-05-31 22:20:37 INFO [httpx] HTTP Request: POST http://127.0.0.1:11434/v1/embeddings "HTTP/1.1 200 OK"
+2026-05-31 22:20:37 INFO [doc_generation.agents.research_agent] Invoking tool rag_search with args={'query': '配置表字段类型 Erlang类型 integer float string boolean list tuple map record'}
+2026-05-31 22:20:37 INFO [doc_generation.tools.rag_tool] rag_search query='配置表字段类型 Erlang类型 integer float string boolean list tuple map record' top_k=5
+2026-05-31 22:20:37 INFO [httpx] HTTP Request: POST http://127.0.0.1:11434/v1/embeddings "HTTP/1.1 200 OK"
+2026-05-31 22:20:37 INFO [httpx] HTTP Request: POST http://127.0.0.1:11434/v1/embeddings "HTTP/1.1 200 OK"
+2026-05-31 22:20:39 INFO [httpx] HTTP Request: POST https://api.zhizengzeng.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-31 22:20:39 INFO [doc_generation.agents.research_agent] llm_call produced response tool_calls=True num_tool_calls=1 iteration=3
+2026-05-31 22:20:39 INFO [doc_generation.agents.research_agent] should_continue decision=tool_node (has_tool_calls=True, iteration=4)
+2026-05-31 22:20:39 INFO [doc_generation.agents.research_agent] tool_node executing 1 tool calls
+2026-05-31 22:20:39 INFO [doc_generation.agents.research_agent] Invoking tool think_tool with args={'reflection': '目前检索到的信息已经比较全面，但关于"新功能协议段的分配规则"和"错误码规范"的具体内容还不够详细。让我再检索一下是否有更具体的协议段分配规则文档，以及错误码的详细规范。'}
+2026-05-31 22:20:40 INFO [httpx] HTTP Request: POST https://api.zhizengzeng.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-31 22:20:40 INFO [doc_generation.agents.research_agent] llm_call produced response tool_calls=True num_tool_calls=1 iteration=3
+2026-05-31 22:20:40 INFO [doc_generation.agents.research_agent] should_continue decision=tool_node (has_tool_calls=True, iteration=4)
+2026-05-31 22:20:40 INFO [doc_generation.agents.research_agent] tool_node executing 1 tool calls
+2026-05-31 22:20:40 INFO [doc_generation.agents.research_agent] Invoking tool think_tool with args={'reflection': '目前检索到的信息还不够完整。我注意到"配置表支持以下数据类型"这个片段被截断了，没有展示具体的数据类型列表。另外，关于配置表命名规范、策划配置表的Excel格式要求、配置表文档编写规范等细节信息还不够充分。让我再检索一次，尝试获取更完整的数据类型说明和命名规范。'}
+2026-05-31 22:20:42 INFO [httpx] HTTP Request: POST https://api.zhizengzeng.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-31 22:20:42 INFO [doc_generation.agents.research_agent] llm_call produced response tool_calls=True num_tool_calls=2 iteration=4
+2026-05-31 22:20:42 INFO [doc_generation.agents.research_agent] should_continue: max iterations reached (5), forcing compress_research
+2026-05-31 22:20:42 INFO [doc_generation.agents.research_agent] compress_research invoked with 14 messages
+2026-05-31 22:20:42 INFO [httpx] HTTP Request: POST https://api.zhizengzeng.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-31 22:20:42 INFO [doc_generation.agents.research_agent] llm_call produced response tool_calls=True num_tool_calls=2 iteration=4
+2026-05-31 22:20:42 INFO [doc_generation.agents.research_agent] should_continue: max iterations reached (5), forcing compress_research
+2026-05-31 22:20:42 INFO [doc_generation.agents.research_agent] compress_research invoked with 14 messages
+2026-05-31 22:20:47 INFO [httpx] HTTP Request: POST https://api.zhizengzeng.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-31 22:20:47 INFO [doc_generation.agents.research_agent] llm_call produced response tool_calls=False num_tool_calls=0 iteration=2
+2026-05-31 22:20:47 INFO [doc_generation.agents.research_agent] should_continue decision=compress_research (has_tool_calls=False, iteration=3)
+2026-05-31 22:20:47 INFO [doc_generation.agents.research_agent] compress_research invoked with 9 messages
+2026-05-31 22:21:06 INFO [httpx] HTTP Request: POST https://api.zhizengzeng.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-31 22:21:08 INFO [httpx] HTTP Request: POST https://api.zhizengzeng.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-31 22:21:11 INFO [httpx] HTTP Request: POST https://api.zhizengzeng.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-31 22:21:11 INFO [doc_generation.agents.supervisor] [COLLECT] Collected 3 research results
+2026-05-31 22:21:11 INFO [doc_generation.agents.supervisor] [SUPERVISOR] supervisor invoked (iteration=2, messages=8)
+2026-05-31 22:21:24 INFO [httpx] HTTP Request: POST https://api.zhizengzeng.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-31 22:21:24 INFO [doc_generation.agents.supervisor] supervisor model produced tool_calls=True num_tool_calls=1
+2026-05-31 22:21:24 INFO [doc_generation.agents.supervisor] [SUPERVISOR] supervisor_tools executing think=1 conduct=0 refine=0
+2026-05-31 22:21:24 INFO [doc_generation.agents.supervisor] ========>[thinking tool] thinking process Reflection recorded: ## 第一轮检索结果分析
+
+### 数据持久化规范 - 关键发现：
+1. **存储选型正确**：文档使用 `#player_misc_extra{}` 是合理的，因为资源找回属于运营活动/限时功能范畴
+2. **但文档存在严重问题**：
+   - 文档中使用了 `{resource_recovery, Date}` 作为 key，但规范要求 key 一般是活动id（整数/原子），不支持复合元组作为 key
+   - 文档中使用了 `value_text` 的 list 存储复杂结构，这符合规范
+   - 文档中使用了 `time` 和 `time1` 字段，符合规范
+   - 但文档中 key 的设计（使用复合元组 `{resource_recovery, Date}`）需要确认是否被支持
+3. **字段映射表格式**：规范要求使用标准模板，文档基本符合但需要调整
+
+### 协议开发规范 - 关键发现：
+1. **协议配对原则**：文档违反了核心规范！规范要求同一消息号同时包含 C2S 和 S2C，但文档使用了不同的消息号（63600/63601, 63610/63611, 63620/63621, 63630/63631）
+2. **消息号格式**：文档中 C2S 和 S2C 使用了不同消息号，这违反了"禁止将请求与响应拆分为不同消息号"的规则
+3. **文档格式**：需要增加"线上包号(pt)"列
+4. **错误码**：文档中的错误码设计需要标注"待确认"
+
+### 配置表设计规范 - 关键发现：
+1. **配置表类型选择**：资源找回属于运营活动类，应使用"列表+元组"方式，而非 Record
+2. 文档中的配置表设计使用了类似 Record 的字段描述方式，需要调整为列表+元组格式
+3. 中文必须使用 `<<"文本"/utf8>>` 格式
+4. 配置函数必须返回 `[]` 作为默认值
+
+### 需要继续检索的内容：
+- key 是否支持复合元组（如 `{resource_recovery, Date}`）
+- 是否有编码规范（Erlang模块命名、函数命名等）
+- 是否有更多关于错误码的规范
+
+让我先调用 refine_draft_report 将第一轮结果融入草稿，然后继续检索。
+2026-05-31 22:21:24 INFO [doc_generation.agents.supervisor] [SUPERVISOR] supervisor invoked (iteration=3, messages=10)
+2026-05-31 22:21:29 INFO [httpx] HTTP Request: POST https://api.zhizengzeng.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-31 22:21:29 INFO [doc_generation.agents.supervisor] supervisor model produced tool_calls=True num_tool_calls=3
+2026-05-31 22:21:29 INFO [doc_generation.agents.supervisor] [SUPERVISOR] supervisor_tools executing think=0 conduct=2 refine=1
+2026-05-31 22:21:29 INFO [doc_generation.agents.supervisor] [DISPATCH] Sending 2 research tasks via Send (hand-off)
+2026-05-31 22:21:31 INFO [httpx] HTTP Request: POST https://api.zhizengzeng.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-31 22:21:31 INFO [doc_generation.agents.research_agent] llm_call produced response tool_calls=True num_tool_calls=1 iteration=0
+2026-05-31 22:21:31 INFO [doc_generation.agents.research_agent] should_continue decision=tool_node (has_tool_calls=True, iteration=1)
+2026-05-31 22:21:31 INFO [doc_generation.agents.research_agent] tool_node executing 1 tool calls
+2026-05-31 22:21:31 INFO [doc_generation.agents.research_agent] Invoking tool rag_search with args={'query': 'Erlang编码规范 模块命名 函数命名 代码组织 gen_server 回调函数'}
+2026-05-31 22:21:31 INFO [doc_generation.tools.rag_tool] rag_search query='Erlang编码规范 模块命名 函数命名 代码组织 gen_server 回调函数' top_k=5
+2026-05-31 22:21:31 INFO [httpx] HTTP Request: POST http://127.0.0.1:11434/v1/embeddings "HTTP/1.1 200 OK"
+2026-05-31 22:21:32 INFO [httpx] HTTP Request: POST https://api.zhizengzeng.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-31 22:21:32 INFO [doc_generation.agents.research_agent] llm_call produced response tool_calls=True num_tool_calls=2 iteration=0
+2026-05-31 22:21:32 INFO [doc_generation.agents.research_agent] should_continue decision=tool_node (has_tool_calls=True, iteration=1)
+2026-05-31 22:21:32 INFO [doc_generation.agents.research_agent] tool_node executing 2 tool calls
+2026-05-31 22:21:32 INFO [doc_generation.agents.research_agent] Invoking tool rag_search with args={'query': 'player_misc_extra key 字段类型 复合元组 合法类型 命名约定'}
+2026-05-31 22:21:32 INFO [doc_generation.tools.rag_tool] rag_search query='player_misc_extra key 字段类型 复合元组 合法类型 命名约定' top_k=5
+2026-05-31 22:21:32 INFO [httpx] HTTP Request: POST http://127.0.0.1:11434/v1/embeddings "HTTP/1.1 200 OK"
+2026-05-31 22:21:32 INFO [doc_generation.agents.research_agent] Invoking tool rag_search with args={'query': 'player_misc_extra 同一活动多条记录 不同日期 存储方案'}
+2026-05-31 22:21:32 INFO [doc_generation.tools.rag_tool] rag_search query='player_misc_extra 同一活动多条记录 不同日期 存储方案' top_k=5
+2026-05-31 22:21:32 INFO [httpx] HTTP Request: POST http://127.0.0.1:11434/v1/embeddings "HTTP/1.1 200 OK"
+2026-05-31 22:21:33 INFO [httpx] HTTP Request: POST https://api.zhizengzeng.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-31 22:21:33 INFO [doc_generation.agents.research_agent] llm_call produced response tool_calls=True num_tool_calls=1 iteration=1
+2026-05-31 22:21:33 INFO [doc_generation.agents.research_agent] should_continue decision=tool_node (has_tool_calls=True, iteration=2)
+2026-05-31 22:21:33 INFO [doc_generation.agents.research_agent] tool_node executing 1 tool calls
+2026-05-31 22:21:33 INFO [doc_generation.agents.research_agent] Invoking tool think_tool with args={'reflection': '第一次检索结果主要返回了配置表开发规范、数据持久化规范、Socket协议规范等内容，这些与Erlang编码规范有一定关联但并非直接针对编码规范本身。我需要更精确地检索Erlang编码规范相关的文档，特别是模块命名、函数命名、gen_server使用规范等核心内容。'}
+2026-05-31 22:21:35 INFO [httpx] HTTP Request: POST https://api.zhizengzeng.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-31 22:21:35 INFO [doc_generation.agents.research_agent] llm_call produced response tool_calls=True num_tool_calls=1 iteration=2
+2026-05-31 22:21:35 INFO [doc_generation.agents.research_agent] should_continue decision=tool_node (has_tool_calls=True, iteration=3)
+2026-05-31 22:21:35 INFO [doc_generation.agents.research_agent] tool_node executing 1 tool calls
+2026-05-31 22:21:35 INFO [doc_generation.agents.research_agent] Invoking tool rag_search with args={'query': 'Erlang 模块命名规范 函数命名规范 gen_server 回调函数 代码组织'}
+2026-05-31 22:21:35 INFO [doc_generation.tools.rag_tool] rag_search query='Erlang 模块命名规范 函数命名规范 gen_server 回调函数 代码组织' top_k=5
+2026-05-31 22:21:36 INFO [httpx] HTTP Request: POST http://127.0.0.1:11434/v1/embeddings "HTTP/1.1 200 OK"
+2026-05-31 22:21:36 INFO [httpx] HTTP Request: POST https://api.zhizengzeng.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-31 22:21:36 INFO [doc_generation.agents.research_agent] llm_call produced response tool_calls=True num_tool_calls=2 iteration=1
+2026-05-31 22:21:36 INFO [doc_generation.agents.research_agent] should_continue decision=tool_node (has_tool_calls=True, iteration=2)
+2026-05-31 22:21:36 INFO [doc_generation.agents.research_agent] tool_node executing 2 tool calls
+2026-05-31 22:21:36 INFO [doc_generation.agents.research_agent] Invoking tool think_tool with args={'reflection': '已获取到以下关键信息：\n\n1. **key 字段类型**：规范中明确说 `key` 一般是活动 id，用于区分不同活动的数据。但关于 key 是否支持复合元组（如 `{atom, integer}`）没有直接说明。\n\n2. **数据类型支持**：规范提到 `value_text` 是 list，list 内部支持 Erlang 中所有的数据类型（整数、元组、列表、map、嵌套 record 等）。但 key 字段本身的类型约束没有明确说明。\n\n3. **同一活动多条记录**：规范提到"同一玩家可有多条记录（按 key 区分活动）"，但针对"同一活动不同日期"的多条记录存储方案没有详细说明。\n\n4. **禁止事项**：禁止同一活动的数据分散在多个 key 中，除非有明确的业务隔离需求。\n\n我需要进一步检索 key 字段的具体类型约束，以及同一活动多条记录（不同日期）的存储方案。<｜end▁of▁thinking｜>\n\n<｜｜DSML｜｜tool_calls>\n<｜｜DSML｜｜invoke name="rag_search">\n<｜｜DSML｜｜parameter name="query" string="true">player_misc_extra key 字段 复合元组 {atom, integer} 类型约束 支持'}
+2026-05-31 22:21:36 INFO [doc_generation.agents.research_agent] Invoking tool rag_search with args={'query': 'player_misc_extra 同一活动 多条记录 不同日期 多期 存储 key设计'}
+2026-05-31 22:21:36 INFO [doc_generation.tools.rag_tool] rag_search query='player_misc_extra 同一活动 多条记录 不同日期 多期 存储 key设计' top_k=5
+2026-05-31 22:21:36 INFO [httpx] HTTP Request: POST http://127.0.0.1:11434/v1/embeddings "HTTP/1.1 200 OK"
+2026-05-31 22:21:39 INFO [httpx] HTTP Request: POST https://api.zhizengzeng.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-31 22:21:39 INFO [doc_generation.agents.research_agent] llm_call produced response tool_calls=True num_tool_calls=1 iteration=3
+2026-05-31 22:21:39 INFO [doc_generation.agents.research_agent] should_continue decision=tool_node (has_tool_calls=True, iteration=4)
+2026-05-31 22:21:39 INFO [doc_generation.agents.research_agent] tool_node executing 1 tool calls
+2026-05-31 22:21:39 INFO [doc_generation.agents.research_agent] Invoking tool think_tool with args={'reflection': '第二次检索结果仍然没有直接返回Erlang编码规范文档。知识库中似乎没有一份独立的"Erlang编码规范"文档。但我从已有的文档中提取到了一些隐含的编码规范信息：\n\n1. 配置表开发规范中展示了函数命名风格：`get_draw_list()`, `get_shop_list()`, `get_lucky_task_2620()`, `get_attr/2` 等\n2. 数据持久化规范中提到了模块命名相关的信息\n3. Socket协议规范中提到了 `pack/read` 或 `encode/decode` 的协议处理模式\n\n让我尝试更精确地搜索，看看是否有专门的编码规范文档。'}
+2026-05-31 22:21:41 INFO [httpx] HTTP Request: POST https://api.zhizengzeng.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-31 22:21:41 INFO [doc_generation.agents.research_agent] llm_call produced response tool_calls=True num_tool_calls=1 iteration=4
+2026-05-31 22:21:41 INFO [doc_generation.agents.research_agent] should_continue: max iterations reached (5), forcing compress_research
+2026-05-31 22:21:41 INFO [doc_generation.agents.research_agent] compress_research invoked with 12 messages
+2026-05-31 22:21:42 INFO [httpx] HTTP Request: POST https://api.zhizengzeng.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-31 22:21:42 INFO [doc_generation.agents.research_agent] llm_call produced response tool_calls=True num_tool_calls=2 iteration=2
+2026-05-31 22:21:42 INFO [doc_generation.agents.research_agent] should_continue decision=tool_node (has_tool_calls=True, iteration=3)
+2026-05-31 22:21:42 INFO [doc_generation.agents.research_agent] tool_node executing 2 tool calls
+2026-05-31 22:21:42 INFO [doc_generation.agents.research_agent] Invoking tool think_tool with args={'reflection': '目前检索到的信息总结：\n\n**关于 key 字段类型：**\n- 规范中明确说 `key` 一般是活动 id，用于区分不同活动的数据\n- 规范中 key 的注释是"key，一般是活动id，用来区分不同活动的数据"\n- 没有明确说明 key 是否支持复合元组（如 `{atom, integer}`）\n- 但规范提到"数据类型：支持 Erlang 中所有数据类型（整数、元组、列表、map、嵌套 record 等）"——这条规则是针对 value_text 等字段的，还是针对整个 record 的？从上下文看，这条规则是在"使用规则"部分，应该是针对整个 player_misc_extra 中可存储的数据类型，但 key 字段作为主键定位字段，其类型约束可能更严格。\n\n**关于同一活动多条记录（不同日期）：**\n- 规范说"同一玩家可有多条记录（按 key 区分活动）"\n- 禁止事项说"禁止同一活动的数据分散在多个 key 中，除非有明确的业务隔离需求"\n- 这意味着如果同一活动但不同日期（如多期活动），如果业务上需要隔离，可以用不同的 key 来区分\n\n**信息缺口：**\n1. key 字段是否支持复合元组（如 `{atom, integer}`）——规范没有明确说明，但从 Erlang 的 mnesia 表设计来看，key 通常是原子或整数，复合元组作为 key 需要看底层存储实现是否支持。\n2. 同一活动不同日期的具体存储方案——规范没有给出具体示例。\n\n让我再检索一下是否有更具体的 key 类型约束或示例。<｜end▁of▁thinking｜>\n\n<｜｜DSML｜｜tool_calls>\n<｜｜DSML｜｜invoke name="rag_search">\n<｜｜DSML｜｜parameter name="query" string="true">player_misc_extra key 复合键 元组 原子 整数 示例 活动id 命名'}
+2026-05-31 22:21:42 INFO [doc_generation.agents.research_agent] Invoking tool rag_search with args={'query': 'player_misc_extra 多期活动 分key 日期 期数 存储方案 设计模式'}
+2026-05-31 22:21:42 INFO [doc_generation.tools.rag_tool] rag_search query='player_misc_extra 多期活动 分key 日期 期数 存储方案 设计模式' top_k=5
+2026-05-31 22:21:42 INFO [httpx] HTTP Request: POST http://127.0.0.1:11434/v1/embeddings "HTTP/1.1 200 OK"
+2026-05-31 22:21:56 INFO [httpx] HTTP Request: POST https://api.zhizengzeng.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-31 22:21:57 INFO [httpx] HTTP Request: POST https://api.zhizengzeng.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-31 22:21:57 INFO [doc_generation.agents.research_agent] llm_call produced response tool_calls=False num_tool_calls=0 iteration=3
+2026-05-31 22:21:57 INFO [doc_generation.agents.research_agent] should_continue decision=compress_research (has_tool_calls=False, iteration=4)
+2026-05-31 22:21:57 INFO [doc_generation.agents.research_agent] compress_research invoked with 13 messages
+2026-05-31 22:22:24 INFO [httpx] HTTP Request: POST https://api.zhizengzeng.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-31 22:22:24 INFO [doc_generation.agents.supervisor] [COLLECT] Collected 2 research results
+2026-05-31 22:22:24 INFO [doc_generation.agents.supervisor] [SUPERVISOR] supervisor invoked (iteration=4, messages=13)
+2026-05-31 22:22:25 INFO [httpx] HTTP Request: POST https://api.zhizengzeng.com/v1/chat/completions "HTTP/1.1 400 Bad Request"
+2026-05-31 22:22:25 ERROR [backend.service] Agent resume failed
+Traceback (most recent call last):
+  File "D:\project\doc_generation\backend\service.py", line 122, in resume_agent_stream
+    async for event in agent.astream_events(
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\base.py", line 1607, in _astream_events_v1_v2
+    async for event in event_stream:
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\tracers\event_stream.py", line 1100, in _astream_events_implementation_v2
+    await task
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\tracers\event_stream.py", line 1055, in consume_astream
+    async for _ in event_streamer.tap_output_aiter(run_id, stream):
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\tracers\event_stream.py", line 222, in tap_output_aiter
+    async for chunk in output:
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\pregel\main.py", line 3407, in astream
+    async for _ in runner.atick(
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\pregel\_runner.py", line 396, in atick
+    await arun_with_retry(
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\pregel\_retry.py", line 703, in arun_with_retry
+    async for _ in task.proc.astream(task.input, config):
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\_internal\_runnable.py", line 867, in astream
+    output = await asyncio.create_task(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\_internal\_runnable.py", line 932, in _consume_aiter
+    async for chunk in it:
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\tracers\event_stream.py", line 199, in tap_output_aiter
+    first = await anext(output, sentinel)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\base.py", line 1767, in atransform
+    async for ichunk in input:
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\pregel\main.py", line 3407, in astream
+    async for _ in runner.atick(
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\pregel\_runner.py", line 396, in atick
+    await arun_with_retry(
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\pregel\_retry.py", line 703, in arun_with_retry
+    async for _ in task.proc.astream(task.input, config):
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\_internal\_runnable.py", line 867, in astream
+    output = await asyncio.create_task(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\_internal\_runnable.py", line 932, in _consume_aiter
+    async for chunk in it:
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\tracers\event_stream.py", line 199, in tap_output_aiter
+    first = await anext(output, sentinel)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\base.py", line 1767, in atransform
+    async for ichunk in input:
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\base.py", line 1171, in astream
+    yield await self.ainvoke(input, config, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\_internal\_runnable.py", line 501, in ainvoke
+    ret = await self.afunc(*args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\doc_generation\agents\supervisor.py", line 112, in supervisor
+    response = await supervisor_model_with_tools.ainvoke(messages)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\base.py", line 5894, in ainvoke
+    return await self.bound.ainvoke(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\language_models\chat_models.py", line 497, in ainvoke
+    llm_result = await self.agenerate_prompt(
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\language_models\chat_models.py", line 1834, in agenerate_prompt
+    return await self.agenerate(
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\language_models\chat_models.py", line 1792, in agenerate
+    raise exceptions[0]
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\language_models\chat_models.py", line 2127, in _agenerate_with_cache
+    result = await self._agenerate(
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_openai\chat_models\base.py", line 1935, in _agenerate
+    _handle_openai_bad_request(e)
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_openai\chat_models\base.py", line 1930, in _agenerate
+    raw_response = await self.async_client.with_raw_response.create(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\openai\_legacy_response.py", line 384, in wrapped
+    return cast(LegacyAPIResponse[R], await func(*args, **kwargs))
+                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\openai\resources\chat\completions\completions.py", line 2739, in create
+    return await self._post(
+           ^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\openai\_base_client.py", line 1931, in post
+    return await self.request(cast_to, opts, stream=stream, stream_cls=stream_cls)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\openai\_base_client.py", line 1716, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.BadRequestError: Error code: 400 - {'error': {'code': 'invalid_request_error', 'message': "An assistant message with 'tool_calls' must be followed by tool messages responding to each 'tool_call_id'. (insufficient tool messages following tool_calls message)", 'param': None, 'type': 'invalid_request_error'}}
+During task with name 'supervisor' and id '9d001abf-f59d-974c-ea08-6a2e5a8adb15'
+During task with name 'supervisor_subgraph' and id '4ae15c47-94e9-085e-69cb-48d267f7879b'
+2026-05-31 22:23:28 INFO [watchfiles.main] 4 changes detected
+2026-05-31 22:23:42 INFO [watchfiles.main] 1 change detected
+2026-05-31 22:24:12 INFO [watchfiles.main] 5 changes detected
+2026-05-31 22:24:14 INFO [watchfiles.main] 1 change detected
+2026-05-31 22:24:16 INFO [watchfiles.main] 1 change detected
+2026-05-31 22:24:26 INFO [watchfiles.main] 5 changes detected
+2026-05-31 22:24:27 INFO [watchfiles.main] 1 change detected
+2026-05-31 22:24:28 INFO [watchfiles.main] 1 change detected
+2026-05-31 22:24:39 INFO [watchfiles.main] 5 changes detected
+2026-05-31 22:24:40 INFO [watchfiles.main] 1 change detected
+2026-05-31 22:24:41 INFO [watchfiles.main] 1 change detected
+2026-05-31 22:24:59 INFO [watchfiles.main] 5 changes detected
+2026-05-31 22:25:00 INFO [watchfiles.main] 1 change detected
+2026-05-31 22:25:01 INFO [watchfiles.main] 1 change detected
+2026-05-31 22:25:14 INFO [watchfiles.main] 5 changes detected
+2026-05-31 22:25:15 INFO [watchfiles.main] 1 change detected
+2026-05-31 22:25:16 INFO [watchfiles.main] 1 change detected

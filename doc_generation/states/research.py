@@ -23,18 +23,19 @@ class ResearcherState(TypedDict):
     researcher_messages: Annotated[Sequence[BaseMessage], add_messages]
     tool_call_iterations: int
     research_topic: str
-    compressed_research: str
+    compressed_research: Annotated[List[str], operator.add]
     raw_notes: Annotated[List[str], operator.add]
     claude_code_job_id: str
     claude_code_result: str
     claude_code_tool_call_id: str
     _claude_code_dispatched: bool
+    _parent_thread_id: str
 
 class ResearcherOutputState(TypedDict):
     """Research Agent的输出状态，包含最终的研究结果。
     此状态表示研究过程的最终输出，包含压缩后的研究结果以及研究过程中的所有Reasearch Notes。
     """
-    compressed_research: str
+    compressed_research: Annotated[List[str], operator.add]
     raw_notes: Annotated[List[str], operator.add]
     researcher_messages: Annotated[Sequence[BaseMessage], add_messages]
 

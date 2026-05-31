@@ -75,7 +75,7 @@ async def _trigger_resume_callback(thread_id: str, job_id: str) -> None:
 
     callback_url = os.environ.get(
         "RESUME_CALLBACK_URL",
-        "http://localhost:8000/api/internal/resume/researcher"
+        "http://localhost:8000/api/internal/resume/supervisor"
     )
     url = f"{callback_url}/{thread_id}"
 

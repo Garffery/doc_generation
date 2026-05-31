@@ -7,17 +7,16 @@
 1. Supervisor Agent协调研究活动并分配任务
 2. 多个Sub-Research-Agent独立地处理特定的子主题
 3. 结果汇总并压缩，用于最终技术开发文档
-Supervisor Agent采用并行执行方式来提高效率，同时为每个研究主题保持独立的上下文窗口。
+Supervisor Agent采用Send并行派发方式来提高效率，通过hand-off实现每个研究主题的状态隔离。
 """
-import asyncio
-
 from langchain_core.messages import BaseMessage, filter_messages, SystemMessage, ToolMessage, HumanMessage
+from langchain_core.runnables import RunnableConfig
 import logging
 
 from langgraph.constants import END, START
 from langgraph.graph import StateGraph
 from typing_extensions import Literal
-from langgraph.types import Command
+from langgraph.types import Command, Send
 
 from doc_generation.agents.evaluator_agent import evaluate_draft_quality
 from doc_generation.agents.red_team_agent import red_team_node
@@ -25,7 +24,7 @@ from doc_generation.agents.research_agent import researcher_agent
 from doc_generation.llm import get_chat_model
 from doc_generation.prompts import MULTI_STEP_DENOISE_PROMPT, CRITICAL_ADDRESS_PROMPT
 from doc_generation.states import QualityMetric
-from doc_generation.states.supervisor import ConductResearch, ResearchComplete, SupervisorState
+from doc_generation.states.supervisor import ConductResearch, ResearchComplete, SupervisorState, ResearchTaskInfo
 from doc_generation.tools import _think_tool, _refine_draft_report_tool
 from doc_generation.utils import get_today_str
 
@@ -59,9 +58,9 @@ def get_notes_from_tool_calls(messages: list[BaseMessage]) -> list[str]:
 
 # ===== CONFIGURATION =====
 
-supervisor_tools = [ConductResearch, ResearchComplete, _think_tool, _refine_draft_report_tool]
+supervisor_tools_list = [ConductResearch, ResearchComplete, _think_tool, _refine_draft_report_tool]
 supervisor_model = get_chat_model("supervisor")
-supervisor_model_with_tools = supervisor_model.bind_tools(supervisor_tools)
+supervisor_model_with_tools = supervisor_model.bind_tools(supervisor_tools_list)
 
 
 # System constants (最大迭代次数/最大并行Sub-Agents)
@@ -128,21 +127,21 @@ async def supervisor(state: SupervisorState) -> Command[Literal["supervisor_tool
     )
 
 
-async def supervisor_tools(state: SupervisorState) -> Command[Literal["supervisor", "__end__"]]:
+async def supervisor_tools(state: SupervisorState):
     """
     执行Supervisor决策——继续下一轮研究或者是结束流程。
 
     功能：
         - 执行 think_tool 调用以进行思考
-        - 并行启动针对不同主题的research agent
-        - 汇总研究结果
+        - 通过 Send 并行派发研究任务到 research 子图节点（hand-off 状态隔离）
         - 确定研究何时完成
 
     参数：
         state：包含supervisor messages和迭代次数
+        config：RunnableConfig，包含 thread_id 等配置信息
 
     返回值：
-        继续下一轮supervisor/结束流程
+        Command 或 list[Send] 用于并行派发
     """
     supervisor_messages = state.get("supervisor_messages", [])
     research_iterations = state.get("research_iterations", 0)
@@ -158,12 +157,9 @@ async def supervisor_tools(state: SupervisorState) -> Command[Literal["superviso
 
     # 如果超过则退出
     if exceeded_iterations or no_tool_calls or research_complete:
-        # 如果满足退出条件，我们会准备最终的、经过整理的notes。
-        # 优先使用结构化的知识库，但如果知识库为空，则使用raw notes。
         final_notes = get_notes_from_tool_calls(state.get("supervisor_messages", []))
         logger.info("[REPORT] The research is complete, writing the final report.")
 
-        # 我们返回一个END来结束这个子图，并将最后的notes传递给supervisor。
         return Command(
             goto=END,
             update={
@@ -171,191 +167,191 @@ async def supervisor_tools(state: SupervisorState) -> Command[Literal["superviso
                 "research_brief": state.get("research_brief", "")
             })
 
-    else:
-        # 初始化变量
+    # 分类工具调用
+    think_tool_calls = [
+        tool_call for tool_call in most_recent_message.tool_calls
+        if tool_call["name"] == "think_tool"
+    ]
+
+    conduct_research_calls = [
+        tool_call for tool_call in most_recent_message.tool_calls
+        if tool_call["name"] == "ConductResearch"
+    ]
+
+    refine_report_calls = [
+        tool_call for tool_call in most_recent_message.tool_calls
+        if tool_call["name"] == "refine_draft_report"
+    ]
+
+    logger.info(
+        "[SUPERVISOR] supervisor_tools executing think=%d conduct=%d refine=%d",
+        len(think_tool_calls),
+        len(conduct_research_calls),
+        len(refine_report_calls),
+    )
+
+    try:
         tool_messages = []
-        all_raw_notes = []
-        draft_report = state.get("draft_report", "")
         updates = {}
         next_step = "supervisor"
 
-        # 执行所有的工具调用
-        try:
-            think_tool_calls = [
-                tool_call for tool_call in most_recent_message.tool_calls
-                if tool_call["name"] == "think_tool"
-            ]
-
-            conduct_research_calls = [
-                tool_call for tool_call in most_recent_message.tool_calls
-                if tool_call["name"] == "ConductResearch"
-            ]
-
-            refine_report_calls = [
-                tool_call for tool_call in most_recent_message.tool_calls
-                if tool_call["name"] == "refine_draft_report"
-            ]
-
-            logger.info(
-                "[SUPERVISOR] supervisor_tools executing think=%d conduct=%d refine=%d",
-                len(think_tool_calls),
-                len(conduct_research_calls),
-                len(refine_report_calls),
+        # 调用 think 工具
+        for tool_call in think_tool_calls:
+            observation = _think_tool.invoke(tool_call["args"])
+            logger.info(f"========>[thinking tool] thinking process {observation}")
+            tool_messages.append(
+                ToolMessage(
+                    content=observation,
+                    name=tool_call["name"],
+                    tool_call_id=tool_call["id"]
+                )
             )
 
-            # 调用 think 工具（在调用其他工具之前，必须拿到反思结果）(synchronous)
-            for tool_call in think_tool_calls:
-                observation = _think_tool.invoke(tool_call["args"])
-                logger.info(f"========>[thinking tool] thinking process {observation}")
+        # 使用 Send 并行派发 ConductResearch 到 research 子图节点（hand-off 状态隔离）
+        if conduct_research_calls:
+            pending_tasks = [
+                ResearchTaskInfo(
+                    tool_call_id=tc["id"],
+                    tool_call_name=tc["name"],
+                    research_topic=tc["args"]["research_topic"],
+                )
+                for tc in conduct_research_calls
+            ]
+
+            # 为每个 ConductResearch 写入占位 ToolMessage，保证消息序列完整
+            # 使用固定 id 格式，后续 collect_research 会用相同 id 替换内容
+            for tc in conduct_research_calls:
                 tool_messages.append(
                     ToolMessage(
-                        content=observation,
-                        name=tool_call["name"],
-                        tool_call_id=tool_call["id"]
+                        content="[Research in progress...]",
+                        name=tc["name"],
+                        tool_call_id=tc["id"],
+                        id=f"research_placeholder_{tc['id']}"
                     )
                 )
 
-            # 调用 ConductResearch工具 (asynchronous)
-            if conduct_research_calls:
-                # 并行启动多个 research agents，每个使用独立 thread_id 以支持 interrupt
-                import uuid as _uuid
-
-                async def _run_researcher(tool_call):
-                    """运行单个 researcher agent，处理 interrupt/resume 循环"""
-                    thread_id = str(_uuid.uuid4())
-                    config = {"configurable": {"thread_id": thread_id}}
-                    input_state = {
-                        "researcher_messages": [
-                            HumanMessage(content=tool_call["args"]["research_topic"])
-                        ],
-                        "research_topic": tool_call["args"]["research_topic"]
-                    }
-
-                    result = await researcher_agent.ainvoke(input_state, config=config)
-
-                    # 检查是否因 interrupt 暂停（claude_code 异步任务未完成）
-                    state_snapshot = await researcher_agent.aget_state(config)
-                    while state_snapshot.tasks and any(
-                        hasattr(t, "interrupts") and t.interrupts for t in state_snapshot.tasks
-                    ):
-                        # 等待 ARQ worker 完成任务并写入 Redis
-                        import redis.asyncio as aioredis
-                        import os as _os
-                        redis_url = _os.environ.get("REDIS_URL", "redis://localhost:6379")
-                        r = aioredis.from_url(redis_url, decode_responses=True)
-
-                        interrupt_value = state_snapshot.tasks[0].interrupts[0].value
-                        job_id = interrupt_value.get("job_id", "")
-
-                        # 轮询等待结果
-                        while True:
-                            res = await r.get(f"claude_code_job:{job_id}")
-                            err = await r.get(f"claude_code_job:{job_id}:error")
-                            if res is not None or err is not None:
-                                break
-                            await asyncio.sleep(5)
-                        await r.aclose()
-
-                        # 恢复子图
-                        from langgraph.types import Command as _Cmd
-                        result = await researcher_agent.ainvoke(_Cmd(resume=True), config=config)
-                        state_snapshot = await researcher_agent.aget_state(config)
-
-                    return result
-
-                coros = [_run_researcher(tc) for tc in conduct_research_calls]
-
-                # 等待所有research agents 返回研究结果
-                tool_results = await asyncio.gather(*coros)
-
-                # 将研究结果格式化为工具消息
-                # 每个research agent都会在 result["compressed_research"] 中返回压缩后的研究结果
-                # 我们将这些压缩后的研究结果写入 ToolMessage 的内容，以便
-                # supervisor agent 可以通过 get_notes_from_tool_calls() 检索到这些结果
-                research_tool_messages = [
-                    ToolMessage(
-                        content=result.get("compressed_research", "Error synthesizing research report"),
-                        name=tool_call["name"],
-                        tool_call_id=tool_call["id"]
-                    ) for result, tool_call in zip(tool_results, conduct_research_calls)
-                ]
-
-                tool_messages.extend(research_tool_messages)
-
-                # 聚合所有的raw notes
-                all_raw_notes = [
-                    "\n".join(result.get("raw_notes", []))
-                    for result in tool_results
-                ]
-
-            # 开始调用大模型结合已有信息修正技术开发文档
-            for tool_call in refine_report_calls:
-                findings = "\n".join(get_notes_from_tool_calls(state.get("supervisor_messages", [])))
-
-                new_draft = _refine_draft_report_tool.invoke({
-                    "research_brief": state.get("research_brief", ""),
-                    "findings": findings,
-                    "draft_report": state.get("draft_report", "")
-                })
-
-                # 执行Critical Step：Self-Evolution的评估
-                eval_result = evaluate_draft_quality(
-                    research_brief=state.get("research_brief", ""),
-                    draft_report=new_draft
-                )
-                logger.info(
-                    "[EVALUATOR] comprehensive score=%f, accuracy score=%f, coherence score=%f",
-                    eval_result.comprehensiveness_score,
-                    eval_result.accuracy_score,
-                    eval_result.coherence_score
-                )
-                logger.info(f"[EVALUATOR] scoing reason: {eval_result.reason}")
-
-                # 评估技术开发文档质量得分：(综合得分+准确率得分+一致性得分) / 3
-                avg_score = (
-                                        eval_result.comprehensiveness_score + eval_result.accuracy_score + eval_result.coherence_score) / 3
-
-                # 把质量得分追加到tool message, 供Supervisor Agent参考
-                tool_messages.append(ToolMessage(
-                    content=f"Draft Updated.\nQuality Score: {avg_score}/10.\nJudge Feedback: {eval_result.reason}",
-                    name=tool_call["name"],
-                    tool_call_id=tool_call["id"]
-                ))
-
-                draft_report = new_draft
-                updates["draft_report"] = draft_report
-
-                # 记录报告质量评分的记录，如果分数低于 min_need_repair_score，把repaire标志位置位true
-                updates["quality_history"] = [QualityMetric(
-                    score=avg_score,
-                    feedback=eval_result.reason,
-                    iteration=state.get("research_iterations", 0))
-                ]
-
-                if avg_score < min_need_repair_score:
-                    updates["needs_quality_repair"] = True
-
-                # 跳转到self-correction节点 (Red Team)
-                next_step = "red_team"
-
-            # 更新本次迭代状态信息
+            # 通过 Command 跳转到 prepare_research 节点，同时保存状态
             updates["supervisor_messages"] = tool_messages
-            updates["raw_notes"] = all_raw_notes
+            updates["pending_research_tasks"] = pending_tasks
 
-            return Command(goto=next_step, update=updates)
+            return Command(goto="prepare_research", update=updates)
 
-        except Exception as e:
-            from langgraph.errors import GraphBubbleUp
-            if isinstance(e, GraphBubbleUp):
-                raise
-            logger.exception("[SUPERVISOR] supervisor_tools failed: %s", e)
-            return Command(
-                goto=END,
-                update={
-                    "notes": get_notes_from_tool_calls(supervisor_messages),
-                    "research_brief": state.get("research_brief", "")
-                }
+        # 开始调用大模型结合已有信息修正技术开发文档
+        for tool_call in refine_report_calls:
+            findings = "\n".join(get_notes_from_tool_calls(state.get("supervisor_messages", [])))
+
+            new_draft = _refine_draft_report_tool.invoke({
+                "research_brief": state.get("research_brief", ""),
+                "findings": findings,
+                "draft_report": state.get("draft_report", "")
+            })
+
+            eval_result = evaluate_draft_quality(
+                research_brief=state.get("research_brief", ""),
+                draft_report=new_draft
             )
+            logger.info(
+                "[EVALUATOR] comprehensive score=%f, accuracy score=%f, coherence score=%f",
+                eval_result.comprehensiveness_score,
+                eval_result.accuracy_score,
+                eval_result.coherence_score
+            )
+            logger.info(f"[EVALUATOR] scoing reason: {eval_result.reason}")
+
+            avg_score = (
+                eval_result.comprehensiveness_score + eval_result.accuracy_score + eval_result.coherence_score) / 3
+
+            tool_messages.append(ToolMessage(
+                content=f"Draft Updated.\nQuality Score: {avg_score}/10.\nJudge Feedback: {eval_result.reason}",
+                name=tool_call["name"],
+                tool_call_id=tool_call["id"]
+            ))
+
+            updates["draft_report"] = new_draft
+            updates["quality_history"] = [QualityMetric(
+                score=avg_score,
+                feedback=eval_result.reason,
+                iteration=state.get("research_iterations", 0))
+            ]
+
+            if avg_score < min_need_repair_score:
+                updates["needs_quality_repair"] = True
+
+            next_step = "red_team"
+
+        updates["supervisor_messages"] = tool_messages
+        updates["raw_notes"] = []
+
+        return Command(goto=next_step, update=updates)
+
+    except Exception as e:
+        from langgraph.errors import GraphBubbleUp
+        if isinstance(e, GraphBubbleUp):
+            raise
+        logger.exception("[SUPERVISOR] supervisor_tools failed: %s", e)
+        return Command(
+            goto=END,
+            update={
+                "notes": get_notes_from_tool_calls(supervisor_messages),
+                "research_brief": state.get("research_brief", "")
+            }
+        )
+
+
+def prepare_research(state: SupervisorState):
+    """Passthrough 节点，仅用于触发条件边派发 Send。"""
+    return {}
+
+
+def route_research(state: SupervisorState, config: RunnableConfig):
+    """条件边函数：通过 Send 并行派发研究任务到 research 子图。"""
+    pending_tasks = state.get("pending_research_tasks", [])
+    parent_thread_id = config.get("configurable", {}).get("thread_id", "")
+
+    sends = [
+        Send("research", {
+            "researcher_messages": [
+                HumanMessage(content=task["research_topic"])
+            ],
+            "research_topic": task["research_topic"],
+            "_parent_thread_id": parent_thread_id,
+        })
+        for task in pending_tasks
+    ]
+
+    logger.info("[DISPATCH] Sending %d research tasks via Send (hand-off)", len(sends))
+    return sends
+
+
+def collect_research(state: SupervisorState) -> Command[Literal["supervisor"]]:
+    """收集并行 research 子图结果，用真正内容替换占位 ToolMessage。"""
+    pending_tasks = state.get("pending_research_tasks", [])
+    compressed_list = state.get("compressed_research", [])
+    raw = state.get("raw_notes", [])
+
+    # 用相同 id 替换占位 ToolMessage 的内容
+    replacement_messages = []
+    for i, task_info in enumerate(pending_tasks):
+        content = compressed_list[i] if i < len(compressed_list) else "Error synthesizing research report"
+        replacement_messages.append(
+            ToolMessage(
+                content=content,
+                name=task_info["tool_call_name"],
+                tool_call_id=task_info["tool_call_id"],
+                id=f"research_placeholder_{task_info['tool_call_id']}"
+            )
+        )
+
+    logger.info("[COLLECT] Collected %d research results", len(replacement_messages))
+
+    return Command(
+        goto="supervisor",
+        update={
+            "supervisor_messages": replacement_messages,
+            "raw_notes": raw,
+            "pending_research_tasks": [],
+        }
+    )
 
 
 # ===== GRAPH CONSTRUCTION =====
@@ -363,10 +359,15 @@ async def supervisor_tools(state: SupervisorState) -> Command[Literal["superviso
 supervisor_builder = StateGraph(SupervisorState)
 supervisor_builder.add_node("supervisor", supervisor)
 supervisor_builder.add_node("supervisor_tools", supervisor_tools)
+supervisor_builder.add_node("prepare_research", prepare_research)
+supervisor_builder.add_node("research", researcher_agent)
+supervisor_builder.add_node("collect_research", collect_research)
 supervisor_builder.add_node("red_team", red_team_node)
 
 supervisor_builder.add_edge(START, "supervisor")
 supervisor_builder.add_edge("supervisor", "supervisor_tools")
+supervisor_builder.add_conditional_edges("prepare_research", route_research, ["research"])
+supervisor_builder.add_edge("research", "collect_research")
 supervisor_builder.add_edge("red_team", "supervisor")
 
 supervisor_agent = supervisor_builder.compile()

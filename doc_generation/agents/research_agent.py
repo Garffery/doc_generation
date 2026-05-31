@@ -121,7 +121,7 @@ def tool_node(state: ResearcherState) -> Command:
             return Command(goto="llm_call", update={"researcher_messages": tool_outputs})
 
         job_id = str(uuid.uuid4())
-        thread_id = state.get("_thread_id", str(uuid.uuid4()))
+        thread_id = state.get("_parent_thread_id", "")
 
         import asyncio
         try:
@@ -236,7 +236,7 @@ def compress_research(state: ResearcherState) -> dict:
 
     logger.debug("compress_research produced raw_notes_count=%d", len(raw_notes))
     return {
-        "compressed_research": str(response.content),
+        "compressed_research": [str(response.content)],
         "raw_notes": ["\n".join(raw_notes)]
     }
 

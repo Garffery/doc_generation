@@ -79,17 +79,14 @@ async def retry(ticket_id: str):
     )
 
 
-@router.post("/internal/resume/researcher/{thread_id}")
-async def resume_researcher(thread_id: str):
-    """ARQ Worker 完成 claude_code_tool 后的回调端点，恢复 researcher 子图执行。"""
-    import os
-    import redis.asyncio as aioredis
+@router.post("/internal/resume/supervisor/{thread_id}")
+async def resume_supervisor(thread_id: str):
+    """ARQ Worker 完成 claude_code_tool 后的回调端点，恢复整个图的执行。
+    researcher 作为 supervisor 的子图，interrupt 会冒泡到顶层 agent，
+    resume 顶层 agent 即可让子图从 interrupt 点继续。
+    """
     from langgraph.types import Command
-
     from doc_generation.agent_builder import agent
-
-    redis_url = os.environ.get("REDIS_URL", "redis://localhost:6379")
-    r = aioredis.from_url(redis_url, decode_responses=True)
 
     config = {"configurable": {"thread_id": thread_id}}
 
@@ -104,8 +101,6 @@ async def resume_researcher(thread_id: str):
         return {"status": "resumed", "thread_id": thread_id}
 
     except Exception as e:
-        logger.exception("Failed to resume researcher for thread_id=%s", thread_id)
+        logger.exception("Failed to resume supervisor for thread_id=%s", thread_id)
         from fastapi import HTTPException
         raise HTTPException(status_code=500, detail=str(e))
-    finally:
-        await r.aclose()

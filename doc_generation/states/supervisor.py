@@ -20,6 +20,13 @@ from doc_generation.states.critique import Critique
 from doc_generation.states.quality import QualityMetric
 
 
+class ResearchTaskInfo(TypedDict):
+    """记录一个待收集的研究任务的元信息"""
+    tool_call_id: str
+    tool_call_name: str
+    research_topic: str
+
+
 class SupervisorState(TypedDict):
     """
     多智能体Supervisor的State定义。
@@ -36,6 +43,8 @@ class SupervisorState(TypedDict):
     active_critiques: Annotated[List[Critique], operator.add]           # 用于存放主动评估的内容
     quality_history: Annotated[List[QualityMetric], operator.add]       # 质量评估的历史记录
     needs_quality_repair: bool                                          # 评估员可以设置一个bool标志，向supervisor发出报告草稿质量低的信号
+    pending_research_tasks: List[ResearchTaskInfo]                      # Send派发研究任务时暂存的tool_call元信息，供collect_research使用
+    compressed_research: Annotated[list[str], operator.add]             # 从并行research子图收集的压缩研究结果
 
 @tool
 class ConductResearch(BaseModel):
