@@ -102,7 +102,7 @@ class ChromaRagStore:
             embedding_kwargs["base_url"] = base_url
 
         embeddings = OpenAIEmbeddings(**embedding_kwargs)
-        persist_path = Path(persist_directory)
+        persist_path = Path(persist_directory).resolve()
         persist_path.mkdir(parents=True, exist_ok=True)
 
         vectorstore = Chroma(

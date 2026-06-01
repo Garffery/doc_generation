@@ -16,7 +16,7 @@ from langchain_core.messages import SystemMessage, HumanMessage, ToolMessage, fi
 
 from doc_generation.llm import get_chat_model
 from doc_generation.states import ResearcherState, ResearcherOutputState
-from doc_generation.utils import get_today_str
+from doc_generation.utils import get_today_str, sanitize_tool_messages
 from doc_generation.tools import _think_tool, _rag_search_tool, _claude_code_tool
 from doc_generation.rag import is_rag_enabled
 from doc_generation.prompts import RESEARCH_AGENT_PROMPT, COMPRESS_RESEARCH_SYSTEM_PROMPT, COMPRESS_RESEARCH_HUMAN_PROMPT
@@ -49,10 +49,10 @@ def llm_call(state: ResearcherState):
     msg_count = len(state.get("researcher_messages", []))
     iterations = state.get("tool_call_iterations", 0)
     logger.debug("llm_call invoked with %d messages, iteration=%d", msg_count, iterations)
-
+    logger.info("=============>调用research_agent")
     # 调用大模型
     response = model_with_tools.invoke(
-        [SystemMessage(content=RESEARCH_AGENT_PROMPT)] + state["researcher_messages"]
+        [SystemMessage(content=RESEARCH_AGENT_PROMPT)] + sanitize_tool_messages(state["researcher_messages"])
     )
 
     logger.info(
@@ -216,10 +216,10 @@ def collect_claude_code_result(state: ResearcherState) -> dict:
 
 def compress_research(state: ResearcherState) -> dict:
     """把研究发现压缩为高价值摘要，只保留有用信息."""
-
     # 组装prompt
+    logger.info("===============>压缩节点")
     system_message = COMPRESS_RESEARCH_SYSTEM_PROMPT.format(date=get_today_str())
-    messages = [SystemMessage(content=system_message)] + state.get("researcher_messages", []) +\
+    messages = [SystemMessage(content=system_message)] + sanitize_tool_messages(state.get("researcher_messages", [])) +\
             [HumanMessage(content=COMPRESS_RESEARCH_HUMAN_PROMPT.format(research_topic=state.get("research_topic", "")))]
     logger.info("compress_research invoked with %d messages", len(messages))
 
