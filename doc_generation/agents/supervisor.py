@@ -26,7 +26,7 @@ from doc_generation.prompts import MULTI_STEP_DENOISE_PROMPT, CRITICAL_ADDRESS_P
 from doc_generation.states import QualityMetric
 from doc_generation.states.supervisor import ConductResearch, ResearchComplete, SupervisorState, ResearchTaskInfo
 from doc_generation.tools import _think_tool, _refine_draft_report_tool
-from doc_generation.utils import get_today_str
+from doc_generation.utils import get_today_str, sanitize_tool_messages
 
 logger = logging.getLogger(__name__)
 
@@ -94,7 +94,7 @@ async def supervisor(state: SupervisorState) -> Command[Literal["supervisor_tool
         max_concurrent_research_units=max_concurrent_researchers,
         max_researcher_iterations=max_researcher_iterations
     )
-    messages = [SystemMessage(content=system_message)] + supervisor_messages
+    messages = [SystemMessage(content=system_message)] + sanitize_tool_messages(supervisor_messages)
 
     # 动态上下文注入：检查并注入任何未处理的对抗性反馈，实现自我纠正机制。
     critiques = state.get("active_critiques", [])

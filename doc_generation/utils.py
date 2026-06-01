@@ -68,3 +68,45 @@ def load_config(stage_name=None, config_path=None):
     return get_config_yml(
         path=config_path, section_name="stages", subsection_name=stage_name
     )
+
+
+def sanitize_tool_messages(messages: list) -> list:
+    """确保每条带 tool_calls 的 assistant message 都有对应的 ToolMessage。
+    对于缺少部分 tool response 的 assistant message，移除未应答的 tool_calls；
+    如果全部 tool_calls 都缺少应答，则移除整条 AI message。"""
+    from langchain_core.messages import ToolMessage, AIMessage
+
+    if not messages:
+        return messages
+
+    all_tool_msg_ids = {
+        msg.tool_call_id for msg in messages if isinstance(msg, ToolMessage)
+    }
+
+    orphan_ids: set[str] = set()
+    for msg in messages:
+        if not isinstance(msg, AIMessage):
+            continue
+        tool_calls = getattr(msg, "tool_calls", None)
+        if not tool_calls:
+            continue
+        required_ids = {tc["id"] for tc in tool_calls}
+        missing = required_ids - all_tool_msg_ids
+        if missing:
+            orphan_ids.update(missing)
+
+    if not orphan_ids:
+        return messages
+
+    result = []
+    for msg in messages:
+        if isinstance(msg, AIMessage) and getattr(msg, "tool_calls", None):
+            kept_calls = [tc for tc in msg.tool_calls if tc["id"] not in orphan_ids]
+            if not kept_calls:
+                continue
+            msg = msg.model_copy(update={"tool_calls": kept_calls})
+        if isinstance(msg, ToolMessage) and msg.tool_call_id in orphan_ids:
+            continue
+        result.append(msg)
+
+    return result

@@ -59,6 +59,10 @@ def write_research_brief(state: AgentState):
     structured_output_model = draft_model.with_structured_output(ResearchQuestion)
     handler = make_safe_invoke(structured_output_model, prompt)
     response = handler()
+
+    if isinstance(response, Command):
+        return response
+
     logger.info(f"结构化输出：{response}")
     logger.debug("write_research_brief produced research_brief length=%d", len(response.research_brief))
 
@@ -78,6 +82,10 @@ def question_to_user(state: AgentState):
     structured_model = draft_model.with_structured_output(ClarificationQuestions)
     handler = make_safe_invoke(structured_model, prompt)
     response = handler()
+
+    if isinstance(response, Command):
+        return response
+
     logger.info(f"提问结果：{response}")
     items = [{"question": item.question, "options": item.options} for item in response.items]
 
@@ -115,6 +123,10 @@ def write_draft_report(state: AgentState):
     structured_output_model = draft_model.with_structured_output(DraftReport)
     handler = make_safe_invoke(structured_output_model, draft_report_prompt)
     response = handler()
+
+    if isinstance(response, Command):
+        return response
+
     logger.info(f"简报结果：{response}")
     logger.debug("write_draft_report produced draft_report length=%d", len(response.draft_report))
 
