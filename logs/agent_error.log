@@ -3088,3 +3088,162 @@ Traceback (most recent call last):
 openai.BadRequestError: Error code: 400 - {'error': {'code': '402', 'message': '很抱歉，检测到有敏感词，互联网非法外之地，请注意言辞~', 'param': '', 'type': 'param_error'}}
 During task with name 'final_report_generation' and id '763215a6-d26a-bdf5-5af9-4e634c06fe35'
 
+
+============================================================
+Traceback (most recent call last):
+  File "D:\project\doc_generation\backend\service.py", line 31, in run_agent_stream
+    async for event in agent.astream_events(input_state, config=config, version="v2"):
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\base.py", line 1607, in _astream_events_v1_v2
+    async for event in event_stream:
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\tracers\event_stream.py", line 1100, in _astream_events_implementation_v2
+    await task
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\tracers\event_stream.py", line 1055, in consume_astream
+    async for _ in event_streamer.tap_output_aiter(run_id, stream):
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\tracers\event_stream.py", line 199, in tap_output_aiter
+    first = await anext(output, sentinel)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\pregel\main.py", line 3407, in astream
+    async for _ in runner.atick(
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\pregel\_runner.py", line 396, in atick
+    await arun_with_retry(
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\pregel\_retry.py", line 703, in arun_with_retry
+    async for _ in task.proc.astream(task.input, config):
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\_internal\_runnable.py", line 867, in astream
+    output = await asyncio.create_task(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\_internal\_runnable.py", line 932, in _consume_aiter
+    async for chunk in it:
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\tracers\event_stream.py", line 199, in tap_output_aiter
+    first = await anext(output, sentinel)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\base.py", line 1767, in atransform
+    async for ichunk in input:
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\base.py", line 1171, in astream
+    yield await self.ainvoke(input, config, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\_internal\_runnable.py", line 501, in ainvoke
+    ret = await self.afunc(*args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\config.py", line 667, in run_in_executor
+    return await asyncio.get_running_loop().run_in_executor(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\software\myConda\envs\rag-test\Lib\concurrent\futures\thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\config.py", line 658, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\doc_generation\agents\draft_agent.py", line 64, in write_research_brief
+    logger.debug("write_research_brief produced research_brief length=%d", len(response.research_brief))
+                                                                               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\pydantic\main.py", line 1042, in __getattr__
+    raise AttributeError(f'{type(self).__name__!r} object has no attribute {item!r}')
+AttributeError: 'AIMessage' object has no attribute 'research_brief'
+During task with name 'write_research_brief' and id '8ee5820d-fc05-0fa7-12f5-20f9a99499ab'
+
+
+============================================================
+Traceback (most recent call last):
+  File "D:\project\doc_generation\backend\service.py", line 31, in run_agent_stream
+    async for event in agent.astream_events(input_state, config=config, version="v2"):
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\base.py", line 1607, in _astream_events_v1_v2
+    async for event in event_stream:
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\tracers\event_stream.py", line 1100, in _astream_events_implementation_v2
+    await task
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\tracers\event_stream.py", line 1055, in consume_astream
+    async for _ in event_streamer.tap_output_aiter(run_id, stream):
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\tracers\event_stream.py", line 199, in tap_output_aiter
+    first = await anext(output, sentinel)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\pregel\main.py", line 3407, in astream
+    async for _ in runner.atick(
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\pregel\_runner.py", line 396, in atick
+    await arun_with_retry(
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\pregel\_retry.py", line 703, in arun_with_retry
+    async for _ in task.proc.astream(task.input, config):
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\_internal\_runnable.py", line 867, in astream
+    output = await asyncio.create_task(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\_internal\_runnable.py", line 932, in _consume_aiter
+    async for chunk in it:
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\tracers\event_stream.py", line 199, in tap_output_aiter
+    first = await anext(output, sentinel)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\base.py", line 1767, in atransform
+    async for ichunk in input:
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\base.py", line 1171, in astream
+    yield await self.ainvoke(input, config, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\_internal\_runnable.py", line 501, in ainvoke
+    ret = await self.afunc(*args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\config.py", line 667, in run_in_executor
+    return await asyncio.get_running_loop().run_in_executor(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\software\myConda\envs\rag-test\Lib\concurrent\futures\thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\config.py", line 658, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\doc_generation\agents\draft_agent.py", line 64, in write_research_brief
+    logger.debug("write_research_brief produced research_brief length=%d", len(response.research_brief))
+                                                                               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\pydantic\main.py", line 1042, in __getattr__
+    raise AttributeError(f'{type(self).__name__!r} object has no attribute {item!r}')
+AttributeError: 'AIMessage' object has no attribute 'research_brief'
+During task with name 'write_research_brief' and id '71a9d1fb-0c16-998a-eb4d-e18633fbeb98'
+
+
+============================================================
+Traceback (most recent call last):
+  File "D:\project\doc_generation\backend\service.py", line 31, in run_agent_stream
+    async for event in agent.astream_events(input_state, config=config, version="v2"):
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\base.py", line 1607, in _astream_events_v1_v2
+    async for event in event_stream:
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\tracers\event_stream.py", line 1100, in _astream_events_implementation_v2
+    await task
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\tracers\event_stream.py", line 1055, in consume_astream
+    async for _ in event_streamer.tap_output_aiter(run_id, stream):
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\tracers\event_stream.py", line 199, in tap_output_aiter
+    first = await anext(output, sentinel)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\pregel\main.py", line 3407, in astream
+    async for _ in runner.atick(
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\pregel\_runner.py", line 396, in atick
+    await arun_with_retry(
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\pregel\_retry.py", line 703, in arun_with_retry
+    async for _ in task.proc.astream(task.input, config):
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\_internal\_runnable.py", line 867, in astream
+    output = await asyncio.create_task(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\_internal\_runnable.py", line 932, in _consume_aiter
+    async for chunk in it:
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\tracers\event_stream.py", line 199, in tap_output_aiter
+    first = await anext(output, sentinel)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\base.py", line 1767, in atransform
+    async for ichunk in input:
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\base.py", line 1171, in astream
+    yield await self.ainvoke(input, config, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langgraph\_internal\_runnable.py", line 501, in ainvoke
+    ret = await self.afunc(*args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\config.py", line 667, in run_in_executor
+    return await asyncio.get_running_loop().run_in_executor(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\software\myConda\envs\rag-test\Lib\concurrent\futures\thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\langchain_core\runnables\config.py", line 658, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\doc_generation\agents\draft_agent.py", line 64, in write_research_brief
+    logger.debug("write_research_brief produced research_brief length=%d", len(response.research_brief))
+                                                                               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\doc_generation\.venv\Lib\site-packages\pydantic\main.py", line 1042, in __getattr__
+    raise AttributeError(f'{type(self).__name__!r} object has no attribute {item!r}')
+AttributeError: 'AIMessage' object has no attribute 'research_brief'
+During task with name 'write_research_brief' and id '750578d3-6bb0-1caa-378c-c5fc627098f8'
+

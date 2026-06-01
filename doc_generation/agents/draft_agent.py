@@ -24,8 +24,6 @@ from doc_generation.skills.registry import get_or_new_skill_storage, load_skills
 logger = logging.getLogger(__name__)
 draft_model = get_chat_model("draft")
 
-MAX_RETRY_TIME = 5
-
 
 def _load_skills_config() -> SkillsConfig:
     config_path = os.environ.get("CONFIG_PATH", "config.yml")
@@ -57,8 +55,7 @@ def write_research_brief(state: AgentState):
 
     # 结构化输出
     structured_output_model = draft_model.with_structured_output(ResearchQuestion)
-    handler = make_safe_invoke(structured_output_model, prompt)
-    response = handler()
+    response = safe_invoke(structured_output_model, prompt)
 
     if isinstance(response, Command):
         return response
@@ -80,8 +77,7 @@ def question_to_user(state: AgentState):
     )
 
     structured_model = draft_model.with_structured_output(ClarificationQuestions)
-    handler = make_safe_invoke(structured_model, prompt)
-    response = handler()
+    response = safe_invoke(structured_model, prompt)
 
     if isinstance(response, Command):
         return response
@@ -121,8 +117,7 @@ def write_draft_report(state: AgentState):
         draft_report_prompt += f"\n\n<用户补充说明>\n{clarification_answers}\n</用户补充说明>\n"
 
     structured_output_model = draft_model.with_structured_output(DraftReport)
-    handler = make_safe_invoke(structured_output_model, draft_report_prompt)
-    response = handler()
+    response = safe_invoke(structured_output_model, draft_report_prompt)
 
     if isinstance(response, Command):
         return response
@@ -136,22 +131,17 @@ def write_draft_report(state: AgentState):
         "supervisor_messages": ["Here is the backend dev doc draft: " + response.draft_report, research_brief]
     }
 
-def make_safe_invoke(model, input_message):
-    def safe_invoke(time: int = 1, new_message=None):
-        if time >= MAX_RETRY_TIME:
-            return Command(goto=END)
-        if time > 1:
-            import time as time_mod
-            time_mod.sleep(2 ** (time - 1))
-        try:
-            msgs = [HumanMessage(content=input_message)]
-            if new_message:
-                msgs.append(new_message)
-            return model.invoke(msgs)
-        except Exception as e:
-            logger.error(f"Error: {e}")
-            return safe_invoke(time + 1, HumanMessage(content=f"Error: {e}"))
-    return safe_invoke
+def safe_invoke(model, input_message):
+    """调用模型并在所有降级失败后返回 Command(goto=END)。
+    ResilientModel 已内置重试和降级逻辑，此函数仅处理最终的兜底。
+    """
+    from doc_generation.resilience import LLMFatalError, FallbackExhaustedError
+
+    try:
+        return model.invoke([HumanMessage(content=input_message)])
+    except (LLMFatalError, FallbackExhaustedError) as e:
+        logger.error("LLM call failed after all retries and fallbacks: %s", e)
+        return Command(goto=END)
 
 if __name__  == "__main__":
     configure_logging(level=os.environ.get("LOG_LEVEL", "DEBUG"))

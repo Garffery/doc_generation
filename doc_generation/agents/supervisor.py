@@ -286,9 +286,13 @@ async def supervisor_tools(state: SupervisorState):
 
     except Exception as e:
         from langgraph.errors import GraphBubbleUp
+        from doc_generation.resilience import LLMFatalError, FallbackExhaustedError
         if isinstance(e, GraphBubbleUp):
             raise
-        logger.exception("[SUPERVISOR] supervisor_tools failed: %s", e)
+        if isinstance(e, (LLMFatalError, FallbackExhaustedError)):
+            logger.error("[SUPERVISOR] LLM call failed after all retries and fallbacks: %s", e)
+        else:
+            logger.exception("[SUPERVISOR] supervisor_tools failed: %s", e)
         return Command(
             goto=END,
             update={
