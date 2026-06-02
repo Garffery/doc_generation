@@ -54,6 +54,8 @@ stages:
         topic: general
         include_raw_content: true
         timeout_seconds: 300
+    graph:
+      recursion_limit: 50
     claude_code:
       cwd: D:\project\project_data
     roles:
