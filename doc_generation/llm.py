@@ -280,4 +280,10 @@ def get_chat_model(role: str, *, stage: str | None = None, max_tokens: int | Non
         max_tokens=resolved_max_tokens,
         timeout_seconds=resolved_timeout
     )
-    return init_chat_model(**kwargs)
+    raw_model = init_chat_model(**kwargs)
+
+    # 用 ResilientModel 包装，提供统一的重试、熔断、降级能力
+    from doc_generation.resilience.config import load_resilience_config
+    from doc_generation.resilience.invoker import ResilientModel
+    resilience_cfg = load_resilience_config(resolved_stage, config_path)
+    return ResilientModel(raw_model, role, resilience_cfg)

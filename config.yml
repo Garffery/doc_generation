@@ -1,9 +1,23 @@
 stages:
   prod:
+    resilience:
+      retry:
+        max_attempts: 3
+        base_delay: 1.0
+        max_delay: 30.0
+        jitter: true
+      circuit_breaker:
+        failure_threshold: 5
+        recovery_timeout: 60
+        success_threshold: 2
+      watchdog:
+        default_timeout: 120
+      fallback:
+        static_response: "系统暂时无法处理您的请求，请稍后重试。"
     cognition:
       openai:
         base_url: https://api.zhizengzeng.com/v1
-        api_key: your-openai-api-key-here
+        api_key: sk-zk2f62f8abfee2397b81f857078fa72ca8c6a0b3001723a4
         organization: dingshixiong
         default_model: gpt-5.4-mini
         temperature: 0
@@ -48,46 +62,76 @@ stages:
         handle: gpt-5.4-mini
         max_tokens: 128000
         timeout_seconds: 60
+        fallback_chain:
+          - backend: deepseek
+            handle: deepseek-v4-flash
+          - static: "Supervisor暂时不可用，流程终止。"
       red_team:
         backend: openai
         handle: gpt-5.4-mini
         max_tokens: 128000
         timeout_seconds: 60
+        fallback_chain:
+          - backend: deepseek
+            handle: deepseek-v4-flash
       context_pruner:
         backend: openai
         handle: gpt-5.4-nano
         max_tokens: 128000
         timeout_seconds: 60
+        fallback_chain:
+          - backend: deepseek
+            handle: deepseek-v4-flash
       researcher_main:
         backend: openai
         handle: gpt-5.4-nano
         max_tokens: 128000
         timeout_seconds: 60
+        fallback_chain:
+          - backend: deepseek
+            handle: deepseek-v4-flash
       researcher_summarizer:
         backend: openai
         handle: gpt-5.4-nano
         max_tokens: 128000
         timeout_seconds: 60
+        fallback_chain:
+          - backend: deepseek
+            handle: deepseek-v4-flash
       researcher_compressor:
         backend: openai
         handle: gpt-5.4-nano
         max_tokens: 128000
         timeout_seconds: 60
+        fallback_chain:
+          - backend: deepseek
+            handle: deepseek-v4-flash
       writer:
         backend: openai
         handle: gpt-5.4-nano
         max_tokens: 128000
         timeout_seconds: 60
+        fallback_chain:
+          - backend: deepseek
+            handle: deepseek-v4-flash
+          - static: "报告生成暂时不可用，请稍后重试。"
       draft:
         backend: openai
         handle: gpt-5.4-nano
         max_tokens: 128000
         timeout_seconds: 60
+        fallback_chain:
+          - backend: deepseek
+            handle: deepseek-v4-flash
+          - static: "草稿生成暂时不可用，请稍后重试。"
       evaluator:
         backend: openai
         handle: gpt-5.4-nano
         max_tokens: 128000
         timeout_seconds: 60
+        fallback_chain:
+          - backend: deepseek
+            handle: deepseek-v4-flash
     skills:
       # Pluggable storage backend (module:Class)
       use: doc_generation.skills.storage.local_skill_storage:LocalSkillStorage
