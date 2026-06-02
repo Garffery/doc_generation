@@ -167,7 +167,7 @@ if __name__  == "__main__":
     print(draft_agent.get_graph().draw_ascii())
 
     # 测试问题
-    thread = {"configurable": {"thread_id": "1", "recursion_limit": 50}}
+    thread = {"configurable": {"thread_id": "1"}, "recursion_limit": 50}
     result = draft_agent.invoke({"messages": [HumanMessage(content="""
 游戏中需要开发一个战令活动,这个战令总共有三档,一档免费战令,"进阶福利","天降豪礼"这两档付费直购战令。
 活动逻辑: 1.点击战令入口，弹出战令界面，显示战令的奖励,能领取的奖励高亮,未达到领取条件的奖励置灰。

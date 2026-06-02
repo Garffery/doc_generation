@@ -8,6 +8,12 @@ from langchain_core.messages import HumanMessage
 from langgraph.types import Command
 
 from backend.db import create_ticket, update_ticket_status, init_report, update_report_stage, get_ticket_id_by_thread
+from doc_generation.utils import load_config
+
+
+def _get_recursion_limit() -> int:
+    cfg = load_config(stage_name="prod", config_path="config.yml") or {}
+    return int(cfg.get("graph", {}).get("recursion_limit", 25))
 
 logger = logging.getLogger(__name__)
 
@@ -18,7 +24,7 @@ async def run_agent_stream(message: str) -> AsyncGenerator[str, None]:
     from doc_generation.agent_builder import agent
 
     thread_id = str(uuid.uuid4())
-    config = {"configurable": {"thread_id": thread_id}}
+    config = {"configurable": {"thread_id": thread_id}, "recursion_limit": _get_recursion_limit()}
     input_state = {"messages": [HumanMessage(content=message)]}
 
     try:
@@ -113,7 +119,7 @@ async def resume_agent_stream(thread_id: str, answers: str) -> AsyncGenerator[st
 
     from doc_generation.agent_builder import agent
 
-    config = {"configurable": {"thread_id": thread_id}}
+    config = {"configurable": {"thread_id": thread_id}, "recursion_limit": _get_recursion_limit()}
     ticket_id = await get_ticket_id_by_thread(thread_id)
 
     try:
@@ -174,7 +180,7 @@ async def retry_agent_stream(ticket_id: str, thread_id: str) -> AsyncGenerator[s
 
     from doc_generation.agent_builder import agent
 
-    config = {"configurable": {"thread_id": thread_id}}
+    config = {"configurable": {"thread_id": thread_id}, "recursion_limit": _get_recursion_limit()}
 
     try:
         await update_ticket_status(ticket_id, "running")
