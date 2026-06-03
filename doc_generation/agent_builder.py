@@ -75,3 +75,6 @@ from pymongo import MongoClient
 _mongo_client = MongoClient(os.environ.get("MONGODB_URI", "mongodb://localhost:27017"))
 checkpointer = MongoDBSaver(_mongo_client, db_name="doc_generation")
 agent = deep_researcher_builder.compile(checkpointer=checkpointer)
+
+
+
