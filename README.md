@@ -212,6 +212,76 @@ cd frontend && npm install && npm run dev
 pytest
 ```
 
+## 工具调用错误处理系统
+
+本项目实现了生产级的工具调用错误处理机制，基于 [AI Agent 错误处理最佳实践](https://agentpatch.ai/blog/ai-agent-error-handling/)：
+
+### 核心特性
+
+- **自动错误分类**：5xx、超时、429、400、401/403 等错误自动分类
+- **智能重试策略**：
+  - 指数退避（5xx、超时）：1s → 2s → 4s
+  - 固定延迟（429）：按 Retry-After 头等待
+  - 不重试（认证错误）：立即抛出
+- **熔断器保护**：短期内频繁失败时自动停止调用
+- **备用工具链**：主工具失败后自动切换到备用工具
+- **成本追踪**：记录调用成本、失败次数，实现渐进式退款
+
+### 使用示例
+
+```python
+from doc_generation.resilience import ResilientTool, load_resilience_config
+
+config = load_resilience_config()
+
+# 包装现有工具
+resilient_search = ResilientTool(
+    tool_fn=tavily_search,
+    tool_name="tavily_search",
+    config=config,
+    fallback_tools=[bing_search],  # 备用工具
+    timeout=30.0
+)
+
+# 调用（自动处理重试、降级、成本追踪）
+result = resilient_search.invoke(query="AI agents")
+```
+
+### 配置
+
+在 `config.yml` 中配置弹性参数：
+
+```yaml
+stages:
+  prod:
+    resilience:
+      retry:
+        max_attempts: 3        # 最大重试次数
+        base_delay: 1.0        # 基础延迟（秒）
+        max_delay: 30.0        # 最大延迟（秒）
+        jitter: true           # 启用抖动
+      circuit_breaker:
+        failure_threshold: 5   # 失败 5 次后打开熔断器
+        recovery_timeout: 60   # 60 秒后进入半开状态
+      watchdog:
+        default_timeout: 120   # 默认超时 120 秒
+```
+
+### 成本追踪
+
+查看工具调用统计：
+
+```python
+from doc_generation.resilience import get_cost_tracker
+
+tracker = get_cost_tracker()
+stats = tracker.get_stats("tavily_search")
+print(f"成功率: {stats.successful_calls}/{stats.total_calls}")
+print(f"总成本: {stats.total_cost}, 退款: {stats.total_refund}")
+```
+
+**详细文档**：[docs/tool_error_handling.md](docs/tool_error_handling.md)
+
 ## RAG（Chroma）
 
 在 `config.yml` 的 `stages.<stage>.rag` 中配置 Chroma 持久化目录与集合名。启用后，`research_agent` 会自动绑定 `rag_search` 工具，供 LangGraph 的 `tool_node` 调用。
