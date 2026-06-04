@@ -1,305 +1,166 @@
 # doc_generation
 
-Python project for document generation.
+基于 LangGraph 的多智能体技术文档自动生成系统，支持 RAG 检索增强、人机交互式澄清问答、异步 Claude Code 代码执行，以及生产级容错机制。
 
-## 架构图
-
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│                          Frontend (React + Vite)                      │
-│                         http://localhost:5173                         │
-├─────────────────────────────────────────────────────────────────────┤
-│  InputForm ──► ProgressBar ──► ClarificationPanel ──► ReportView    │
-│                                                                      │
-│  SSE Events: session / status / progress / interrupt / result        │
-└────────────────────────────┬────────────────────────────────────────┘
-                             │ POST /api/generate (SSE)
-                             │ POST /api/resume   (SSE)
-                             ▼
-┌─────────────────────────────────────────────────────────────────────┐
-│                     Backend (FastAPI + Uvicorn)                       │
-│                      http://localhost:8000                            │
-├─────────────────────────────────────────────────────────────────────┤
-│  routes.py ──► service.py ──► agent_builder.py (LangGraph)           │
-└────────────────────────────┬────────────────────────────────────────┘
-                             │
-                             ▼
-┌─────────────────────────────────────────────────────────────────────┐
-│                   LangGraph Workflow (StateGraph)                     │
-│                                                                      │
-│  ┌──────────────────┐    ┌──────────────────┐    ┌───────────────┐  │
-│  │ write_research   │    │ question_to_user │    │ write_draft   │  │
-│  │ _brief           │───►│ (interrupt)      │───►│ _report       │  │
-│  └──────────────────┘    └──────────────────┘    └───────┬───────┘  │
-│                                                          │          │
-│                                                          ▼          │
-│  ┌──────────────────┐    ┌──────────────────────────────────────┐   │
-│  │ final_report     │◄───│ supervisor_subgraph                  │   │
-│  │ _generation      │    │ (research_agent + evaluator + ...)   │   │
-│  └──────────────────┘    └──────────────────────────────────────┘   │
-│                                                                      │
-│  Checkpointer: MemorySaver (支持 interrupt/resume)                   │
-└─────────────────────────────────────────────────────────────────────┘
-                             │
-                             ▼
-┌─────────────────────────────────────────────────────────────────────┐
-│                        External Services                             │
-├─────────────────────────────────────────────────────────────────────┤
-│  • LLM (OpenAI API / langchain-openai)                              │
-│  • ChromaDB (RAG 向量检索)                                           │
-│  • Claude Code SDK (代码工具调用)                                     │
-└─────────────────────────────────────────────────────────────────────┘
-```
-
-### 核心流程
+## 架构
 
 ```
-用户输入需求
-    │
-    ▼
-write_research_brief ── 需求拆解，生成功能点列表 (F-001, F-002...)
-    │
-    ▼
-question_to_user ────── LLM 生成澄清问题（含候选答案），interrupt 暂停等待用户选择
-    │
-    ▼
-write_draft_report ──── 结合用户回答，生成后端技术文档草稿
-    │
-    ▼
-supervisor_subgraph ─── 多轮深度研究与优化（research_agent / evaluator / red_team）
-    │
-    ▼
-final_report_generation ── 汇总生成最终技术文档
+用户输入 (React 前端 :5173)
+    ↓  POST /api/generate (SSE)
+FastAPI 后端 (:8000)
+    ↓
+LangGraph StateGraph
+    ├─ write_research_brief    需求分解，生成功能点列表
+    ├─ question_to_user        生成澄清问题，interrupt 暂停等待用户
+    ├─ write_draft_report      结合用户回答生成初稿
+    ├─ supervisor_subgraph     多轮精炼（researcher + evaluator + red_team）
+    └─ final_report_generation 汇总输出最终文档
 ```
 
-### 目录结构
+**技术栈**
 
-```
-doc_generation/
-├── agent_builder.py        # LangGraph 主图构建
-├── agents/                 # 各节点实现
-│   ├── draft_agent.py      # write_research_brief / question_to_user / write_draft_report
-│   ├── supervisor.py       # supervisor 子图
-│   ├── research_agent.py   # 研究 agent
-│   └── evaluator_agent.py  # 评估 agent
-├── states/                 # State 定义 (Pydantic models)
-├── prompts/                # 各环节 Prompt
-├── tools/                  # LangGraph 工具 (RAG, Claude Code)
-├── rag/                    # ChromaDB 向量存储
-├── skills/                 # 技能系统 (SKILL.md 加载)
-└── llm.py                  # LLM 模型配置
+| 组件 | 技术 |
+|------|------|
+| 前端 | React + Vite (TypeScript) |
+| 后端 | FastAPI + Uvicorn |
+| 工作流 | LangGraph StateGraph |
+| LLM | OpenAI / DeepSeek（备用链） |
+| 向量库 | ChromaDB + BGE-M3 |
+| 任务队列 | ARQ + Redis（异步 Claude Code） |
+| 检查点 | MongoDB（interrupt/resume 持久化） |
+| 网络搜索 | Tavily |
 
-backend/
-├── app.py                  # FastAPI 应用入口
-├── api/routes.py           # API 路由 (/generate, /resume)
-├── service.py              # SSE 流式服务
-└── schemas.py              # 请求/响应模型
+## 快速开始
 
-frontend/src/
-├── App.tsx                 # 主应用 (状态管理)
-├── api.ts                  # SSE 流式 API 客户端
-└── components/
-    ├── InputForm.tsx       # 需求输入
-    ├── ProgressBar.tsx     # 进度条 (5阶段)
-    ├── ClarificationPanel.tsx  # 澄清问答 (选择题+其他)
-    └── ReportView.tsx      # Markdown 文档渲染
-```
+**前置条件**：Python 3.10+、Node.js 18+、MongoDB、Redis
 
-## 新增功能：Claude Code 异步执行架构
+```bash
+# 安装
+python -m venv .venv && .venv\Scripts\activate
+pip install -e ".[dev]"
+cd frontend && npm install
 
-本次更新将 `claude_code_tool` 从同步调用改为基于 ARQ + Redis 的异步执行模式，避免长时间运行的 Claude Code 任务阻塞 LangGraph 主流程。
+# 配置
+cp .env.example .env  # 填写 API Key 等
 
-### 架构概览
+# 启动（Windows 一键）
+start.bat
 
-```
-research_agent (LangGraph 子图)
-    │
-    ├── tool_node 检测到 claude_code 调用
-    │       │
-    │       ▼
-    │   dispatch_claude_code_tool ──► ARQ Redis 队列
-    │       │
-    │       ▼
-    │   wait_for_claude_code ──► interrupt 挂起子图
-    │
-    │                               ARQ Worker (独立进程)
-    │                                   │
-    │                                   ▼
-    │                           执行 _run_claude_code
-    │                                   │
-    │                                   ▼
-    │                           结果写入 Redis
-    │                                   │
-    │                                   ▼
-    │                           POST /api/internal/resume/researcher/{thread_id}
-    │                                   │
-    │       ┌───────────────────────────┘
-    │       ▼
-    │   collect_claude_code_result ──► 封装 ToolMessage
-    │       │
-    │       ▼
-    │   llm_call (继续推理)
-    │
-    ▼
-supervisor 轮询等待 interrupt 恢复
+# 或手动分别启动
+uvicorn backend.app:app --reload --port 8000
+cd frontend && npm run dev
+python -m arq doc_generation.worker.WorkerSettings
 ```
 
-### 关键组件
+访问 `http://localhost:5173`。
 
-| 组件 | 文件 | 说明 |
-|------|------|------|
-| ARQ Worker | `doc_generation/worker.py` | 独立进程，监听 Redis 队列执行 claude_code_tool，结果存入 Redis |
-| 异步派发 | `doc_generation/agents/research_agent.py` | tool_node 将 claude_code 调用派发到 ARQ 队列 |
-| Interrupt/Resume | `doc_generation/agents/research_agent.py` | wait_for_claude_code 节点通过 interrupt 挂起，等待 Worker 完成后恢复 |
-| 回调端点 | `backend/api/routes.py` | `POST /api/internal/resume/researcher/{thread_id}` 恢复子图执行 |
-| Supervisor 适配 | `doc_generation/agents/supervisor.py` | 为每个 researcher 分配独立 thread_id，轮询等待 interrupt 恢复 |
-| MongoDB Checkpointer | `doc_generation/agents/research_agent.py` | researcher 子图使用 MongoDBSaver 支持 interrupt/resume 持久化 |
+## 配置
 
-### 新增依赖
+### 环境变量
 
-- `arq` — 基于 Redis 的异步任务队列
-- `redis` / `redis.asyncio` — Redis 客户端
-- `pymongo` + `langgraph-checkpoint-mongodb` — researcher 子图的 checkpoint 持久化
-- `httpx` — Worker 回调通知
+| 变量 | 默认值 | 说明 |
+|------|--------|------|
+| `MONGODB_URI` | `mongodb://localhost:27017` | MongoDB 连接串 |
+| `REDIS_URL` | `redis://localhost:6379` | Redis 连接串 |
+| `RESUME_CALLBACK_URL` | `http://localhost:8000/api/internal/resume/researcher` | ARQ 完成回调地址 |
+| `CONFIG_PATH` | `config.yml` | 配置文件路径 |
 
-### 配置变更
-
-`config.yml` 新增 `claude_code.cwd` 字段，指定 Claude Code 工具的工作目录：
+### config.yml 主要配置项
 
 ```yaml
 stages:
   prod:
     claude_code:
-      cwd: D:\project\project_data
-```
-
-环境变量：
-- `REDIS_URL` — Redis 连接地址（默认 `redis://localhost:6379`）
-- `MONGODB_URI` — MongoDB 连接地址（默认 `mongodb://localhost:27017`）
-- `RESUME_CALLBACK_URL` — Worker 回调地址（默认 `http://localhost:8000/api/internal/resume/researcher`）
-
-### 启动方式
-
-`start.bat` / `stop.bat` 已更新，自动管理 ARQ Worker 进程：
-
-```bash
-# 手动启动 Worker
-python -m arq doc_generation.worker.WorkerSettings
-```
-
-## Setup
-
-```bash
-cd doc_generation
-python -m venv .venv
-.venv\Scripts\activate
-pip install -e ".[dev]"
-```
-
-## Run
-
-```bash
-# 后端
-uvicorn backend.app:app --reload --port 8000
-
-# 前端
-cd frontend && npm install && npm run dev
-```
-
-## Test
-
-```bash
-pytest
-```
-
-## 工具调用错误处理系统
-
-本项目实现了生产级的工具调用错误处理机制，基于 [AI Agent 错误处理最佳实践](https://agentpatch.ai/blog/ai-agent-error-handling/)：
-
-### 核心特性
-
-- **自动错误分类**：5xx、超时、429、400、401/403 等错误自动分类
-- **智能重试策略**：
-  - 指数退避（5xx、超时）：1s → 2s → 4s
-  - 固定延迟（429）：按 Retry-After 头等待
-  - 不重试（认证错误）：立即抛出
-- **熔断器保护**：短期内频繁失败时自动停止调用
-- **备用工具链**：主工具失败后自动切换到备用工具
-- **成本追踪**：记录调用成本、失败次数，实现渐进式退款
-
-### 使用示例
-
-```python
-from doc_generation.resilience import ResilientTool, load_resilience_config
-
-config = load_resilience_config()
-
-# 包装现有工具
-resilient_search = ResilientTool(
-    tool_fn=tavily_search,
-    tool_name="tavily_search",
-    config=config,
-    fallback_tools=[bing_search],  # 备用工具
-    timeout=30.0
-)
-
-# 调用（自动处理重试、降级、成本追踪）
-result = resilient_search.invoke(query="AI agents")
-```
-
-### 配置
-
-在 `config.yml` 中配置弹性参数：
-
-```yaml
-stages:
-  prod:
+      cwd: D:\project\project_data   # Claude Code 工具工作目录
     resilience:
       retry:
-        max_attempts: 3        # 最大重试次数
-        base_delay: 1.0        # 基础延迟（秒）
-        max_delay: 30.0        # 最大延迟（秒）
-        jitter: true           # 启用抖动
+        max_attempts: 3
+        base_delay: 1.0
+        max_delay: 30.0
       circuit_breaker:
-        failure_threshold: 5   # 失败 5 次后打开熔断器
-        recovery_timeout: 60   # 60 秒后进入半开状态
-      watchdog:
-        default_timeout: 120   # 默认超时 120 秒
+        failure_threshold: 5         # 失败 5 次后熔断
+        recovery_timeout: 60
+    rag:
+      persist_directory: ./chroma_db
+    skills:
+      enabled: [erlang-player-data-storage, erlang-socket-protocol-doc]
 ```
 
-### 成本追踪
+## API
 
-查看工具调用统计：
+| 方法 | 路径 | 说明 |
+|------|------|------|
+| POST | `/api/generate` | 发起文档生成（SSE 流式） |
+| POST | `/api/resume` | 回答澄清问题后恢复 |
+| POST | `/api/retry` | 从 MongoDB 检查点重试 |
+| GET | `/api/tickets` | 查看任务列表 |
 
-```python
-from doc_generation.resilience import get_cost_tracker
+SSE 事件类型：`session` / `status` / `progress` / `interrupt` / `result` / `error`
 
-tracker = get_cost_tracker()
-stats = tracker.get_stats("tavily_search")
-print(f"成功率: {stats.successful_calls}/{stats.total_calls}")
-print(f"总成本: {stats.total_cost}, 退款: {stats.total_refund}")
-```
-
-**详细文档**：[docs/tool_error_handling.md](docs/tool_error_handling.md)
-
-## RAG（Chroma）
-
-在 `config.yml` 的 `stages.<stage>.rag` 中配置 Chroma 持久化目录与集合名。启用后，`research_agent` 会自动绑定 `rag_search` 工具，供 LangGraph 的 `tool_node` 调用。
-
-将文档写入知识库：
+## RAG 知识库
 
 ```bash
+# 导入文档
 doc-generation-rag-ingest skills/public/erlang-socket-protocol-doc/SKILL.md
-# 或
+
+# 批量导入
 python -m doc_generation.rag.ingest path/to/docs/
 ```
 
-在自定义图中使用：
+领域知识文档放在 `skills/public/<name>/SKILL.md`，在 `config.yml` 的 `skills.enabled` 中启用后自动注入对应 Agent 的提示词。
 
-```python
-from doc_generation.tools import _rag_search_tool
+## 容错机制
 
-tools = [_rag_search_tool]
-tools_by_name = {t.name: t for t in tools}
-model_with_tools = model.bind_tools(tools)
+- **重试**：指数退避（5xx/超时），固定延迟（429），不重试（401/403）
+- **熔断器**：短期高频失败后自动停止调用，60s 后半开恢复
+- **LLM 备用链**：OpenAI → DeepSeek → 静态响应，每个角色独立配置
+- **成本追踪**：记录调用次数与成本，支持渐进式退款
+
+详见 [docs/tool_error_handling.md](docs/tool_error_handling.md)。
+
+## Claude Code 异步执行
+
+`claude_code_tool` 通过 ARQ + Redis 异步执行，避免阻塞 LangGraph 主流程：
+
+```
+research_agent
+  └─ dispatch_claude_code_tool ──► ARQ Redis 队列
+  └─ wait_for_claude_code      ──► interrupt 挂起
+
+ARQ Worker（独立进程）
+  └─ 执行 claude_code
+  └─ 结果写入 Redis
+  └─ POST /api/internal/resume/researcher/{thread_id} ──► 恢复子图
+```
+
+## 目录结构
+
+```
+doc_generation/
+├── agents/             # draft_agent, research_agent, supervisor, evaluator, red_team
+├── tools/              # rag_search, think, claude_code
+├── rag/                # ChromaDB 向量存储
+├── skills/             # 可插拔知识注入
+├── states/             # LangGraph State 定义
+├── prompts/            # 各阶段提示词
+├── agent_builder.py    # StateGraph 编译入口
+├── llm.py              # LLM 工厂（含 fallback 链）
+└── worker.py           # ARQ Worker
+backend/
+├── app.py
+├── api/routes.py
+├── service.py          # SSE 流式逻辑
+└── db.py               # MongoDB 操作
+frontend/src/
+├── App.tsx
+├── api.ts
+└── components/         # InputForm, ProgressBar, ClarificationPanel, ReportView
+skills/public/          # 领域知识文档（SKILL.md）
+config.yml
+```
+
+## 测试
+
+```bash
+pytest
 ```

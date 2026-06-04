@@ -60,8 +60,8 @@ stages:
       cwd: D:\project\project_data
     roles:
       supervisor:
-        backend: openai
-        handle: gpt-5.4-mini
+        backend: deepseek
+        handle: deepseek-v4-pro
         max_tokens: 128000
         timeout_seconds: 60
         fallback_chain:
@@ -69,48 +69,48 @@ stages:
             handle: deepseek-v4-flash
           - static: "Supervisor暂时不可用，流程终止。"
       red_team:
-        backend: openai
-        handle: gpt-5.4-mini
+        backend: deepseek
+        handle: deepseek-v4-pro
         max_tokens: 128000
         timeout_seconds: 60
         fallback_chain:
           - backend: deepseek
             handle: deepseek-v4-flash
       context_pruner:
-        backend: openai
-        handle: gpt-5.4-nano
+        backend: deepseek
+        handle: deepseek-v4-pro
         max_tokens: 128000
         timeout_seconds: 60
         fallback_chain:
           - backend: deepseek
             handle: deepseek-v4-flash
       researcher_main:
-        backend: openai
-        handle: gpt-5.4-nano
+        backend: deepseek
+        handle: deepseek-v4-flash
         max_tokens: 128000
         timeout_seconds: 60
         fallback_chain:
           - backend: deepseek
             handle: deepseek-v4-flash
       researcher_summarizer:
-        backend: openai
-        handle: gpt-5.4-nano
+        backend: deepseek
+        handle: deepseek-v4-flash
         max_tokens: 128000
         timeout_seconds: 60
         fallback_chain:
           - backend: deepseek
             handle: deepseek-v4-flash
       researcher_compressor:
-        backend: openai
-        handle: gpt-5.4-nano
+        backend: deepseek
+        handle: deepseek-v4-flash
         max_tokens: 128000
         timeout_seconds: 60
         fallback_chain:
           - backend: deepseek
             handle: deepseek-v4-flash
       writer:
-        backend: openai
-        handle: gpt-5.4-nano
+        backend: deepseek
+        handle: deepseek-v4-flash
         max_tokens: 128000
         timeout_seconds: 60
         fallback_chain:
@@ -118,8 +118,8 @@ stages:
             handle: deepseek-v4-flash
           - static: "报告生成暂时不可用，请稍后重试。"
       draft:
-        backend: openai
-        handle: gpt-5.4-nano
+        backend: deepseek
+        handle: deepseek-v4-pro
         max_tokens: 128000
         timeout_seconds: 60
         fallback_chain:
@@ -127,8 +127,8 @@ stages:
             handle: deepseek-v4-flash
           - static: "草稿生成暂时不可用，请稍后重试。"
       evaluator:
-        backend: openai
-        handle: gpt-5.4-nano
+        backend: deepseek
+        handle: deepseek-v4-flash
         max_tokens: 128000
         timeout_seconds: 60
         fallback_chain:
