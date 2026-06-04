@@ -132,7 +132,7 @@ class ResilientModel:
     def _execute_sync(self, messages: Any, **kwargs: Any) -> Any:
         """同步执行编排：熔断 → 超时 → 重试 → 降级。"""
 
-        # 1. 熔断器检查
+        # 1. 熔断器检查(短路了去尝试一下,如果有fall-back)
         if not self._breaker.allow_request():
             logger.warning("[RESILIENT] Circuit OPEN for backend='%s', skipping to fallback", self._backend)
             return self._fallback_sync(messages, **kwargs)

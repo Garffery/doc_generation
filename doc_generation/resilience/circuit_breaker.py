@@ -34,9 +34,9 @@ class CircuitBreaker:
     def __init__(self, backend: str, config: CircuitBreakerConfig | None = None):
         self.backend = backend
         cfg = config or CircuitBreakerConfig()
-        self._failure_threshold = cfg.failure_threshold
-        self._recovery_timeout = cfg.recovery_timeout
-        self._success_threshold = cfg.success_threshold
+        self._failure_threshold = cfg.failure_threshold   ## 开启断路器的次数阈值
+        self._recovery_timeout = cfg.recovery_timeout     ## 半开的时间间隔
+        self._success_threshold = cfg.success_threshold   ## 关闭断路器的次数阈值
 
         self._state = CircuitState.CLOSED
         self._failure_count = 0

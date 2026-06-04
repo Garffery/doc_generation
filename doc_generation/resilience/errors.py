@@ -167,26 +167,34 @@ def classify_error(exc: Exception, *, backend: str = "", role: str = "") -> LLME
     # 基于 HTTP 状态码分类
     status_code = _get_status_code(exc)
     if status_code is not None:
+        # 429: 速率限制 —— 请求频率超出 API 配额，需等待后重试
         if status_code == 429:
             retry_after = _extract_retry_after(exc)
             return LLMRateLimitError(str(exc), retry_after=retry_after, **common_kwargs)
 
+        # 408: 请求超时；504: 网关超时 —— 服务端未在规定时间内响应
         if status_code in (408, 504):
             return LLMTimeoutError(str(exc), **common_kwargs)
 
+        # 500: 服务器内部错误；502: 网关错误；503: 服务不可用 —— 模型服务过载或暂时故障
         if status_code in (500, 502, 503):
             return LLMModelOverloadedError(str(exc), **common_kwargs)
 
+        # 401: 未认证（API Key 无效/缺失）；403: 无权限（Key 有效但无权访问该资源）
         if status_code in (401, 403):
             return LLMAuthError(str(exc), **common_kwargs)
 
+        # 400: 错误请求 —— 根据响应体内容进一步细分错误类型
         if status_code == 400:
             body = _get_error_body(exc)
             body_lower = body.lower()
+            # 响应体提及认证/授权关键词，归为认证错误
             if "authentication" in body_lower or "authorization" in body_lower:
                 return LLMAuthError(str(exc), **common_kwargs)
+            # 响应体提及内容过滤/安全策略，归为内容审核拦截
             if "content_filter" in body_lower or "content_policy" in body_lower or "safety" in body_lower:
                 return LLMContentFilterError(str(exc), **common_kwargs)
+            # 响应体提及上下文长度/token 超限，归为上下文超长错误
             if "context_length" in body_lower or "max_tokens" in body_lower or "too long" in body_lower:
                 return LLMContextLengthError(str(exc), **common_kwargs)
             return LLMInvalidRequestError(str(exc), **common_kwargs)
