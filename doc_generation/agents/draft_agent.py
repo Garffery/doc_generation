@@ -108,7 +108,7 @@ def write_draft_report(state: AgentState):
     draft_report_prompt = DRAFT_REPORT_PROMPT.format(
         research_brief=research_brief,
         date=get_today_str(),
-        skills_section=_skills_section("write_draft_report"),
+        # skills_section=_skills_section("write_draft_report"),
     )
 
     # 如果有用户澄清回答，追加到 prompt 上下文
